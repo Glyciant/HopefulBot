@@ -1,0 +1,18 @@
+{% include "./header.html" %}
+  <table>
+    <thead>
+      <th>Username</th>
+      <th>Channel</th>
+      <th>Content</th>
+    </thead>
+    <tbody>
+      {% for entry in logs %}
+        <tr>
+          <td title="{{entry.author_id}}">{{entry.author}}</td>
+          <td>#{{entry.channel}}</td>
+          <td title="{{entry.id}}">{{entry.content}}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% include "./footer.html" %}
