@@ -146,7 +146,8 @@ db.twitch_settings.getAll().then(function(data) {
               blacklist: 1000,
               paragraph: 1000,
               actions: 1000,
-              banned_words: []
+              banned_words: [],
+              banned_regex: []
             },
             commands: {
               magic: 800,
@@ -155,6 +156,7 @@ db.twitch_settings.getAll().then(function(data) {
               get: 800,
               emote: 800,
               opemote: 500,
+              pyramid: 500,
               moderators: 800,
               chatters: 800,
               countdown: 800,
@@ -202,11 +204,13 @@ db.twitch_settings.getAll().then(function(data) {
               chance: 3
             },
             quotes: {
-              level: 800,
+              readlevel: 800,
+              addlevel: 600,
               quotes: []
             },
             shoutout: {
-              level: 800,
+              readlevel: 800,
+              addlevel: 500,
               channel: ""
             },
             highlights: {
@@ -292,8 +296,92 @@ db.twitch_settings.getAll().then(function(data) {
           }
         }
       }
-    })
 
+      // Love
+      if (params[0] == ";love") {
+        if (helpers.userLevel(user, data) <= data.settings.commands.love) {
+          var love = Math.floor(Math.random() * 100) + 0
+          client.say(channel, "There is " + love + "% love between " + params[1] + " and " + display_name + " <3")
+        }
+      }
+
+      // Shoutout
+      if (params[0] == ";shoutout") {
+        if (params[1] == "edit") {
+          if (helpers.userLevel(user, data) <= data.settings.shoutout.addlevel) {
+            if (params[2]) {
+              data.settings.shoutout.channel = params[2]
+              db.twitch_settings.update(channel, data)
+              client.say(channel, display_name + " -> Shoutout channel updated.");
+            }
+            else {
+              client.say(channel, display_name + " -> Please include a channel to shoutout.");
+            }
+          }
+        }
+        else {
+          client.say(channel, "Make sure to check out " + data.settings.shoutout.channel + " over at http://twitch.tv/" + data.settings.shoutout.channel.toLowerCase());
+        }
+      }
+
+      // Regulars
+      if (params[0] == ";regulars") {
+        if (helpers.userLevel(user, data) <= 400) {
+          if (params[1] == "add") {
+            if (params[2]) {
+              data.regulars.push(params[2].toLowerCase())
+              db.twitch_settings.update(channel, data)
+              client.say(channel, display_name + " -> " + params[2] + " has been added as a regular.");
+            }
+            else {
+              client.say(channel, display_name + " -> Please include a user to add as a regular.");
+            }
+          }
+          else if (params[1] == "remove") {
+            if (params[2]) {
+              data.regulars.splice(data.regulars.indexOf(params[2]))
+              db.twitch_settings.update(channel, data)
+              client.say(channel, display_name + " -> " + params[2] + " has been removed as a regular.");
+            }
+            else {
+              client.say(channel, display_name + " -> Please include a user to remove as a regular.");
+            }
+          }
+        }
+        if (params[1] == "list") {
+          client.say(channel, display_name + " -> Regulars: " + data.regulars);
+        }
+      }
+
+      // Editors
+      if (params[0] == ";editors") {
+        if (helpers.userLevel(user, data) <= 400) {
+          if (params[1] == "add") {
+            if (params[2]) {
+              data.editors.push(params[2].toLowerCase())
+              db.twitch_settings.update(channel, data)
+              client.say(channel, display_name + " -> " + params[2] + " has been added as a editor.");
+            }
+            else {
+              client.say(channel, display_name + " -> Please include a user to add as a editor.");
+            }
+          }
+          else if (params[1] == "remove") {
+            if (params[2]) {
+              data.editors.splice(data.editors.indexOf(params[2]))
+              db.twitch_settings.update(channel, data)
+              client.say(channel, display_name + " -> " + params[2] + " has been removed as a editor.");
+            }
+            else {
+              client.say(channel, display_name + " -> Please include a user to remove as a editor.");
+            }
+          }
+        }
+        if (params[1] == "list") {
+          client.say(channel, display_name + " -> Editors: " + data.editors);
+        }
+      }
+    })
   });
 })
 
@@ -444,6 +532,14 @@ bot.on("message", function(message) {
         else {
           bot.reply(message, "Silence. You live to tell your story.");
         }
+      }
+    }
+
+    // love
+    if (params[0] == "-love") {
+      if (data.settings.commands.love == true) {
+        var love = Math.floor(Math.random() * 100) + 0
+    		bot.reply(message, "There is " + love + "% love between " + params[1] + " and " + author + " <3")
       }
     }
   })
