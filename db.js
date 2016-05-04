@@ -17,7 +17,7 @@ var discord_logs = {
       })
     })
   },
-  getEntries: () => {
+  getAll: () => {
     return new Promise((resolve, reject) => {
       DiscordLogModel.then((db) => {
         resolve(db)
@@ -28,7 +28,6 @@ var discord_logs = {
 
 var discord_settings = {
   add: (object) => {
-    console.log(object)
     return new Promise((resolve, reject) => {
       DiscordSettingsModel.insert(object).then((db) => {
         resolve(db)
@@ -59,7 +58,7 @@ var twitch_logs = {
       })
     })
   },
-  getEntries: () => {
+  getAll: () => {
     return new Promise((resolve, reject) => {
       TwitchLogModel.then((db) => {
         resolve(db)

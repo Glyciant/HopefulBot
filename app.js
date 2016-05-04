@@ -36,11 +36,33 @@ app.get('/', function(req, res) {
   res.render("index", {title: "Home"})
 });
 
-app.get('/logs/:server/', function(req, res) {
-  db.logs.getEntries(req.param.server).then(function(data) {
-    res.render("logs", {title: "Home", logs: data})
+app.get('/api/v1/twitch/:user/', function(req, res) {
+  db.twitch_settings.get(req.param.user).then(function(data) {
+    res.send(data[0])
   })
-});
+})
+
+app.get('/api/v1/twitch/:user/logs/', function(req, res) {
+  db.twitch_logs.getAll(req.param.user).then(function(data) {
+    res.send(data)
+  })
+})
+
+app.get('/api/v1/discord/:id/', function(req, res) {
+  db.discord_settings.get(req.param.id).then(function(data) {
+    res.send(data[0])
+  })
+})
+
+app.get('/api/v1/discord/:id/logs/', function(req, res) {
+  db.discord_logs.getAll(req.param.id).then(function(data) {
+    res.send(data)
+  })
+})
+
+app.get('/api/*/', function(req, res) {
+  res.send({error: 404, message: "API data not found."})
+})
 
 var channels = []
 db.twitch_settings.getAll().then(function(data) {
@@ -129,7 +151,6 @@ db.twitch_settings.getAll().then(function(data) {
             commands: {
               magic: 800,
               love: 800,
-              roulette: 800,
               uptime: 800,
               get: 800,
               emote: 800,
@@ -175,6 +196,11 @@ db.twitch_settings.getAll().then(function(data) {
               open: false,
               users: []
             },
+            roulette: {
+              level: 800,
+              timeout: 1,
+              chance: 3
+            },
             quotes: {
               level: 800,
               quotes: []
@@ -214,6 +240,59 @@ db.twitch_settings.getAll().then(function(data) {
         }
       }
     }
+    db.twitch_settings.get(channel).then(function(data) {
+      var data = data[0]
+
+      // 8Ball
+      if (params[0] == ";8ball") {
+        if (helpers.userLevel(user, data) <= data.settings.commands.magic) {
+          var answer = Math.floor(Math.random() * 24) + 1
+          if (answer == 1) { client.say(channel, display_name + " -> Yes!")}
+          if (answer == 2) { client.say(channel, display_name + " -> No!")}
+          if (answer == 3) { client.say(channel, display_name + " -> Huh? I... wasn't listening. :P")}
+          if (answer == 4) { client.say(channel, display_name + " -> I could answer that, but I'd have to ban you forever.")}
+          if (answer == 5) { client.say(channel, display_name + " -> The answer is unclear. Trust me, I double checked.")}
+          if (answer == 6) { client.say(channel, display_name + " -> YesNoYesNoYesNoYesNoYesNoYesNoYesNo :P")}
+          if (answer == 7) { client.say(channel, display_name + " -> So, you do think I'm clever?") }
+          if (answer == 8) { client.say(channel, display_name + " -> It's a coin flip really... :\\ ")}
+          if (answer == 9) { client.say(channel, display_name + " -> Today, it's a yes. Tommorow, it will be a no.")}
+          if (answer == 10) { client.say(channel, display_name + " -> Maybe!")}
+          if (answer == 11) { client.say(channel, display_name + " -> Leave it with me.") }
+          if (answer == 12) { client.say(channel, display_name + " -> Ask the question to the nearest mirror three times, and the answer will appear.") }
+          if (answer == 13) { client.say(channel, display_name + " -> Your answer has been posted and should arrive within the next 7 days.") }
+          if (answer == 14) { client.say(channel, display_name + " -> Deal or no deal?") }
+          if (answer == 15) { client.say(channel, display_name + " -> Probably not, sorry bud.") }
+          if (answer == 16) { client.say(channel, display_name + " -> An answer to that question will cost £5. Are you paying by cash or card?") }
+          if (answer == 17) { client.say(channel, display_name + " -> Ask again later.") }
+          if (answer == 18) { client.say(channel, display_name + " -> Are you sure you'd like to know that answer? I don't think you are.") }
+          if (answer == 19) { client.say(channel, display_name + " -> I doubt that.") }
+          if (answer == 20) { client.say(channel, display_name + " -> Sure thing! I think...") }
+          if (answer == 21) { client.say(channel, display_name + " -> Yes, the outlook is good.") }
+          if (answer == 22) { client.say(channel, display_name + " -> I forgot the question, please repeat it.") }
+          if (answer == 23) { client.say(channel, display_name + " -> I don't see why not.") }
+          if (answer == 24) { client.say(channel, display_name + " -> Why would you ask that?") }
+        }
+      }
+
+      // Roulette
+      if (params[0] == ";roulette") {
+        if (helpers.userLevel(user, data) <= data.settings.roulette.level) {
+          var roulette = Math.floor(Math.random() * data.settings.roulette.chance) + 1
+          if (roulette == 1) {
+            if (helpers.userLevel(user, data) <= 500) {
+              client.say(channel, display_name + " -> BANG! You've been shot - but you're saved by your mod armour.");
+            }
+            else {
+              client.timeout(channel, user.username, data.settings.roulette.timeout)
+              client.say(channel, display_name + " -> BANG! You've been shot :(");
+            }
+          }
+          else {
+            client.say(channel, display_name + " -> Silence. You live to tell your story.");
+          }
+        }
+      }
+    })
 
   });
 })
@@ -271,7 +350,6 @@ bot.on("message", function(message) {
             commands: {
               magic: true,
               love: true,
-              roulette: true,
               all_users: true,
               uuid: true,
               uptime: true,
@@ -286,6 +364,10 @@ bot.on("message", function(message) {
             raffle: {
               open: false,
               users: []
+            },
+            roulette: {
+              enabled: true,
+              chance: 3
             }
           }
         })
@@ -316,4 +398,53 @@ bot.on("message", function(message) {
       }
     }
   }
+
+  db.discord_settings.get(server_id).then(function(data) {
+    var data = data[0]
+
+    // 8Ball
+    if (params[0] == "-8ball") {
+      if (data.settings.commands.magic == true) {
+        var answer = Math.floor(Math.random() * 24) + 1
+    		if (answer == 1) { bot.reply(message, "Yes!")}
+    		if (answer == 2) { bot.reply(message, "No!")}
+    		if (answer == 3) { bot.reply(message, "Huh? I... wasn't listening. :P")}
+    		if (answer == 4) { bot.reply(message, "I could answer that, but I'd have to ban you forever.")}
+    		if (answer == 5) { bot.reply(message, "The answer is unclear. Trust me, I double checked.")}
+    		if (answer == 6) { bot.reply(message, "YesNoYesNoYesNoYesNoYesNoYesNoYesNo :P")}
+    		if (answer == 7) { bot.reply(message, "So, you do think I'm clever?") }
+    		if (answer == 8) { bot.reply(message, "It's a coin flip really... :\\ ")}
+    		if (answer == 9) { bot.reply(message, "Today, it's a yes. Tommorow, it will be a no.")}
+    		if (answer == 10) { bot.reply(message, "Maybe!")}
+    		if (answer == 11) { bot.reply(message, "Leave it with me.") }
+    		if (answer == 12) { bot.reply(message, "Ask the question to the nearest mirror three times, and the answer will appear.") }
+    		if (answer == 13) { bot.reply(message, "Your answer has been posted and should arrive within the next 7 days.") }
+    		if (answer == 14) { bot.reply(message, "Deal or no deal?") }
+    		if (answer == 15) { bot.reply(message, "Probably not, sorry bud.") }
+    		if (answer == 16) { bot.reply(message, "An answer to that question will cost £5. Are you paying by cash or card?") }
+    		if (answer == 17) { bot.reply(message, "Ask again later.") }
+    		if (answer == 18) { bot.reply(message, "Are you sure you'd like to know that answer? I don't think you are.") }
+    		if (answer == 19) { bot.reply(message, "I doubt that.") }
+    		if (answer == 20) { bot.reply(message, "Sure thing! I think...") }
+    		if (answer == 21) { bot.reply(message, "Yes, the outlook is good.") }
+    		if (answer == 22) { bot.reply(message, "I forgot the question, please repeat it.") }
+    		if (answer == 23) { bot.reply(message, "I don't see why not.") }
+    		if (answer == 24) { bot.reply(message, "Why would you ask that?") }
+      }
+    }
+
+    // Roulette
+    if (params[0] == "-roulette") {
+      if (data.settings.roulette.enabled == true) {
+        var roulette = Math.floor(Math.random() * data.settings.roulette.chance) + 1
+        if (roulette == 1) {
+          bot.deleteMessage(message)
+          bot.reply(message, "BANG! You've been shot :(");
+        }
+        else {
+          bot.reply(message, "Silence. You live to tell your story.");
+        }
+      }
+    }
+  })
 })
