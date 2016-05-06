@@ -10,7 +10,7 @@ schema.primarykey = {
   discordlogs: "id",
   twitchsettings: "id",
   twitchlogs: "id"
-}
+};
 
 schema.discordlogs = {
   id: type.string(),
@@ -20,18 +20,30 @@ schema.discordlogs = {
   server_id: type.string(),
   content: type.string(),
   date: type.date()
-}
+};
 
 schema.twitchsettings = {
   id: type.string(),
   discord: type.string()
-}
+};
 
 schema.twitchlogs = {
   id: type.string(),
   display_name: type.string(),
   date: type.date(),
   content: type.string()
-}
+};
 
-module.exports = schema
+schema.commands = {
+  id: type.string(),
+  response: type.string(),
+  channel: type.string(),
+  cost: type.number(),
+  add: type.number(),
+  cooldown: type.number(),
+  reactivate_twitch: type.date(),
+  reactivate_discord: type.date(),
+  count: type.number()
+};
+
+module.exports = schema;

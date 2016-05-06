@@ -3,10 +3,10 @@ var config = require("./config"),
     helpers = require("./helpers"),
     schema = require("./schema"),
     express = require("express"),
-    session = require("express-session")
+    session = require("express-session"),
     app = express(),
     discord = require("discord.js"),
-    tmi = require("tmi.js")
+    tmi = require("tmi.js"),
     swig = require("swig"),
     restler = require("restler"),
     bodyParser = require("body-parser"),
@@ -33,51 +33,51 @@ app.get('*', function(req, res, next) {
 });
 
 app.get('/', function(req, res) {
-  res.render("index", {title: "Home"})
+  res.render("index", {title: "Home"});
 });
 
 app.get('/api/v1/twitch/:user/', function(req, res) {
   db.twitch_settings.get(req.param.user).then(function(data) {
-    res.send(data[0])
-  })
-})
+    res.send(data[0]);
+  });
+});
 
 app.get('/api/v1/twitch/:user/logs/', function(req, res) {
   db.twitch_logs.getAll(req.param.user).then(function(data) {
-    res.send(data)
-  })
-})
+    res.send(data);
+  });
+});
 
 app.get('/api/v1/discord/:id/', function(req, res) {
   db.discord_settings.get(req.param.id).then(function(data) {
-    res.send(data[0])
-  })
-})
+    res.send(data[0]);
+  });
+});
 
 app.get('/api/v1/discord/:id/logs/', function(req, res) {
   db.discord_logs.getAll(req.param.id).then(function(data) {
-    res.send(data)
-  })
-})
+    res.send(data);
+  });
+});
 
 app.get('/api/*/', function(req, res) {
-  res.send({error: 404, message: "API data not found."})
-})
+  res.send({error: 404, message: "API data not found."});
+});
 
-var channels = []
+var channels = [];
 db.twitch_settings.getAll().then(function(data) {
   for (var i in data) {
-    channels.push(data[i].id)
+    channels.push(data[i].id);
   }
 
-  channels.splice(channels.length - 1)
+  channels.splice(channels.length - 1);
 
   if (channels.indexOf("#heepsbot") < 0) {
-    channels.push("#heepsbot")
+    channels.push("#heepsbot");
   }
 
   if (channels.indexOf("#heep123") < 0) {
-    channels.push("#heep123")
+    channels.push("#heep123");
   }
 
   var ircoptions = {
@@ -104,35 +104,35 @@ db.twitch_settings.getAll().then(function(data) {
         params = message.split(' ');
 
     // Logging
-    db.twitch_logs.addEntry({"display_name": display_name, date: date, content: message})
+    db.twitch_logs.addEntry({"display_name": display_name, date: date, content: message});
 
     // Join Channel
     if (params[0] == ";join") {
       if (channel == "#heep123" || channel == "#heepsbot") {
-        if ((user["user-type"] == "global_mod" || user["user-type"] == "admin" || user["user-type"] == "staff" || helpers.isAdmin(display_name) == true) && params[1]) {
-          client.join("#" + params[1])
-          client.say("#" + params[1], "Hi! I have been sent to this channel by " + display_name + " in " + channel + ". If you don't want me here, type '~leave'. Otherwise, type '~setup' get started.")
-          client.say(channel, display_name + " -> Joining channel #" + params[1] + "...")
+        if ((user["user-type"] == "global_mod" || user["user-type"] == "admin" || user["user-type"] == "staff" || helpers.isAdmin(display_name) === true) && params[1]) {
+          client.join("#" + params[1]);
+          client.say("#" + params[1], "Hi! I have been sent to this channel by " + display_name + " in " + channel + ". If you don't want me here, type '~leave'. Otherwise, type '~setup' get started.");
+          client.say(channel, display_name + " -> Joining channel #" + params[1] + "...");
         }
         else {
-          client.join("#" + user.username)
-          client.say("#" + user.username, "Hi! I have been sent to this channel by " + display_name + " in " + channel + ". If you don't want me here, type '~leave'. Otherwise, type '~setup' get started.")
-          client.say(channel, display_name + " -> Joining channel #" + user.username + "...")
+          client.join("#" + user.username);
+          client.say("#" + user.username, "Hi! I have been sent to this channel by " + display_name + " in " + channel + ". If you don't want me here, type '~leave'. Otherwise, type '~setup' get started.");
+          client.say(channel, display_name + " -> Joining channel #" + user.username + "...");
         }
       }
     }
 
     // Leave Channel
     if (params[0] == ";leave") {
-      if (user["user-type"] == "global_mod" || user["user-type"] == "admin" || user["user-type"] == "staff" || helpers.isAdmin(display_name) == true || channel.replace("#","") == user.username) {
-        client.say(channel, display_name + " -> Leaving channel...")
-        client.leave(channel)
+      if (user["user-type"] == "global_mod" || user["user-type"] == "admin" || user["user-type"] == "staff" || helpers.isAdmin(display_name) === true || channel.replace("#","") == user.username) {
+        client.say(channel, display_name + " -> Leaving channel...");
+        client.leave(channel);
       }
     }
 
     // Setup
     if (params[0] == ";setup") {
-      if (user["user-type"] == "global_mod" || user["user-type"] == "admin" || user["user-type"] == "staff" || helpers.isAdmin(display_name) == true || channel.replace("#","") == user.username) {
+      if (user["user-type"] == "global_mod" || user["user-type"] == "admin" || user["user-type"] == "staff" || helpers.isAdmin(display_name) === true || channel.replace("#","") == user.username) {
         db.twitch_settings.add({
           id: channel,
           discord: "",
@@ -219,75 +219,75 @@ db.twitch_settings.getAll().then(function(data) {
             },
             timers: []
           }
-        })
-        client.say(channel, display_name + " -> Setup completed.")
+        });
+        client.say(channel, display_name + " -> Setup completed.");
       }
     }
 
     // Handle Discord
     if (params[0] == ";discord") {
-      if (user["user-type"] == "global_mod" || user["user-type"] == "admin" || user["user-type"] == "staff" || helpers.isAdmin(display_name) == true || channel.replace("#","") == user.username) {
+      if (user["user-type"] == "global_mod" || user["user-type"] == "admin" || user["user-type"] == "staff" || helpers.isAdmin(display_name) === true || channel.replace("#","") == user.username) {
         if (params[1] == "getbot") {
-          client.say(channel, display_name + " -> Get the Heepsbot for Discord here: https://discordapp.com/oauth2/authorize?&client_id=176399298655682571&scope=bot&permissions=257054")
+          client.say(channel, display_name + " -> Get the Heepsbot for Discord here: https://discordapp.com/oauth2/authorize?&client_id=176399298655682571&scope=bot&permissions=257054");
         }
         else if (params[1] == "server") {
           if (params[2]) {
             db.twitch_settings.get(channel).then(function(data) {
-              data[0].discord = params[2]
-              db.twitch_settings.update(channel, data[0])
-            })
-            client.say(channel, display_name + " -> Discord server has been set.")
+              data[0].discord = params[2];
+              db.twitch_settings.update(channel, data[0]);
+            });
+            client.say(channel, display_name + " -> Discord server has been set.");
           }
           else {
-            client.say(channel, display_name + " -> Please include a server ID in your message.")
+            client.say(channel, display_name + " -> Please include a server ID in your message.");
           }
         }
       }
     }
     db.twitch_settings.get(channel).then(function(data) {
-      var data = data[0]
+      var data = data[0];
 
       // 8Ball
       if (params[0] == ";8ball") {
         if (helpers.userLevel(user, data) <= data.settings.commands.magic) {
-          var answer = Math.floor(Math.random() * 24) + 1
-          if (answer == 1) { client.say(channel, display_name + " -> Yes!")}
-          if (answer == 2) { client.say(channel, display_name + " -> No!")}
-          if (answer == 3) { client.say(channel, display_name + " -> Huh? I... wasn't listening. :P")}
-          if (answer == 4) { client.say(channel, display_name + " -> I could answer that, but I'd have to ban you forever.")}
-          if (answer == 5) { client.say(channel, display_name + " -> The answer is unclear. Trust me, I double checked.")}
-          if (answer == 6) { client.say(channel, display_name + " -> YesNoYesNoYesNoYesNoYesNoYesNoYesNo :P")}
-          if (answer == 7) { client.say(channel, display_name + " -> So, you do think I'm clever?") }
-          if (answer == 8) { client.say(channel, display_name + " -> It's a coin flip really... :\\ ")}
-          if (answer == 9) { client.say(channel, display_name + " -> Today, it's a yes. Tommorow, it will be a no.")}
-          if (answer == 10) { client.say(channel, display_name + " -> Maybe!")}
-          if (answer == 11) { client.say(channel, display_name + " -> Leave it with me.") }
-          if (answer == 12) { client.say(channel, display_name + " -> Ask the question to the nearest mirror three times, and the answer will appear.") }
-          if (answer == 13) { client.say(channel, display_name + " -> Your answer has been posted and should arrive within the next 7 days.") }
-          if (answer == 14) { client.say(channel, display_name + " -> Deal or no deal?") }
-          if (answer == 15) { client.say(channel, display_name + " -> Probably not, sorry bud.") }
-          if (answer == 16) { client.say(channel, display_name + " -> An answer to that question will cost £5. Are you paying by cash or card?") }
-          if (answer == 17) { client.say(channel, display_name + " -> Ask again later.") }
-          if (answer == 18) { client.say(channel, display_name + " -> Are you sure you'd like to know that answer? I don't think you are.") }
-          if (answer == 19) { client.say(channel, display_name + " -> I doubt that.") }
-          if (answer == 20) { client.say(channel, display_name + " -> Sure thing! I think...") }
-          if (answer == 21) { client.say(channel, display_name + " -> Yes, the outlook is good.") }
-          if (answer == 22) { client.say(channel, display_name + " -> I forgot the question, please repeat it.") }
-          if (answer == 23) { client.say(channel, display_name + " -> I don't see why not.") }
-          if (answer == 24) { client.say(channel, display_name + " -> Why would you ask that?") }
+          var answer = Math.floor(Math.random() * 24) + 1;
+          if (answer == 1) { client.say(channel, display_name + " -> Yes!"); }
+          if (answer == 2) { client.say(channel, display_name + " -> No!"); }
+          if (answer == 3) { client.say(channel, display_name + " -> Huh? I... wasn't listening. :P"); }
+          if (answer == 4) { client.say(channel, display_name + " -> I could answer that, but I'd have to ban you forever."); }
+          if (answer == 5) { client.say(channel, display_name + " -> The answer is unclear. Trust me, I double checked."); }
+          if (answer == 6) { client.say(channel, display_name + " -> YesNoYesNoYesNoYesNoYesNoYesNoYesNo :P"); }
+          if (answer == 7) { client.say(channel, display_name + " -> So, you do think I'm clever?"); }
+          if (answer == 8) { client.say(channel, display_name + " -> It's a coin flip really... :\\ "); }
+          if (answer == 9) { client.say(channel, display_name + " -> Today, it's a yes. Tommorow, it will be a no."); }
+          if (answer == 10) { client.say(channel, display_name + " -> Maybe!"); }
+          if (answer == 11) { client.say(channel, display_name + " -> Leave it with me."); }
+          if (answer == 12) { client.say(channel, display_name + " -> Ask the question to the nearest mirror three times, and the answer will appear."); }
+          if (answer == 13) { client.say(channel, display_name + " -> Your answer has been posted and should arrive within the next 7 days."); }
+          if (answer == 14) { client.say(channel, display_name + " -> Deal or no deal?"); }
+          if (answer == 15) { client.say(channel, display_name + " -> Probably not, sorry bud."); }
+          if (answer == 16) { client.say(channel, display_name + " -> An answer to that question will cost £5. Are you paying by cash or card?"); }
+          if (answer == 17) { client.say(channel, display_name + " -> Ask again later."); }
+          if (answer == 18) { client.say(channel, display_name + " -> Are you sure you'd like to know that answer? I don't think you are."); }
+          if (answer == 19) { client.say(channel, display_name + " -> I doubt that."); }
+          if (answer == 20) { client.say(channel, display_name + " -> Sure thing! I think..."); }
+          if (answer == 21) { client.say(channel, display_name + " -> Yes, the outlook is good."); }
+          if (answer == 22) { client.say(channel, display_name + " -> I forgot the question, please repeat it."); }
+          if (answer == 23) { client.say(channel, display_name + " -> I don't see why not."); }
+          if (answer == 24) { client.say(channel, display_name + " -> Why would you ask that?"); }
         }
       }
 
       // Roulette
       if (params[0] == ";roulette") {
         if (helpers.userLevel(user, data) <= data.settings.roulette.level) {
-          var roulette = Math.floor(Math.random() * data.settings.roulette.chance) + 1
+          var roulette = Math.floor(Math.random() * data.settings.roulette.chance) + 1;
           if (roulette == 1) {
             if (helpers.userLevel(user, data) <= 500) {
               client.say(channel, display_name + " -> BANG! You've been shot - but you're saved by your mod armour.");
             }
             else {
-              client.timeout(channel, user.username, data.settings.roulette.timeout)
+              client.timeout(channel, user.username, data.settings.roulette.timeout);
               client.say(channel, display_name + " -> BANG! You've been shot :(");
             }
           }
@@ -300,8 +300,8 @@ db.twitch_settings.getAll().then(function(data) {
       // Love
       if (params[0] == ";love") {
         if (helpers.userLevel(user, data) <= data.settings.commands.love) {
-          var love = Math.floor(Math.random() * 100) + 0
-          client.say(channel, "There is " + love + "% love between " + params[1] + " and " + display_name + " <3")
+          var love = Math.floor(Math.random() * 100) + 0;
+          client.say(channel, "There is " + love + "% love between " + params[1] + " and " + display_name + " <3");
         }
       }
 
@@ -310,8 +310,8 @@ db.twitch_settings.getAll().then(function(data) {
         if (params[1] == "edit") {
           if (helpers.userLevel(user, data) <= data.settings.shoutout.addlevel) {
             if (params[2]) {
-              data.settings.shoutout.channel = params[2]
-              db.twitch_settings.update(channel, data)
+              data.settings.shoutout.channel = params[2];
+              db.twitch_settings.update(channel, data);
               client.say(channel, display_name + " -> Shoutout channel updated.");
             }
             else {
@@ -329,8 +329,8 @@ db.twitch_settings.getAll().then(function(data) {
         if (helpers.userLevel(user, data) <= 400) {
           if (params[1] == "add") {
             if (params[2]) {
-              data.regulars.push(params[2].toLowerCase())
-              db.twitch_settings.update(channel, data)
+              data.regulars.push(params[2].toLowerCase());
+              db.twitch_settings.update(channel, data);
               client.say(channel, display_name + " -> " + params[2] + " has been added as a regular.");
             }
             else {
@@ -339,8 +339,8 @@ db.twitch_settings.getAll().then(function(data) {
           }
           else if (params[1] == "remove") {
             if (params[2]) {
-              data.regulars.splice(data.regulars.indexOf(params[2]))
-              db.twitch_settings.update(channel, data)
+              data.regulars.splice(data.regulars.indexOf(params[2]));
+              db.twitch_settings.update(channel, data);
               client.say(channel, display_name + " -> " + params[2] + " has been removed as a regular.");
             }
             else {
@@ -358,8 +358,8 @@ db.twitch_settings.getAll().then(function(data) {
         if (helpers.userLevel(user, data) <= 400) {
           if (params[1] == "add") {
             if (params[2]) {
-              data.editors.push(params[2].toLowerCase())
-              db.twitch_settings.update(channel, data)
+              data.editors.push(params[2].toLowerCase());
+              db.twitch_settings.update(channel, data);
               client.say(channel, display_name + " -> " + params[2] + " has been added as a editor.");
             }
             else {
@@ -368,8 +368,8 @@ db.twitch_settings.getAll().then(function(data) {
           }
           else if (params[1] == "remove") {
             if (params[2]) {
-              data.editors.splice(data.editors.indexOf(params[2]))
-              db.twitch_settings.update(channel, data)
+              data.editors.splice(data.editors.indexOf(params[2]));
+              db.twitch_settings.update(channel, data);
               client.say(channel, display_name + " -> " + params[2] + " has been removed as a editor.");
             }
             else {
@@ -381,13 +381,110 @@ db.twitch_settings.getAll().then(function(data) {
           client.say(channel, display_name + " -> Editors: " + data.editors);
         }
       }
-    })
+
+      // Commands
+      db.commands.getAll(channels).then(function(commands) {
+        // Edit/View Commands
+        if (params[0] == ";commands") {
+          if (params[1] == "add") {
+            if (params[2] && params[3]) {
+              db.commands.getCommand(params[2], channel).then(function(command) {
+                if (command[0]) {
+                  client.say(channel, display_name + " -> A command with that name already exists.");
+                }
+                else {
+                  var commandText = message.replace(params[0] + " ", ""),
+                      commandText = commandText.replace(params[1] + " ", ""),
+                      commandText = commandText.replace(params[2] + " ", "");
+
+                  if (commandText.indexOf("<ul>") >= 0 && commandText.indexOf("</ul>") >= 0) {
+                    var level = parseInt(commandText.substring(commandText.lastIndexOf("<ul>")+4,commandText.lastIndexOf("</ul>")));
+                    if (isNaN(level)) {
+                      var level = 0;
+                    }
+                  }
+                  else {
+                    var level = 0;
+                  }
+                  if (commandText.indexOf("<pc>") >= 0 && commandText.indexOf("</pc>") >= 0) {
+                    var cost = parseInt(commandText.substring(commandText.lastIndexOf("<pc>")+4,commandText.lastIndexOf("</pc>")));
+                    if (isNaN(cost)) {
+                      var cost = 0;
+                    }
+                  }
+                  else {
+                    var cost = 0;
+                  }
+                  if (commandText.indexOf("<ap>") >= 0 && commandText.indexOf("</ap>") >= 0) {
+                    var add = parseInt(commandText.substring(commandText.lastIndexOf("<ap>")+4,commandText.lastIndexOf("</ap>")));
+                    if (isNaN(add)) {
+                      var add = 0;
+                    }
+                  }
+                  else {
+                    var add = 0;
+                  }
+                  if (commandText.indexOf("<cd>") >= 0 && commandText.indexOf("</cd>") >= 0) {
+                    var cooldown = parseInt(commandText.substring(commandText.lastIndexOf("<cd>")+4,commandText.lastIndexOf("</cd>")));
+                    if (isNaN(cooldown)) {
+                      var cooldown = 0;
+                    }
+                  }
+                  else {
+                    var cooldown = 0;
+                  }
+
+                  commandText = commandText.replace(/(<[A-z]{1,3}>.*<\/[A-z]{1,3}>)/g, "");
+                  commandText = commandText.trim();
+
+                  db.commands.add({
+                    id: params[2],
+                    response: commandText,
+                    channel: channel,
+                    level: level,
+                    cost: cost,
+                    add: add,
+                    cooldown: cooldown,
+                    reactivate_twitch: null,
+                    reactivate_discord: null,
+                    count: 0
+                  });
+                  client.say(channel, display_name + " -> Command " + params[2] + " has been added.");
+                }
+              });
+            }
+          }
+          else if (params[1] == "list") {
+
+          }
+          else if (params[1] == "remove") {
+            db.commands.getCommand(params[2], channel).then(function(command) {
+              if (command[0]) {
+                db.commands.delete(params[2], channel);
+                client.say(channel, display_name + " -> Command " + params[2] + " has been deleted.");
+              }
+              else {
+                client.say(channel, display_name + " -> A command with that name does not exist.");
+              }
+            });
+          }
+        }
+
+        // Trigger Commands
+        db.commands.getCommand(params[0], channel).then(function(command) {
+          var command = command[0];
+          client.say(channel, command.response);
+          command.count = command.count + 1;
+          db.commands.update(command);
+        });
+      });
+    });
   });
-})
+});
 
 bot.loginWithToken(config.bot.discord).then(success).catch(err);
-function success(token){ console.log("Login Successful!") }
-function err(error){ console.log("Login Failed! Arguments: " + arguments) }
+function success(token){ console.log("Login Successful!"); }
+function err(error){ console.log("Login Failed! Arguments: " + arguments); }
 
 bot.on("message", function(message) {
   var author_id = message.author.id,
@@ -395,18 +492,18 @@ bot.on("message", function(message) {
       server_id = message.channel.server.id,
       author = message.author.username,
       channel = message.channel.name,
-      server = message.channel.server.name
+      server = message.channel.server.name;
       content = message.content,
       params = content.split(' '),
       message_id = message.id,
-      date = new Date()
+      date = new Date();
 
   // Logging
-  db.discord_logs.addEntry({id: message_id, author_id: author_id, author: author, channel: channel, server_id: server_id, content: content, date: date})
+  db.discord_logs.addEntry({id: message_id, author_id: author_id, author: author, channel: channel, server_id: server_id, content: content, date: date});
 
   // Get Server ID
   if (params[0] == "-serverid") {
-    bot.reply(message, "This server's ID is: " + server_id)
+    bot.reply(message, "This server's ID is: " + server_id);
   }
 
   // Setup
@@ -458,10 +555,10 @@ bot.on("message", function(message) {
               chance: 3
             }
           }
-        })
-        bot.reply(message, "Setup Complete")
-      })
-    })
+        });
+        bot.reply(message, "Setup Complete");
+      });
+    });
   }
 
   // Handle Twitch
@@ -471,62 +568,62 @@ bot.on("message", function(message) {
         db.twitch_settings.getLink(server_id).then(function(link) {
           if (link !== [] && link[0].id == "#" + params[2]) {
             db.discord_settings.get(server_id).then(function(data) {
-              data[0].twitch = "#" + params[2]
-              db.discord_settings.update(server_id, data[0])
-            })
-            bot.reply(message, "Twitch channel has been set.")
+              data[0].twitch = "#" + params[2];
+              db.discord_settings.update(server_id, data[0]);
+            });
+            bot.reply(message, "Twitch channel has been set.");
           }
           else {
-            bot.reply(message, "Could not set channel; the channel named has not set this server as theirs.")
+            bot.reply(message, "Could not set channel; the channel named has not set this server as theirs.");
           }
-        })
+        });
       }
       else {
-        bot.reply(message, "Please include a Twitch username in your message.")
+        bot.reply(message, "Please include a Twitch username in your message.");
       }
     }
   }
 
   db.discord_settings.get(server_id).then(function(data) {
-    var data = data[0]
+    var data = data[0];
 
     // 8Ball
     if (params[0] == "-8ball") {
-      if (data.settings.commands.magic == true) {
-        var answer = Math.floor(Math.random() * 24) + 1
-    		if (answer == 1) { bot.reply(message, "Yes!")}
-    		if (answer == 2) { bot.reply(message, "No!")}
-    		if (answer == 3) { bot.reply(message, "Huh? I... wasn't listening. :P")}
-    		if (answer == 4) { bot.reply(message, "I could answer that, but I'd have to ban you forever.")}
-    		if (answer == 5) { bot.reply(message, "The answer is unclear. Trust me, I double checked.")}
-    		if (answer == 6) { bot.reply(message, "YesNoYesNoYesNoYesNoYesNoYesNoYesNo :P")}
-    		if (answer == 7) { bot.reply(message, "So, you do think I'm clever?") }
-    		if (answer == 8) { bot.reply(message, "It's a coin flip really... :\\ ")}
-    		if (answer == 9) { bot.reply(message, "Today, it's a yes. Tommorow, it will be a no.")}
-    		if (answer == 10) { bot.reply(message, "Maybe!")}
-    		if (answer == 11) { bot.reply(message, "Leave it with me.") }
-    		if (answer == 12) { bot.reply(message, "Ask the question to the nearest mirror three times, and the answer will appear.") }
-    		if (answer == 13) { bot.reply(message, "Your answer has been posted and should arrive within the next 7 days.") }
-    		if (answer == 14) { bot.reply(message, "Deal or no deal?") }
-    		if (answer == 15) { bot.reply(message, "Probably not, sorry bud.") }
-    		if (answer == 16) { bot.reply(message, "An answer to that question will cost £5. Are you paying by cash or card?") }
-    		if (answer == 17) { bot.reply(message, "Ask again later.") }
-    		if (answer == 18) { bot.reply(message, "Are you sure you'd like to know that answer? I don't think you are.") }
-    		if (answer == 19) { bot.reply(message, "I doubt that.") }
-    		if (answer == 20) { bot.reply(message, "Sure thing! I think...") }
-    		if (answer == 21) { bot.reply(message, "Yes, the outlook is good.") }
-    		if (answer == 22) { bot.reply(message, "I forgot the question, please repeat it.") }
-    		if (answer == 23) { bot.reply(message, "I don't see why not.") }
-    		if (answer == 24) { bot.reply(message, "Why would you ask that?") }
+      if (data.settings.commands.magic === true) {
+        var answer = Math.floor(Math.random() * 24) + 1;
+    		if (answer == 1) { bot.reply(message, "Yes!"); }
+    		if (answer == 2) { bot.reply(message, "No!"); }
+    		if (answer == 3) { bot.reply(message, "Huh? I... wasn't listening. :P"); }
+    		if (answer == 4) { bot.reply(message, "I could answer that, but I'd have to ban you forever."); }
+    		if (answer == 5) { bot.reply(message, "The answer is unclear. Trust me, I double checked."); }
+    		if (answer == 6) { bot.reply(message, "YesNoYesNoYesNoYesNoYesNoYesNoYesNo :P"); }
+    		if (answer == 7) { bot.reply(message, "So, you do think I'm clever?"); }
+    		if (answer == 8) { bot.reply(message, "It's a coin flip really... :\\ "); }
+    		if (answer == 9) { bot.reply(message, "Today, it's a yes. Tommorow, it will be a no."); }
+    		if (answer == 10) { bot.reply(message, "Maybe!" ); }
+    		if (answer == 11) { bot.reply(message, "Leave it with me."); }
+    		if (answer == 12) { bot.reply(message, "Ask the question to the nearest mirror three times, and the answer will appear."); }
+    		if (answer == 13) { bot.reply(message, "Your answer has been posted and should arrive within the next 7 days."); }
+    		if (answer == 14) { bot.reply(message, "Deal or no deal?"); }
+    		if (answer == 15) { bot.reply(message, "Probably not, sorry bud."); }
+    		if (answer == 16) { bot.reply(message, "An answer to that question will cost £5. Are you paying by cash or card?"); }
+    		if (answer == 17) { bot.reply(message, "Ask again later."); }
+    		if (answer == 18) { bot.reply(message, "Are you sure you'd like to know that answer? I don't think you are."); }
+    		if (answer == 19) { bot.reply(message, "I doubt that."); }
+    		if (answer == 20) { bot.reply(message, "Sure thing! I think..."); }
+    		if (answer == 21) { bot.reply(message, "Yes, the outlook is good."); }
+    		if (answer == 22) { bot.reply(message, "I forgot the question, please repeat it."); }
+    		if (answer == 23) { bot.reply(message, "I don't see why not."); }
+    		if (answer == 24) { bot.reply(message, "Why would you ask that?"); }
       }
     }
 
     // Roulette
     if (params[0] == "-roulette") {
-      if (data.settings.roulette.enabled == true) {
-        var roulette = Math.floor(Math.random() * data.settings.roulette.chance) + 1
+      if (data.settings.roulette.enabled === true) {
+        var roulette = Math.floor(Math.random() * data.settings.roulette.chance) + 1;
         if (roulette == 1) {
-          bot.deleteMessage(message)
+          bot.deleteMessage(message);
           bot.reply(message, "BANG! You've been shot :(");
         }
         else {
@@ -537,10 +634,10 @@ bot.on("message", function(message) {
 
     // love
     if (params[0] == "-love") {
-      if (data.settings.commands.love == true) {
-        var love = Math.floor(Math.random() * 100) + 0
-    		bot.reply(message, "There is " + love + "% love between " + params[1] + " and " + author + " <3")
+      if (data.settings.commands.love === true) {
+        var love = Math.floor(Math.random() * 100) + 0;
+    		bot.reply(message, "There is " + love + "% love between " + params[1] + " and " + author + " <3");
       }
     }
-  })
-})
+  });
+});
