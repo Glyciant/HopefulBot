@@ -33,7 +33,127 @@ app.get('*', function(req, res, next) {
 });
 
 app.get('/', function(req, res) {
-  res.render("index", {title: "Home"});
+  res.render("index", {title: "Home", theme: "Neutral"});
+});
+
+app.get('/', function(req, res) {
+  res.render("index", {title: "Help", theme: "Neutral"});
+});
+
+app.get('/dashboard/', function(req, res) {
+  res.render("dashboard", {title: "Dashboard", theme: "Neutral"});
+});
+
+app.get('/dashboard/api/', function(req, res) {
+  res.render("api", {title: "Manage API Data", theme: "Neutral"});
+});
+
+app.get('/dashboard/twitch/', function(req, res) {
+  res.render("twitch", {title: "Twitch Dashboard", theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/alerts/', function(req, res) {
+  res.render("twitch_alerts", {title: "Twitch Chat Alerts", theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/autowelcome/', function(req, res) {
+  res.render("twitch_autowelcome", {title: "Twitch Auto-Welcome", theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/commands/', function(req, res) {
+  res.render("twitch_commands", {title: "Custom Commands", theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/highlights/', function(req, res) {
+  res.render("twitch_highlights", {title: "Twitch Highlight Markers", theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/levels/', function(req, res) {
+  res.render("twitch_levels", {title: "Twitch Command User-Levels", theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/logs/', function(req, res) {
+  res.render("twitch_logs", {title: "Twitch Chat Logs", theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/points/', function(req, res) {
+  res.render("twitch_points", {title: "Twitch Points", theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/points/autopoints/', function(req, res) {
+  res.render("twitch_points_autopoints", {title: "Twitch Auto-Points", theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/points/claim/', function(req, res) {
+  res.render("twitch_points_claim", {title: "Twitch Points Claim", theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/points/:user/', function(req, res) {
+  res.render("twitch_points_user", {title: "Twitch Points: " + req.param.user, theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/poll/', function(req, res) {
+  res.render("twitch_poll", {title: "Twitch Poll", theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/poll/overlay/', function(req, res) {
+  res.render("twitch_poll_overlay", {title: "Twitch Poll Stream Overlay", theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/raffle/', function(req, res) {
+  res.render("twitch_raffle", {title: "Twitch Raffle", theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/raffle/overlay/', function(req, res) {
+  res.render("twitch_raffle_overlay", {title: "Twitch Raffle Stream Overlay", theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/shoutout/', function(req, res) {
+  res.render("twitch_shoutout", {title: "Twitch Shoutout", theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/spam/', function(req, res) {
+  res.render("twitch_spam", {title: "Twitch Spam Protection", theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/timers/', function(req, res) {
+  res.render("twitch_timers", {title: "Twitch Timers", theme: "Twitch"});
+});
+
+app.get('/dashboard/twitch/users/', function(req, res) {
+  res.render("twitch_users", {title: "Twitch Users", theme: "Twitch"});
+});
+
+app.get('/dashboard/discord/', function(req, res) {
+  res.render("discord", {title: "Discord Dashboard", theme: "Discord"});
+});
+
+app.get('/dashboard/discord/commands/', function(req, res) {
+  res.render("discord_commands", {title: "Discord Commands", theme: "Discord"});
+});
+
+app.get('/dashboard/discord/logs/', function(req, res) {
+  res.render("discord_logs", {title: "Discord Chat Logs", theme: "Discord"});
+});
+
+app.get('/dashboard/discord/poll/', function(req, res) {
+  res.render("discord_poll", {title: "Discord Poll", theme: "Discord"});
+});
+
+app.get('/dashboard/discord/poll/overlay/', function(req, res) {
+  res.render("discord_poll_overlay", {title: "Discord Poll Stream Overlay", theme: "Discord"});
+});
+
+app.get('/dashboard/discord/raffle/', function(req, res) {
+  res.render("discord_raffle", {title: "Discord Raffle", theme: "Discord"});
+});
+
+app.get('/dashboard/discord/raffle/overlay/', function(req, res) {
+  res.render("discord_raffle_overlay", {title: "Discord Raffle Stream Overlay", theme: "Discord"});
+});
+
+app.get('/dashboard/discord/spam/', function(req, res) {
+  res.render("discord_spam", {title: "Discord Spam", theme: "Discord"});
 });
 
 app.get('/api/v1/twitch/:user/', function(req, res) {
@@ -56,6 +176,12 @@ app.get('/api/v1/discord/:id/', function(req, res) {
 
 app.get('/api/v1/discord/:id/logs/', function(req, res) {
   db.discord_logs.getAll(req.param.id).then(function(data) {
+    res.send(data);
+  });
+});
+
+app.get('/api/v1/commands/:user/', function(req, res) {
+  db.commands.getAll(req.param.user).then(function(data) {
     res.send(data);
   });
 });
