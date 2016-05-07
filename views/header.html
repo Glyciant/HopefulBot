@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>HeepBot: {{title}}</title>
+  <title>HeepsBot: {{title}}</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css">
   <link rel="stylesheet" href="/css/style.css">
@@ -9,22 +9,35 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/6.0.0/markdown-it.js"></script>
 </head>
-<body class="purple lighten-4">
+{% if theme == "Twitch" %}
+<body class="deep-purple lighten-4">
+{% elseif theme == "Discord" %}
+<body class="blue lighten-4">
+{% else %}
+<body class="teal lighten-4">
+{% endif %}
   <div class="nav">
-    {%if loggedin%}
-    <ul id="dropdown-logout" class="dropdown-content grey">
+    {% if loggedin %}
+    {% if theme == "Twitch" %}
+    <ul id="dropdown-logout" class="dropdown-content deep-purple lighten-2">
+    {% elseif theme == "Discord" %}
+    <ul id="dropdown-logout" class="dropdown-content blue lighten-2">
+    {% else %}
+    <ul id="dropdown-logout" class="dropdown-content teal lighten-2">
+    {% endif %}
       <li><a class="white-text" href="/auth/logout/">Logout</a></li>
     </ul>
-    {%endif%}
-    <nav class="purple darken-2">
+    {% endif%}
+    {% if theme == "Twitch" %}
+    <nav class="purple darken-4">
+    {% elseif theme == "Discord" %}
+    <nav class="blue darken-4">
+    {% else %}
+    <nav class="teal darken-4">
+    {% endif %}
       <div class="nav-wrapper">
         <ul class="center">
           <li><a href="/">Home</a></li>
-          {%if loggedin && isMod%}
-          <li><a href="/mail/">View Messages</a></li>
-          <li><a href="/compose/">Compose Message</a></li>
-          <li><a href="/mute/">Muted Users</a></li>
-          {%endif%}
         </ul>
         <ul class="right">
           <li><a href="https://github.com/Heep123/Heepsbot-V2">GitHub</a></li>

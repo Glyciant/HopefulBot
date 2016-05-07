@@ -8,7 +8,7 @@ var config = require("./config"),
     discord = require("discord.js"),
     tmi = require("tmi.js"),
     swig = require("swig"),
-    restler = require("restler"),
+    needle = require("needle"),
     bodyParser = require("body-parser"),
     cookieParser = require("cookie-parser"),
     thinky = require("thinky"),
@@ -28,7 +28,14 @@ app.listen(config.app.port, function() {
   console.log('Listing on port: ' + config.app.port);
 });
 
+app.locals = {
+  authurl: config.auth.authurl
+};
+
 app.get('*', function(req, res, next) {
+  app.locals.loggedin = req.session.display_name;
+  app.locals.username = req.session.name;
+  app.locals.isAdmin = helpers.isAdmin(app.locals.username);
 	next();
 });
 
@@ -36,7 +43,40 @@ app.get('/', function(req, res) {
   res.render("index", {title: "Home", theme: "Neutral"});
 });
 
-app.get('/', function(req, res) {
+app.get('/auth/login/', function(req, res) {
+  needle.post('https://api.twitch.tv/kraken/oauth2/token', {
+		client_id: config.auth.cid,
+		client_secret: config.auth.secret,
+		grant_type: 'authorization_code',
+		redirect_uri: config.app.baseurl + '/auth/login/',
+		code: req.query.code
+	}, function(err, resp, body) {
+		if(!err) {
+			needle.get('https://api.twitch.tv/kraken/user?oauth_token=' + body.access_token, function(error, data) {
+        if(!error) {
+					req.session.auth = body.access_token;
+					req.session.name = data.body.name;
+          req.session.display_name = data.body.display_name;
+					res.redirect('/');
+				}
+        else{
+					res.render("error", {title: "Error", theme: "Neutral", code: "404", description: "Could not authenticate via the Twitch API."});
+				}
+			});
+		}
+    else{
+			res.render("error", {title: "Error", theme: "Neutral", code: "404", description: "Twitch API appears to be having issues."});
+		}
+	});
+});
+
+app.get('/auth/logout/', function(req, res) {
+	req.session.destroy(function() {
+		res.redirect('/');
+	});
+});
+
+app.get('/help/', function(req, res) {
   res.render("index", {title: "Help", theme: "Neutral"});
 });
 
