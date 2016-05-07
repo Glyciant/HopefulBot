@@ -1,18 +1,26 @@
-var config = {}
+var config = {};
 
-config.app = {}
-config.app.port = 8000
+config.app = {};
+config.app.port = 8000;
+config.app.baseurl = "http://localhost:" + config.app.port;
 
-config.rethink = {}
+config.rethink = {};
 config.rethink.host = "127.0.0.1";
 config.rethink.port = "28015";
 config.rethink.db = "HeepBot";
 
-config.twitch = {}
-config.twitch.admins = ["Heep123"]
+config.auth = {};
+config.auth.cid = "";
+config.auth.secret = "";
+config.auth.redirect = config.app.baseurl + "/auth/login/";
+config.auth.authurl = "https://api.twitch.tv/kraken/oauth2/authorize?response_type=code&client_id=" + config.auth.cid + "&redirect_uri=" + config.auth.redirect + "&forceverify=true&scope=user_read+channel_subscriptions+channel_editor";
 
-config.bot = {}
-config.bot.twitch = ""
-config.bot.discord = ""
+config.twitch = {};
+config.twitch.admins = ["heep123"];
 
-module.exports = config
+config.bot = {};
+config.bot.twitch = "";
+config.bot.discord = "";
+
+module.exports = config;
+
