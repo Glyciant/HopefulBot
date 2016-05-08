@@ -5,3 +5,16 @@
 .dropdown-content li:hover, .dropdown-content li.active, .dropdown-content li.selected {
 	background-color: inherit;
 }
+
+input[type=text]:focus:not([readonly])#new_editor, input[type=text]:focus:not([readonly])#new_regular, input[type=text]:not([readonly])#new_editor, input[type=text]:not([readonly])#new_regular {
+	border-bottom: 1px solid #000;
+	box-shadow: 0 1px 0 0 #000;
+}
+
+.input-field label[for="new_editor"], .input-field label[for="new_regular"], input[type=text]:focus:not([readonly])#new_editor+label, input[type=text]:focus:not([readonly])#new_regular+label {
+	color: #000;
+}
+
+select {
+	display: inline-block;
+}

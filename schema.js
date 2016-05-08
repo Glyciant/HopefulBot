@@ -9,7 +9,8 @@ var schema = {};
 schema.primarykey = {
   discordlogs: "id",
   twitchsettings: "id",
-  twitchlogs: "id"
+  twitchlogs: "id",
+  commands: "id"
 };
 
 schema.discordlogs = {
@@ -36,6 +37,7 @@ schema.twitchlogs = {
 
 schema.commands = {
   id: type.string(),
+  name: type.string(),
   response: type.string(),
   channel: type.string(),
   cost: type.number(),

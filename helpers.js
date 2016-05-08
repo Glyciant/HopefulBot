@@ -9,6 +9,15 @@ var isAdmin = function(user) {
   }
 };
 
+var isEditor = function(user, object) {
+  if (object.editors.indexOf(user) > -1) {
+    return true;
+  }
+  else {
+    return false;
+  }
+};
+
 var userLevel = function(object, data) {
   if (config.twitch.admins.indexOf(object.username) > -1) {
     return 1;
@@ -47,5 +56,6 @@ var userLevel = function(object, data) {
 
 module.exports = {
   isAdmin: isAdmin,
-  userLevel: userLevel
+  userLevel: userLevel,
+  isEditor: isEditor
 };

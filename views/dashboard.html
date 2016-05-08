@@ -1,2 +1,38 @@
 {% include "./header.html" %}
+<div class="row">
+  <div class="col s10 offset-s1 teal lighten-5" style="border-radius:20px; margin-top:15px; padding: 15px;">
+    <p>This is your dashboard homepage. Here you can control every feature from both Discord and Twitch. To begin, choose a service!</p>
+  </div>
+</div>
+<div class="row">
+  <div class="col s4 offset-s1 deep-purple darken-4" style="border-radius:20px; padding-bottom: 20px">
+    <center>
+      <h3 class="white-text">Twitch</h3>
+        <div class="input-field">
+          <select id="twitch-channel">
+            {% for channel in data %}
+              <option>{{channel.twitch}}</option>
+            {% endfor %}
+          </select>
+          <br />
+          <a href="javascript:;" id="goto-twitch" class="btn teal darken-4 white-text" style="margin-top: 20px">Go</a>
+        </div>
+    </center>
+  </div>
+  <div class="col s4 offset-s2 blue darken-4" style="border-radius:20px; padding-bottom: 20px">
+    <center>
+      <h3 class="white-text">Discord</h3>
+      <div class="input-field">
+        <select id="discord-server">
+          {% for channel in data %}
+            <option>{{channel.discord}}</option>
+          {% endfor %}
+        </select>
+        <br />
+        <a href="javascript:;" id="goto-discord" class="btn teal darken-4 white-text" style="margin-top: 20px">Go</a>
+      </div>
+    </center>
+  </div>
+</div>
+<script src="/js/dashboard.js"></script>
 {% include "./footer.html" %}

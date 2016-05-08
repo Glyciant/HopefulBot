@@ -121,28 +121,28 @@ var commands = {
       });
     });
   },
-  getCommand: (id, channel) => {
+  getCommand: (name, channel) => {
     return new Promise((resolve, reject) => {
-      CommandsModel.filter({id: id, channel: channel}).then((db) => {
+      CommandsModel.filter({name: name, channel: channel}).then((db) => {
         resolve(db);
       });
     });
   },
   update: (object) => {
     return new Promise((resolve, reject) => {
-      CommandsModel.filter({id: object.id, channel: object.channel}).update(object).then((db) => {
+      CommandsModel.filter({id: object.id}).update(object).then((db) => {
         resolve(db);
       });
     });
   },
-  delete: (id, channel) => {
+  delete: (id) => {
     return new Promise((resolve, reject) => {
-      CommandsModel.filter({id: id, channel: channel}).delete().then((db) => {
+      CommandsModel.filter({id: id}).delete().then((db) => {
         resolve(db);
       });
     });
   }
-};
+}
 
 module.exports = {
   discord_settings: discord_settings,
