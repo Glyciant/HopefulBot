@@ -9,10 +9,12 @@
     "discord.js": "^7.0.1",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
+    "hitbox-chat": "^0.1.5",
     "needle": "^1.0.0",
     "swig": "^1.4.2",
     "thinky": "^2.3.2",
-    "tmi.js": "0.0.29"
+    "tmi.js": "0.0.29",
+    "toggle-switch": "0.0.2"
   },
   "devDependencies": {},
   "scripts": {},

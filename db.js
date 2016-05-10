@@ -59,6 +59,13 @@ var twitch_logs = {
       });
     });
   },
+  getChannel: (id) => {
+    return new Promise((resolve, reject) => {
+      TwitchLogModel.filter({channel: id}).then((db) => {
+        resolve(db);
+      });
+    });
+  },
   getAll: () => {
     return new Promise((resolve, reject) => {
       TwitchLogModel.then((db) => {

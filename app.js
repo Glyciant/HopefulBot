@@ -12,6 +12,7 @@ var config = require("./config"),
     bodyParser = require("body-parser"),
     cookieParser = require("cookie-parser"),
     thinky = require("thinky"),
+    toggleSwitch = require("toggle-switch"),
     bot = new discord.Client();
 
 // Setup Stuff
@@ -25,7 +26,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.listen(config.app.port, function() {
-  console.log('Listing on port: ' + config.app.port);
+  console.log('[DASHBOARD] Listing on port: ' + config.app.port);
 });
 
 app.locals = {
@@ -48,7 +49,7 @@ app.get('/api/v1/twitch/:user/', function(req, res) {
 });
 
 app.get('/api/v1/twitch/:user/logs/', function(req, res) {
-  db.twitch_logs.getAll("#" + req.params.user).then(function(data) {
+  db.twitch_logs.getChannel("#" + req.params.user).then(function(data) {
     res.send(data);
   });
 });
@@ -146,82 +147,22 @@ app.get('/dashboard/:user/api/', function(req, res) {
 });
 
 app.get('/dashboard/:user/twitch/', function(req, res) {
-  res.render("twitch", {title: "Twitch Dashboard", theme: "Twitch"});
-});
 
-app.get('/dashboard/:user/twitch/alerts/', function(req, res) {
-  res.render("twitch_alerts", {title: "Twitch Chat Alerts", theme: "Twitch"});
-});
-
-app.get('/dashboard/:user/twitch/autowelcome/', function(req, res) {
-  res.render("twitch_autowelcome", {title: "Twitch Auto-Welcome", theme: "Twitch"});
-});
-
-app.get('/dashboard/:user/twitch/commands/', function(req, res) {
   db.twitch_settings.get("#" + req.params.user).then(function(channel) {
     if (helpers.isEditor(app.locals.username, channel[0]) || helpers.isAdmin(app.locals.username) || req.params.user == app.locals.username) {
       var editor = true;
     }
-    db.commands.getAll("#" + req.params.user).then(function(data) {
-      res.render("twitch_commands", {title: "Custom Commands", theme: "Twitch", editor: editor, data: data, owner: req.params.user});
+    if (helpers.isAdmin(app.locals.username) || req.params.user == app.locals.username) {
+      var admin = true;
+    }
+    db.twitch_settings.get("#" + req.params.user).then(function(data) {
+      db.twitch_logs.getChannel("#" + req.params.user).then(function(logs) {
+        db.commands.getAll("#" + req.params.user).then(function(commands) {
+          res.render("twitch", {title: "Twitch Dashboard", theme: "Twitch", owner: req.params.user, logs: logs, editors: data[0].editors, regulars: data[0].regulars, editor: editor, admin: admin, commands: commands});
+        });
+      });
     });
   });
-});
-
-app.get('/dashboard/:user/twitch/highlights/', function(req, res) {
-  res.render("twitch_highlights", {title: "Twitch Highlight Markers", theme: "Twitch"});
-});
-
-app.get('/dashboard/:user/twitch/levels/', function(req, res) {
-  res.render("twitch_levels", {title: "Twitch Command User-Levels", theme: "Twitch"});
-});
-
-app.get('/dashboard/:user/twitch/logs/', function(req, res) {
-  res.render("twitch_logs", {title: "Twitch Chat Logs", theme: "Twitch"});
-});
-
-app.get('/dashboard/:user/twitch/points/', function(req, res) {
-  res.render("twitch_points", {title: "Twitch Points", theme: "Twitch"});
-});
-
-app.get('/dashboard/:user/twitch/points/autopoints/', function(req, res) {
-  res.render("twitch_points_autopoints", {title: "Twitch Auto-Points", theme: "Twitch"});
-});
-
-app.get('/dashboard/:user/twitch/points/claim/', function(req, res) {
-  res.render("twitch_points_claim", {title: "Twitch Points Claim", theme: "Twitch"});
-});
-
-app.get('/dashboard/:user/twitch/points/:user/', function(req, res) {
-  res.render("twitch_points_user", {title: "Twitch Points: " + req.param.user, theme: "Twitch"});
-});
-
-app.get('/dashboard/:user/twitch/poll/', function(req, res) {
-  res.render("twitch_poll", {title: "Twitch Poll", theme: "Twitch"});
-});
-
-app.get('/dashboard/:user/twitch/poll/overlay/', function(req, res) {
-  res.render("twitch_poll_overlay", {title: "Twitch Poll Stream Overlay", theme: "Twitch"});
-});
-
-app.get('/dashboard/:user/twitch/raffle/', function(req, res) {
-  res.render("twitch_raffle", {title: "Twitch Raffle", theme: "Twitch"});
-});
-
-app.get('/dashboard/:user/twitch/raffle/overlay/', function(req, res) {
-  res.render("twitch_raffle_overlay", {title: "Twitch Raffle Stream Overlay", theme: "Twitch"});
-});
-
-app.get('/dashboard/:user/twitch/shoutout/', function(req, res) {
-  res.render("twitch_shoutout", {title: "Twitch Shoutout", theme: "Twitch"});
-});
-
-app.get('/dashboard/:user/twitch/spam/', function(req, res) {
-  res.render("twitch_spam", {title: "Twitch Spam Protection", theme: "Twitch"});
-});
-
-app.get('/dashboard/:user/twitch/timers/', function(req, res) {
-  res.render("twitch_timers", {title: "Twitch Timers", theme: "Twitch"});
 });
 
 app.get('/dashboard/:user/twitch/users/', function(req, res) {
@@ -240,34 +181,6 @@ app.get('/dashboard/:user/twitch/users/', function(req, res) {
 
 app.get('/dashboard/:server/discord/', function(req, res) {
   res.render("discord", {title: "Discord Dashboard", theme: "Discord"});
-});
-
-app.get('/dashboard/:server/discord/commands/', function(req, res) {
-  res.render("discord_commands", {title: "Discord Commands", theme: "Discord"});
-});
-
-app.get('/dashboard/:server/discord/logs/', function(req, res) {
-  res.render("discord_logs", {title: "Discord Chat Logs", theme: "Discord"});
-});
-
-app.get('/dashboard/:server/discord/poll/', function(req, res) {
-  res.render("discord_poll", {title: "Discord Poll", theme: "Discord"});
-});
-
-app.get('/dashboard/:server/discord/poll/overlay/', function(req, res) {
-  res.render("discord_poll_overlay", {title: "Discord Poll Stream Overlay", theme: "Discord"});
-});
-
-app.get('/dashboard/:server/discord/raffle/', function(req, res) {
-  res.render("discord_raffle", {title: "Discord Raffle", theme: "Discord"});
-});
-
-app.get('/dashboard/:server/discord/raffle/overlay/', function(req, res) {
-  res.render("discord_raffle_overlay", {title: "Discord Raffle Stream Overlay", theme: "Discord"});
-});
-
-app.get('/dashboard/:server/discord/spam/', function(req, res) {
-  res.render("discord_spam", {title: "Discord Spam", theme: "Discord"});
 });
 
 app.get('*', function(req, res) {
@@ -371,7 +284,7 @@ db.twitch_settings.getAll().then(function(data) {
         params = message.split(' ');
 
     // Logging
-    db.twitch_logs.addEntry({"display_name": display_name, date: date, content: message});
+    db.twitch_logs.addEntry({"display_name": display_name, date: date, content: message, channel: channel});
 
     // Join Channel
     if (params[0] == ";join") {
@@ -407,6 +320,14 @@ db.twitch_settings.getAll().then(function(data) {
           regulars: [],
           editors: [],
           settings: {
+            api: {
+              commands: true,
+              aliases: true,
+              twitch_settings: true,
+              twitch_logs: true,
+              discord_settings: true,
+              discord_logs: true
+            },
             spam: {
               links: 1000,
               caps: 1000,
@@ -454,8 +375,18 @@ db.twitch_settings.getAll().then(function(data) {
             },
             song_requests: [],
             subwelcome: {
-              enabled: false,
-              message: "Thank you so much for subscribing, ^USER^! <3"
+              channel: {
+                new_enabled: false,
+                old_enabled: false,
+                new_message: "^USER^ just subscribed. Thank you so much! bleedPurple",
+                old_message: "^USER^ just subscribed for the ^MONTHS^ month. Thank your for your continued support!"
+              },
+              host: {
+                new_enabled: false,
+                old_enabled: false,
+                new_message: "^USER^ just subscribed to ^HOSTCHAN^!",
+                old_message: "^USER^ just subscribed to ^HOSTCHAN^ for the ^MONTHS^ month!"
+              }
             },
             poll: {
               open: false,
@@ -496,7 +427,7 @@ db.twitch_settings.getAll().then(function(data) {
     if (params[0] == ";discord") {
       if (user["user-type"] == "global_mod" || user["user-type"] == "admin" || user["user-type"] == "staff" || helpers.isAdmin(display_name) === true || channel.replace("#","") == user.username) {
         if (params[1] == "getbot") {
-          client.say(channel, display_name + " -> Get the Heepsbot for Discord here: https://discordapp.com/oauth2/authorize?&client_id=176399298655682571&scope=bot&permissions=257054");
+          client.say(channel, display_name + " -> Get the Heepsbot for Discord here: https://discordapp.com/oauth2/authorize?&client_id=176399298655682571&scope=bot&permissions=335801375");
         }
         else if (params[1] == "server") {
           if (params[2]) {
@@ -751,8 +682,8 @@ db.twitch_settings.getAll().then(function(data) {
 });
 
 bot.loginWithToken(config.bot.discord).then(success).catch(err);
-function success(token){ console.log("Login Successful!"); }
-function err(error){ console.log("Login Failed! Arguments: " + arguments); }
+function success(token){ console.log("[DISCORD] Login Successful!"); }
+function err(error){ console.log("[DISCORD] Login Failed! Arguments: " + arguments); }
 
 bot.on("message", function(message) {
   var author_id = message.author.id,

@@ -18,3 +18,27 @@ input[type=text]:focus:not([readonly])#new_editor, input[type=text]:focus:not([r
 select {
 	display: inline-block;
 }
+
+.switch-toggle label:after, .switch-toggle label:before {
+	display: none;
+}
+
+.twitch-body-theme .tabs .tab a {
+	color: #6441A5;
+}
+
+.twitch-body-theme .tabs .tab a:hover {
+	color: #4a148c;
+}
+
+.twitch-body-theme .tabs .indicator {
+	background-color: #6441A5;
+}
+
+.twitch-body-theme .switch label input[type=checkbox]:checked+.lever {
+	background-color: #9a7fcc;
+}
+
+.twitch-body-theme .switch label input[type=checkbox]:checked+.lever:after {
+	background-color: #6441A5;
+}

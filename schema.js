@@ -32,7 +32,8 @@ schema.twitchlogs = {
   id: type.string(),
   display_name: type.string(),
   date: type.date(),
-  content: type.string()
+  content: type.string(),
+  channel: type.string()
 };
 
 schema.commands = {
