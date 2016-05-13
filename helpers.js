@@ -1,4 +1,5 @@
-var config = require("./config");
+var config = require("./config"),
+    needle = require("needle");
 
 var isAdmin = function(user) {
   if (config.twitch.admins.indexOf(user) > -1) {
@@ -54,8 +55,25 @@ var userLevel = function(object, data) {
   }
 };
 
+var getChannel = function(username) {
+  return new Promise(function(resolve, reject) {
+    needle.get("https://api.twitch.tv/kraken/channels/" + username, { client_id: config.auth.cid }, (err, data) => {
+      if (data.body.status == "422") {
+        resolve("suspended");
+      }
+      else if (data.body.status == "404") {
+        resolve("missing");
+      }
+      else {
+        resolve(data.body);
+      }
+    });
+  });
+};
+
 module.exports = {
   isAdmin: isAdmin,
   userLevel: userLevel,
-  isEditor: isEditor
+  isEditor: isEditor,
+  getChannel: getChannel
 };

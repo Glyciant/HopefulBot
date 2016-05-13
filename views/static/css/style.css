@@ -1,4 +1,4 @@
-.nav-wrapper .dropdown-content {
+│.nav-wrapper .dropdown-content {
 	margin-top:64px
 }
 
@@ -41,4 +41,22 @@ select {
 
 .twitch-body-theme .switch label input[type=checkbox]:checked+.lever:after {
 	background-color: #6441A5;
+}
+
+.twitch-body-theme .switch-candy a {
+	background-color: #B9A3E3;
+	box-shadow: 0;
+}
+
+.switch-candy.switch-toggle {
+	padding: 20px 0 !important;
+}
+
+.switch-candy label {
+	position: relative;
+	right: 5px;
+}
+
+.panel-hidden {
+	display: none;
 }

@@ -42,6 +42,13 @@ var discord_settings = {
       });
     });
   },
+  getAll: () => {
+    return new Promise((resolve, reject) => {
+      DiscordSettingsModel.then((db) => {
+        resolve(db);
+      });
+    });
+  },
   update: (id, object) => {
     return new Promise((resolve, reject) => {
       DiscordSettingsModel.filter({id: id}).update(object).then((db) => {

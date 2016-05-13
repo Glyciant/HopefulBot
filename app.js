@@ -130,15 +130,23 @@ app.get('*', function(req, res, next) {
 
 app.get('/dashboard/', function(req, res) {
   db.twitch_settings.getAll().then(function(twitch) {
-    var channels = [];
-    for (var i in twitch) {
-      if (i !== "remove") {
-        if (twitch[i].editors.indexOf(app.locals.username) > -1 || twitch[i].id == "#" + app.locals.username) {
-          channels.push({twitch: twitch[i].id.replace("#", ""), discord: twitch[i].discord});
+    db.discord_settings.getAll().then(function(discord) {
+      var channels = [];
+      for (var i in twitch) {
+        var discordPos = discord.map(function(x) { return x.id; }).indexOf(twitch[i].discord)
+        if (i !== "remove") {
+          if (twitch[i].editors.indexOf(app.locals.username) > -1 || twitch[i].id == "#" + app.locals.username) {
+            if (discord[discordPos]) {
+              channels.push({twitch: twitch[i].id.replace("#", ""), twitch_name: twitch[i].name, twitch_image: twitch[i].logo, discord_id: twitch[i].discord, discord_name: discord[discordPos].name });
+            }
+            else {
+              channels.push({twitch: twitch[i].id.replace("#", ""), twitch_name: twitch[i].name, twitch_image: twitch[i].logo });
+            }
+          }
         }
       }
-    }
-    res.render("dashboard", {title: "Dashboard", theme: "Neutral", data: channels});
+      res.render("dashboard", {title: "Dashboard", theme: "Neutral", data: channels});
+    });
   });
 });
 
@@ -147,34 +155,34 @@ app.get('/dashboard/:user/api/', function(req, res) {
 });
 
 app.get('/dashboard/:user/twitch/', function(req, res) {
-
   db.twitch_settings.get("#" + req.params.user).then(function(channel) {
-    if (helpers.isEditor(app.locals.username, channel[0]) || helpers.isAdmin(app.locals.username) || req.params.user == app.locals.username) {
-      var editor = true;
+    if (channel.length > 0) {
+      if (helpers.isEditor(app.locals.username, channel[0]) || helpers.isAdmin(app.locals.username) || req.params.user == app.locals.username) {
+        var editor = true;
+      }
+      if (helpers.isAdmin(app.locals.username) || req.params.user == app.locals.username) {
+        var admin = true;
+      }
+      var editors = channel[0].editors,
+          regulars = channel[0].regulars,
+          exists = true;
     }
-    if (helpers.isAdmin(app.locals.username) || req.params.user == app.locals.username) {
-      var admin = true;
-    }
-    db.twitch_settings.get("#" + req.params.user).then(function(data) {
-      db.twitch_logs.getChannel("#" + req.params.user).then(function(logs) {
-        db.commands.getAll("#" + req.params.user).then(function(commands) {
-          res.render("twitch", {title: "Twitch Dashboard", theme: "Twitch", owner: req.params.user, logs: logs, editors: data[0].editors, regulars: data[0].regulars, editor: editor, admin: admin, commands: commands});
+    db.twitch_logs.getChannel("#" + req.params.user).then(function(logs) {
+      db.commands.getAll("#" + req.params.user).then(function(commands) {
+        helpers.getChannel(req.params.user).then(function(twitch) {
+          if (twitch !== "suspended") {
+            if (twitch.display_name.substr(twitch.display_name.length - 1) == "s") {
+              var ends = true;
+            }
+          }
+          if (channel.length > 0) {
+            channel[0].name = twitch.display_name;
+            channel[0].logo = twitch.logo;
+            db.twitch_settings.update(channel[0].id, channel[0]);
+          }
+          res.render("twitch", {title: "Twitch Dashboard", theme: "Twitch", owner: req.params.user, logs: logs, editors: editors, regulars: regulars, editor: editor, admin: admin, commands: commands, twitch: twitch, exists: exists, ends: ends });
         });
       });
-    });
-  });
-});
-
-app.get('/dashboard/:user/twitch/users/', function(req, res) {
-  db.twitch_settings.get("#" + req.params.user).then(function(channel) {
-    if (helpers.isEditor(app.locals.username, channel[0]) || helpers.isAdmin(app.locals.username) || req.params.user == app.locals.username) {
-      var editor = true;
-    }
-    if (helpers.isAdmin(app.locals.username) || req.params.user == app.locals.username) {
-      var admin = true;
-    }
-    db.twitch_settings.get("#" + app.locals.username).then(function(data) {
-      res.render("twitch_users", {title: "Twitch Users", theme: "Twitch", editors: data[0].editors, regulars: data[0].regulars, editor: editor, admin: admin});
     });
   });
 });
@@ -221,27 +229,27 @@ app.post('/twitch/users/remove_regular/', function(req, res) {
 });
 
 app.post('/twitch/commands/add', function(req, res) {
-  req.body.level = parseInt(req.body.level)
-  req.body.cost = parseInt(req.body.cost)
-  req.body.add = parseInt(req.body.add)
-  req.body.cooldown = parseInt(req.body.cooldown)
-  req.body.count = 0
+  req.body.level = parseInt(req.body.level);
+  req.body.cost = parseInt(req.body.cost);
+  req.body.add = parseInt(req.body.add);
+  req.body.cooldown = parseInt(req.body.cooldown);
+  req.body.count = 0;
 
-  db.commands.add(req.body)
+  db.commands.add(req.body);
 });
 
 app.post('/twitch/commands/edit', function(req, res) {
-  req.body.level = parseInt(req.body.level)
-  req.body.cost = parseInt(req.body.cost)
-  req.body.add = parseInt(req.body.add)
-  req.body.cooldown = parseInt(req.body.cooldown)
-  req.body.count = 0
+  req.body.level = parseInt(req.body.level);
+  req.body.cost = parseInt(req.body.cost);
+  req.body.add = parseInt(req.body.add);
+  req.body.cooldown = parseInt(req.body.cooldown);
+  req.body.count = 0;
 
-  db.commands.update(req.body)
+  db.commands.update(req.body);
 });
 
 app.post('/twitch/commands/delete', function(req, res) {
-  db.commands.delete(req.body.id)
+  db.commands.delete(req.body.id);
 });
 
 var channels = [];
@@ -786,6 +794,10 @@ bot.on("message", function(message) {
 
   db.discord_settings.get(server_id).then(function(data) {
     var data = data[0];
+
+    // Update DB
+    data.name = server;
+    db.discord_settings.update(data[0].id, data[0])
 
     // 8Ball
     if (params[0] == "-8ball") {

@@ -5,33 +5,35 @@
   </div>
 </div>
 <div class="row">
-  <div class="col s4 offset-s1 deep-purple darken-4" style="border-radius:20px; padding-bottom: 20px">
-    <center>
-      <h3 class="white-text">Twitch</h3>
-        <div class="input-field">
-          <select id="twitch-channel">
-            {% for channel in data %}
-              <option>{{channel.twitch}}</option>
-            {% endfor %}
-          </select>
-          <br />
-          <a href="javascript:;" id="goto-twitch" class="btn teal darken-4 white-text" style="margin-top: 20px">Go</a>
-        </div>
-    </center>
+  <div class="col s4 offset-s1 deep-purple darken-4" style="border-radius:20px;">
+      <a class='dropdown-button center' href='#' data-activates='dashboard-twitch'><img class="responsive-img" src="/img/twitch_dashboard.png"/></a>
+      <ul id='dashboard-twitch' class='dropdown-content'>
+        {% for channel in data %}
+          <li><a href="/dashboard/{{channel.twitch}}/twitch/" class="deep-purple-text text-darken-4"><img class="responsive-img" src="{{channel.twitch_image}}" style="max-height: 30px; position: relative; top: 9px;"/> {{channel.twitch_name}}</a></li>
+        {% endfor %}
+      </ul>
   </div>
-  <div class="col s4 offset-s2 blue darken-4" style="border-radius:20px; padding-bottom: 20px">
-    <center>
-      <h3 class="white-text">Discord</h3>
-      <div class="input-field">
-        <select id="discord-server">
-          {% for channel in data %}
-            <option>{{channel.discord}}</option>
-          {% endfor %}
-        </select>
-        <br />
-        <a href="javascript:;" id="goto-discord" class="btn teal darken-4 white-text" style="margin-top: 20px">Go</a>
-      </div>
-    </center>
+  <div class="col s4 offset-s2 blue darken-4" style="border-radius:20px;">
+      <a class='dropdown-button center' href='#' data-activates='dashboard-discord'><img class="responsive-img" src="/img/discord_dashboard.png"/></a>
+      <ul id='dashboard-discord' class='dropdown-content'>
+        {% for channel in data %}
+          {% if channel.discord_id %}
+            <li><a href="/dashboard/{{channel.discord_id}}/discord/" class="blue-text text-darken-4">{{channel.discord_name}} ({{channel.discord_id}})</a></li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+  </div>
+  <div class="col s4 offset-s4  light-green accent-4" style="border-radius:20px; margin-top: 20px">
+      <a class='dropdown-button center modal-trigger' href='#modal-hitbox'><img class="responsive-img" src="/img/hitbox_dashboard.png"/></a>
+      <div id="modal-hitbox" class="modal">
+       <div class="modal-content">
+         <h4>Soon™</h4>
+         <p>Sorry! Heepsbot doesn't currently support Hitbox. However, we hope to have it up and running soon.</p>
+       </div>
+       <div class="modal-footer">
+         <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+       </div>
+     </div>
   </div>
 </div>
 <script src="/js/dashboard.js"></script>
