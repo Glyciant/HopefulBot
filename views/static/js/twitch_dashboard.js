@@ -37,3 +37,15 @@ $(document).delegate("#toggle-documentation", "click", function() {
     $(this).html("- Hide Panel");
   }
 });
+
+$(document).delegate("#update-stream-data", "click", function() {
+  var status = $("#stream-title").val(),
+      channel = $(this).data("channel"),
+      game = $("#stream-game").val();
+
+  $.post("/twitch/api/update", {
+    status: status,
+    channel: channel,
+    game: game
+  });
+});

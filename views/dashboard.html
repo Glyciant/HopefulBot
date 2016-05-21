@@ -18,7 +18,7 @@
       <ul id='dashboard-discord' class='dropdown-content'>
         {% for channel in data %}
           {% if channel.discord_id %}
-            <li><a href="/dashboard/{{channel.discord_id}}/discord/" class="blue-text text-darken-4">{{channel.discord_name}} ({{channel.discord_id}})</a></li>
+            <li><a href="/dashboard/{{channel.discord_id}}/discord/" class="blue-text text-darken-4"><img class="responsive-img" src="{{channel.discord_image}}" style="max-height: 30px; position: relative; top: 9px;"/> {{channel.discord_name}} ({{channel.discord_id}})</a></li>
           {% endif %}
         {% endfor %}
       </ul>

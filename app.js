@@ -13,6 +13,8 @@ var config = require("./config"),
     cookieParser = require("cookie-parser"),
     thinky = require("thinky"),
     toggleSwitch = require("toggle-switch"),
+    _ = require("underscore"),
+    CronJob = require("cron").CronJob,
     bot = new discord.Client();
 
 // Setup Stuff
@@ -137,7 +139,7 @@ app.get('/dashboard/', function(req, res) {
         if (i !== "remove") {
           if (twitch[i].editors.indexOf(app.locals.username) > -1 || twitch[i].id == "#" + app.locals.username) {
             if (discord[discordPos]) {
-              channels.push({twitch: twitch[i].id.replace("#", ""), twitch_name: twitch[i].name, twitch_image: twitch[i].logo, discord_id: twitch[i].discord, discord_name: discord[discordPos].name });
+              channels.push({twitch: twitch[i].id.replace("#", ""), twitch_name: twitch[i].name, twitch_image: twitch[i].logo, discord_id: twitch[i].discord, discord_name: discord[discordPos].name, discord_image: discord[discordPos].image });
             }
             else {
               channels.push({twitch: twitch[i].id.replace("#", ""), twitch_name: twitch[i].name, twitch_image: twitch[i].logo });
@@ -150,8 +152,8 @@ app.get('/dashboard/', function(req, res) {
   });
 });
 
-app.get('/dashboard/:user/api/', function(req, res) {
-  res.render("api", {title: "Manage API Data", theme: "Neutral"});
+app.get('/dashboard/:user/security/', function(req, res) {
+  res.render("security", {title: "Manage Security", theme: "Neutral"});
 });
 
 app.get('/dashboard/:user/twitch/', function(req, res) {
@@ -165,22 +167,42 @@ app.get('/dashboard/:user/twitch/', function(req, res) {
       }
       var editors = channel[0].editors,
           regulars = channel[0].regulars,
-          exists = true;
+          exists = true,
+          points = _.sortBy(channel[0].settings.points.totals, "total").reverse();
     }
-    db.twitch_logs.getChannel("#" + req.params.user).then(function(logs) {
+    db.twitch_logs.getChannel("#" + req.params.user).then(function(twitch_chat_logs) {
       db.commands.getAll("#" + req.params.user).then(function(commands) {
         helpers.getChannel(req.params.user).then(function(twitch) {
           if (twitch !== "suspended") {
             if (twitch.display_name.substr(twitch.display_name.length - 1) == "s") {
               var ends = true;
             }
+            var partner = twitch.partner,
+                status = twitch.status,
+                game = twitch.game;
           }
           if (channel.length > 0) {
             channel[0].name = twitch.display_name;
             channel[0].logo = twitch.logo;
             db.twitch_settings.update(channel[0].id, channel[0]);
           }
-          res.render("twitch", {title: "Twitch Dashboard", theme: "Twitch", owner: req.params.user, logs: logs, editors: editors, regulars: regulars, editor: editor, admin: admin, commands: commands, twitch: twitch, exists: exists, ends: ends });
+          helpers.getHosts(twitch._id).then(function(hosts) {
+            helpers.isTwitchEditor(app.locals.username, req.params.user, req.session.auth).then(function(twitchEditor) {
+              db.stats.get().then(function(main_stats) {
+                Promise.all([db.discord_logs.getAll(), db.discord_logs.bot(), db.twitch_logs.bot(), helpers.getModChannels()]).then(function(misc_stats) {
+                  var stats = {};
+                  stats.twitch_total = main_stats[0].twitch,
+                  stats.discord_total = main_stats[0].discord,
+                  stats.twitch_messages_logged = twitch_chat_logs.length,
+                  stats.discord_messages_logged = misc_stats[0].length,
+                  stats.discord_messages_sent = misc_stats[1].length,
+                  stats.twitch_messages_sent = misc_stats[2].length,
+                  stats.twitch_mod_total = misc_stats[3];
+                  res.render("twitch", {title: "Twitch Dashboard", theme: "Twitch", owner: req.params.user, twitch_chat_logs: twitch_chat_logs, editors: editors, regulars: regulars, editor: editor, admin: admin, commands: commands, twitch: twitch, exists: exists, ends: ends, points: points, partner: partner, status: status, game: game, hosts: hosts, twitchEditor: twitchEditor, stats: stats });
+                })
+              });
+            });
+          });
         });
       });
     });
@@ -252,6 +274,48 @@ app.post('/twitch/commands/delete', function(req, res) {
   db.commands.delete(req.body.id);
 });
 
+app.post('/twitch/points/get', function(req, res) {
+  db.twitch_settings.get("#" + req.body.channel).then(function(data) {
+    var index = data[0].settings.points.totals.map(function(x) { return x.id; }).indexOf(req.body.user)
+    if (index > -1) {
+      res.status(200).send({ points: data[0].settings.points.totals[index].total});
+    }
+    else {
+      res.status(200).send({ points: "0" });
+    }
+  });
+});
+
+app.post('/twitch/points/update', function(req, res) {
+  db.twitch_settings.get("#" + req.body.channel).then(function(data) {
+    if (req.body.type !== "set") {
+      var index = data[0].settings.points.totals.map(function(x) { return x.id; }).indexOf(req.body.user);
+      if (index > -1) {
+        var oldval = data[0].settings.points.totals[index].total
+        data[0].settings.points.totals.splice(index, 1);
+      }
+      if (oldval) {
+        data[0].settings.points.totals.push({id: req.body.user, total: parseInt(oldval) + parseInt(req.body.points)});
+      }
+      else {
+        data[0].settings.points.totals.push({id: req.body.user, total: parseInt(req.body.points)});
+      }
+    }
+    else {
+      var index = data[0].settings.points.totals.map(function(x) { return x.id; }).indexOf(req.body.user);
+      if (index > -1) {
+        data[0].settings.points.totals.splice(index, 1);
+      }
+      data[0].settings.points.totals.push({id: req.body.user, total: parseInt(req.body.points)});
+    }
+    db.twitch_settings.update(data[0].id, data[0])
+  });
+});
+
+app.post('/twitch/api/update/', function(req, res) {
+  helpers.updateTwitch(req.body.status, req.body.game, req.body.channel, req.session.auth)
+});
+
 var channels = [];
 db.twitch_settings.getAll().then(function(data) {
   for (var i in data) {
@@ -285,6 +349,16 @@ db.twitch_settings.getAll().then(function(data) {
 
   var client = new tmi.client(ircoptions);
   client.connect();
+
+  var twitchStats = new CronJob("* */5 * * * *", function() {
+    db.stats.get().then(function(stats) {
+      stats[0].twitch = client.getChannels().length;
+      db.stats.update(stats[0])
+    })
+    }, function () {
+      console.log("[STATS] CronJob Stopped.")
+    },
+    true);
 
   client.on("chat", function (channel, user, message, self) {
     var display_name = user["display-name"],
@@ -343,11 +417,28 @@ db.twitch_settings.getAll().then(function(data) {
               blacklist: 1000,
               paragraph: 1000,
               actions: 1000,
-              banned_words: [],
-              banned_regex: []
+              settings: {
+                links_whitelist: [],
+                caps_percent: 60,
+                caps_minimum: 6,
+                symbols_percent: 60,
+                symbols_minimum: 6,
+                paragraph_limit: 350,
+                banned_words: [],
+                banned_regex: [],
+                permit: true,
+                permit_time: 120
+              },
+              messages: {
+                links: "Links require approval by a moderator!",
+                caps: "Please do not SHOUT in chat.",
+                symbols: "Cut the symbol spam please.",
+                blacklist: "That word/phrase isn't allowed here!",
+                paragraph: "Please make messages shorter.",
+                actions: "Do not use coloured text."
+              }
             },
             commands: {
-              magic: 800,
               love: 800,
               uptime: 800,
               get: 800,
@@ -368,6 +459,7 @@ db.twitch_settings.getAll().then(function(data) {
               message: "Welcome to the stream, ^USER^!"
             },
             points: {
+              name: "points",
               totals: []
             },
             autopoints: {
@@ -404,6 +496,12 @@ db.twitch_settings.getAll().then(function(data) {
             raffle: {
               open: false,
               users: []
+            },
+            magic: {
+              level: 800,
+              responses: [
+
+              ]
             },
             roulette: {
               level: 800,
@@ -456,7 +554,7 @@ db.twitch_settings.getAll().then(function(data) {
 
       // 8Ball
       if (params[0] == ";8ball") {
-        if (helpers.userLevel(user, data) <= data.settings.commands.magic) {
+        if (helpers.userLevel(user, data) <= data.settings.magic.level) {
           var answer = Math.floor(Math.random() * 24) + 1;
           if (answer == 1) { client.say(channel, display_name + " -> Yes!"); }
           if (answer == 2) { client.say(channel, display_name + " -> No!"); }
@@ -689,9 +787,28 @@ db.twitch_settings.getAll().then(function(data) {
   });
 });
 
-bot.loginWithToken(config.bot.discord).then(success).catch(err);
-function success(token){ console.log("[DISCORD] Login Successful!"); }
-function err(error){ console.log("[DISCORD] Login Failed! Arguments: " + arguments); }
+function discordlogin() {
+  bot.loginWithToken(config.bot.discord).then(success).catch(err);
+  function success(token){ console.log("[DISCORD] Login Successful!"); }
+  function err(error){ console.log("[DISCORD] Login Failed! Arguments: " + arguments); }
+}
+
+discordlogin();
+
+var discordStats = new CronJob("* */5 * * * *", function() {
+  db.stats.get().then(function(stats) {
+    stats[0].discord = bot.servers.length;
+    db.stats.update(stats[0])
+  })
+  }, function () {
+    console.log("[STATS] CronJob Stopped.")
+  },
+  true);
+
+
+bot.on("disconnected", function() {
+  discordlogin();
+})
 
 bot.on("message", function(message) {
   var author_id = message.author.id,
@@ -699,7 +816,8 @@ bot.on("message", function(message) {
       server_id = message.channel.server.id,
       author = message.author.username,
       channel = message.channel.name,
-      server = message.channel.server.name;
+      server = message.channel.server.name,
+      server_image = message.channel.server.iconURL,
       content = message.content,
       params = content.split(' '),
       message_id = message.id,
@@ -797,7 +915,8 @@ bot.on("message", function(message) {
 
     // Update DB
     data.name = server;
-    db.discord_settings.update(data[0].id, data[0])
+    data.image = server_image;
+    db.discord_settings.update(data.id, data);
 
     // 8Ball
     if (params[0] == "-8ball") {

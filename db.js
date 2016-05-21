@@ -8,7 +8,8 @@ var	config = require('./config'),
   DiscordSettingsModel = thinky.createModel('discord_settings', schema.twitchsettings, schema.primarykey.twitchsettings),
   TwitchLogModel = thinky.createModel('twitch_logs', schema.twitchlogs, schema.primarykey.twitchlogs),
   TwitchSettingsModel = thinky.createModel('twitch_settings', schema.twitchsettings, schema.primarykey.twitchsettings),
-  CommandsModel = thinky.createModel('commands', schema.commands, schema.primarykey.commands);
+  CommandsModel = thinky.createModel('commands', schema.commands, schema.primarykey.commands),
+  StatsModel = thinky.createModel('stats', schema.stats, schema.primarykey.stats);
 
 var discord_logs = {
   addEntry: (object) => {
@@ -21,6 +22,13 @@ var discord_logs = {
   getAll: () => {
     return new Promise((resolve, reject) => {
       DiscordLogModel.then((db) => {
+        resolve(db);
+      });
+    });
+  },
+  bot: () => {
+    return new Promise((resolve, reject) => {
+      DiscordLogModel.filter({author_id: "176399321313312768"}).then((db) => {
         resolve(db);
       });
     });
@@ -76,6 +84,13 @@ var twitch_logs = {
   getAll: () => {
     return new Promise((resolve, reject) => {
       TwitchLogModel.then((db) => {
+        resolve(db);
+      });
+    });
+  },
+  bot: () => {
+    return new Promise((resolve, reject) => {
+      TwitchLogModel.filter({display_name: "Heepsbot"}).then((db) => {
         resolve(db);
       });
     });
@@ -158,10 +173,28 @@ var commands = {
   }
 }
 
+var stats = {
+  get: () => {
+    return new Promise((resolve, reject) => {
+      StatsModel.then((db) => {
+        resolve(db);
+      });
+    });
+  },
+  update: (object) => {
+    return new Promise((resolve, reject) => {
+      StatsModel.update(object).then((db) => {
+        resolve(db);
+      });
+    });
+  }
+}
+
 module.exports = {
   discord_settings: discord_settings,
   discord_logs: discord_logs,
   twitch_settings: twitch_settings,
   twitch_logs: twitch_logs,
-  commands: commands
+  commands: commands,
+  stats: stats
 }

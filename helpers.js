@@ -71,9 +71,61 @@ var getChannel = function(username) {
   });
 };
 
+var getHosts = function(id) {
+  return new Promise(function(resolve, reject) {
+    needle.get("https://tmi.twitch.tv/hosts?include_logins=1&target=" + id, { client_id: config.auth.cid }, (err, data) => {
+      resolve(data.body.hosts);
+    });
+  });
+};
+
+var updateTwitch = function(status, game, channel, auth) {
+  return new Promise(function(resolve, reject) {
+    needle.put("https://api.twitch.tv/kraken/channels/" + channel + "?oauth_token=" + auth, {channel: { status: status, game: game } }, (err, data) => {
+      resolve(data.body);
+    });
+  });
+};
+
+var isTwitchEditor = function(user, channel, auth) {
+  return new Promise(function(resolve, reject) {
+    needle.get("https://api.twitch.tv/kraken/channels/" + channel + "/editors?oauth_token=" + auth, (err, data) => {
+      if (data.body.users) {
+        var index = data.body.users.map(function(x) { return x.name; }).indexOf(user);
+        if (index > -1 || user == channel) {
+          resolve(true);
+        }
+        else {
+          resolve(false);
+        }
+      }
+      else {
+        resolve(false);
+      }
+    });
+  });
+};
+
+var getModChannels = function() {
+  return new Promise(function(resolve, reject) {
+    needle.get("https://twitchstuff.3v.fi/api/mods/heepsbot", (err, data) => {
+      if (data.body.count) {
+        resolve(data.body.count)
+      }
+      else {
+        resolve("Error")
+      }
+    });
+  });
+};
+
 module.exports = {
   isAdmin: isAdmin,
   userLevel: userLevel,
   isEditor: isEditor,
-  getChannel: getChannel
+  getChannel: getChannel,
+  getHosts: getHosts,
+  updateTwitch: updateTwitch,
+  isTwitchEditor: isTwitchEditor,
+  getModChannels: getModChannels
 };

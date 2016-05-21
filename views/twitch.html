@@ -27,8 +27,91 @@
     <div class="white center" style="border-radius:20px; margin-top:15px; padding: 15px;">
       <h4>{{twitch.display_name}}{% if !ends %}'s{% else %}'{% endif %} Dashboard</h4>
       {% if admin %}
-      <a href="javascript:;" id="join-channel" class="btn purple darken-4 white-text">Join</a> <a href="javascript:;" id="part-channel" class="btn purple darken-4 white-text">Part</a><br /><br />
+      <a href="javascript:;" id="join-channel" class="btn purple darken-4 white-text">Join</a> <a href="javascript:;" id="part-channel" class="btn purple darken-4 white-text">Part</a><br />
+      {% if exists %}
+      <a href="#modal-default-settings" class="btn purple darken-4 white-text modal-trigger" style="margin-top: 5px;">Default Settings</a>
+      <div id="modal-default-settings" class="modal left-align">
+        <div class="modal-content">
+          <h4>Revert to Default Settings.</h4>
+          <p>Are you sure you want to revert to all default settings? You will lose all records of points, editors, regulars, commands, spam protection settings, logs and all other bot features. This action cannot be undone!</p>
+        </div>
+        <div class="modal-footer">
+          <a href="#!" class="modal-action modal-close btn-flat" id="default-settings" data-channel="{{owner}}">Continue</a>
+          <a href="#!" class="modal-action modal-close btn-flat">Cancel</a>
+        </div>
+      </div>
+      {% else %}
+      <a href="javascript:;" id="channel-setup" data-channel="{{owner}}" class="btn purple darken-4 white-text" style="margin-top: 5px;">Run Setup</a>
       {% endif %}
+      <br /><br />
+      {% endif %}
+    </div>
+    <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px;">
+      <h5 class="center">Shortcuts</h5>
+      Coming Soon
+    </div>
+    <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px;">
+      <h5 class="center">Twitch Info</h5>
+      <input type="text" value="{{status}}" placeholder="Stream Title" id="stream-title" data-channel="{{owner}}">
+      <input type="text" value="{{game}}" placeholder="Stream Game" id="stream-game" data-channel="{{owner}}">
+      {% if partner %}
+      {% if twitchEditor %}
+      <select style="display: inline-block">
+        <option>30 Seconds</option>
+        <option>1 Minute</option>
+        <option>1 Minute 30 Seconds</option>
+        <option>2 Minutes</option>
+        <option>2 Minutes 30 Seconds</option>
+        <option>3 Minutes</option>
+      </select>
+      {% endif %}
+      <div class="row center">
+        {% if twitchEditor %}
+        <div class="col s4">
+          <a href="javascript:;" id="run-ad" class="btn purple darken-4 white-text modal-trigger" style="margin-top: 10px;">Run Ad</a>
+        </div>
+        <div class="col s4">
+          <a href="#modal-channel-hosts" class="btn purple darken-4 white-text modal-trigger" style="margin-top: 10px;">Hosts</a>
+        </div>
+        <div class="col s4">
+          <a href="javascript:;" id="update-stream-data" data-channel="{{owner}}" class="btn purple darken-4 white-text modal-trigger" style="margin-top: 10px;">Save</a>
+        </div>
+        {% else %}
+        <div class="col s12">
+          <a href="#modal-channel-hosts" class="btn purple darken-4 white-text modal-trigger" style="margin-top: 10px;">Hosts</a>
+        </div>
+        {% endif %}
+      </div>
+      {% else %}
+      <div class="row center">
+        {% if twitchEditor %}
+        <div class="col s6">
+          <a href="javascript:;" id="update-stream-data" data-channel="{{owner}}" class="btn purple darken-4 white-text modal-trigger" style="margin-top: 10px;">Save</a>
+        </div>
+        <div class="col s6">
+          <a href="#modal-channel-hosts" class="btn purple darken-4 white-text modal-trigger" style="margin-top: 10px;">Hosts</a>
+        </div>
+        {% else %}
+        <div class="col s12">
+          <a href="#modal-channel-hosts" class="btn purple darken-4 white-text modal-trigger" style="margin-top: 10px;">Hosts</a>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+      <div id="modal-channel-hosts" class="modal left-align">
+        <div class="modal-content">
+          <h4>Hosts of {{twitch.display_name}}</h4>
+          {% for host in hosts %}
+          <p>{{host.host_login}}</p>
+          {% endfor %}
+          {%if !hosts[0]%}
+          <p class="center"><i>None</i></p>
+          {%endif%}
+        </div>
+        <div class="modal-footer">
+          <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+        </div>
+      </div>
     </div>
     <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px;">
       <h5 class="center">Chat</h5>
@@ -36,13 +119,21 @@
     </div>
     <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px;">
       <h5 class="center">Heepsbot Statistics</h5>
-      Soon™
+      <p><strong>Twitch Channels Present:</strong> {{stats.twitch_total}}</p>
+      <p><strong>Discord Servers Present:</strong> {{stats.discord_total}}</p>
+      <p><strong>Twitch Messages Logged:</strong> {{stats.twitch_messages_logged}}</p>
+      <p><strong>Discord Messages Logged:</strong> {{stats.discord_messages_logged}}</p>
+      <p><strong>Twitch Messages Sent:</strong> {{stats.twitch_messages_sent}}</p>
+      <p><strong>Discord Messages Sent:</strong> {{stats.discord_messages_sent}}</p>
+      <p><strong>Twitch Actions Total:</strong> {{stats.twitch_actions}}</p>
+      <p><strong>Discord Actions Total:</strong> {{stats.discord_actions}}</p>
+      <p><strong>Twitch Mod Status Count:</strong> {{stats.twitch_mod_total}}</p>
     </div>
   </div>
   {% if exists %}
   <div class="col m9 s12">
     <div class="white row" style="border-radius:20px; margin-top:15px; padding: 15px;">
-      <h5 style="display: inline-block;">Spam Protection</h5><a style="float: right; display: inline" href="javascript:;" id="toggle-spam" class="btn deep-purple darken-2 white-text modal-trigger">- Hide Panel</a>
+      <h5 style="display: inline-block;">Spam Protection</h5><a style="float: right; display: inline" href="javascript:;" id="toggle-spam" class="btn purple darken-4 white-text modal-trigger">- Hide Panel</a>
       <div id="panel-spam" class="panel-shown">
         <table class="bordered">
           <thead class="row">
@@ -181,14 +272,15 @@
       </div>
     </div>
     <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px;">
-      <h5 style="display: inline-block;">Commands</h5><a style="float: right; display: inline" href="javascript:;" id="toggle-commands" class="btn deep-purple darken-2 white-text modal-trigger">- Hide Panel</a>
+      <h5 style="display: inline-block;">Commands</h5><a style="float: right; display: inline" href="javascript:;" id="toggle-commands" class="btn purple darken-4 white-text modal-trigger">- Hide Panel</a>
       <div id="panel-commands">
         <ul class="tabs">
           <li class="tab col s4"><a href="#tab-custom">Custom Commands</a></li>
+          <li class="tab col s4"><a href="#tab-aliases">Aliases</a></li>
           <li class="tab col s4"><a href="#tab-commands">Built-In Commands</a></li>
         </ul>
         <div id="tab-custom">
-          {% if editor %}<a style="float: right; display: inline" href="#modal-add-command" class="btn deep-purple darken-2 white-text modal-trigger">+ Add Command</a>
+          {% if editor %}<a style="float: right; display: inline" href="#modal-add-command" class="btn purple darken-4 white-text modal-trigger">+ Add Command</a>
           <div id="modal-add-command" class="modal">
             <div class="modal-content">
               <h4>Add Custom Command</h4>
@@ -313,231 +405,234 @@
               {% endfor %}
             </tbody>
           </table>
-        </div>
-        <div id="tab-commands">
-          <table>
-            <thead class="row">
-              <th class="col s10">Command</th>
-              <th class="col s2">Options</th>
-            </thead>
-            <tbody>
-              <tr class="row">
-                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                  <strong>Uptime</strong><br />
-                  Allows users to be able to check how long the stream has been live.
-                </td>
-                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                  <div class="switch" style="display: inline-block; margin-right: 5px;">
-                    <label>
-                      Off
-                      {% if editor %}
-                      <input type="checkbox">
-                      {% else %}
-                      <input disabled type="checkbox">
-                      {% endif %}
-                      <span class="lever"></span>
-                      On
-                    </label>
-                  </div>
-                  <a href="#modal-command-uptime" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                </td>
-              </tr>
-              <tr class="row">
-                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                  <strong>Chatters</strong><br />
-                  Posts the total number of users logged in to chat.
-                </td>
-                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                  <div class="switch" style="display: inline-block; margin-right: 5px;">
-                    <label>
-                      Off
-                      {% if editor %}
-                      <input type="checkbox">
-                      {% else %}
-                      <input disabled type="checkbox">
-                      {% endif %}
-                      <span class="lever"></span>
-                      On
-                    </label>
-                  </div>
-                  <a href="#modal-command-chatters" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                </td>
-              </tr>
-              <tr class="row">
-                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                  <strong>8Ball</strong><br />
-                  Post an answer to a yes/no question from a bank of options. <sub>Don't rely on this being accurate.</sub>
-                </td>
-                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                  <div class="switch" style="display: inline-block; margin-right: 5px;">
-                    <label>
-                      Off
-                      {% if editor %}
-                      <input type="checkbox">
-                      {% else %}
-                      <input disabled type="checkbox">
-                      {% endif %}
-                      <span class="lever"></span>
-                      On
-                    </label>
-                  </div>
-                  <a href="#modal-command-magic" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                </td>
-              </tr>
-              <tr class="row">
-                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                  <strong>Roulette</strong><br />
-                  Anyone using this command has a chance of being timed out.
-                </td>
-                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                  <div class="switch" style="display: inline-block; margin-right: 5px;">
-                    <label>
-                      Off
-                      {% if editor %}
-                      <input type="checkbox">
-                      {% else %}
-                      <input disabled type="checkbox">
-                      {% endif %}
-                      <span class="lever"></span>
-                      On
-                    </label>
-                  </div>
-                  <a href="#modal-command-roulette" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                </td>
-              </tr>
-              <tr class="row">
-                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                  <strong>Love</strong><br />
-                  Posts a random percentage of love between two users.
-                </td>
-                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                  <div class="switch" style="display: inline-block; margin-right: 5px;">
-                    <label>
-                      Off
-                      {% if editor %}
-                      <input type="checkbox">
-                      {% else %}
-                      <input disabled type="checkbox">
-                      {% endif %}
-                      <span class="lever"></span>
-                      On
-                    </label>
-                  </div>
-                  <a href="#modal-command-love" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                </td>
-              </tr>
-              <tr class="row">
-                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                  <strong>Get</strong><br />
-                  Gets data directly from the Twitch API.
-                </td>
-                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                  <div class="switch" style="display: inline-block; margin-right: 5px;">
-                    <label>
-                      Off
-                      {% if editor %}
-                      <input type="checkbox">
-                      {% else %}
-                      <input disabled type="checkbox">
-                      {% endif %}
-                      <span class="lever"></span>
-                      On
-                    </label>
-                  </div>
-                  <a href="#modal-command-get" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                </td>
-              </tr>
-              <tr class="row">
-                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                  <strong>Emote</strong><br />
-                  Posts a line of Twitch Emotes. There are 6 on each line.
-                </td>
-                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                  <div class="switch" style="display: inline-block; margin-right: 5px;">
-                    <label>
-                      Off
-                      {% if editor %}
-                      <input type="checkbox">
-                      {% else %}
-                      <input disabled type="checkbox">
-                      {% endif %}
-                      <span class="lever"></span>
-                      On
-                    </label>
-                  </div>
-                  <a href="#modal-command-emote" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                </td>
-              </tr>
-              <tr class="row">
-                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                  <strong>OPEmote</strong><br />
-                  Posts 15 lines of Twitch Emotes. There are 6 on each line.
-                </td>
-                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                  <div class="switch" style="display: inline-block; margin-right: 5px;">
-                    <label>
-                      Off
-                      {% if editor %}
-                      <input type="checkbox">
-                      {% else %}
-                      <input disabled type="checkbox">
-                      {% endif %}
-                      <span class="lever"></span>
-                      On
-                    </label>
-                  </div>
-                  <a href="#modal-command-opemote" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                </td>
-              </tr>
-              <tr class="row">
-                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                  <strong>Pyramid</strong><br />
-                  Sends 5 pieces of a pyramid, in a random order.
-                </td>
-                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                  <div class="switch" style="display: inline-block; margin-right: 5px;">
-                    <label>
-                      Off
-                      {% if editor %}
-                      <input type="checkbox">
-                      {% else %}
-                      <input disabled type="checkbox">
-                      {% endif %}
-                      <span class="lever"></span>
-                      On
-                    </label>
-                  </div>
-                  <a href="#modal-command-pyramid" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                </td>
-              </tr>
-              <tr class="row">
-                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                  <strong>Shoutout</strong><br />
-                  Promotes a channel of your choice.
-                </td>
-                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                  <div class="switch" style="display: inline-block; margin-right: 5px;">
-                    <label>
-                      Off
-                      {% if editor %}
-                      <input type="checkbox">
-                      {% else %}
-                      <input disabled type="checkbox">
-                      {% endif %}
-                      <span class="lever"></span>
-                      On
-                    </label>
-                  </div>
-                  <a href="#modal-command-shoutout" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div id="tab-aliases">
+
+          </div>
+          <div id="tab-commands">
+            <table>
+              <thead class="row">
+                <th class="col s10">Command</th>
+                <th class="col s2">Options</th>
+              </thead>
+              <tbody>
+                <tr class="row">
+                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                    <strong>Uptime</strong><br />
+                    Allows users to be able to check how long the stream has been live.
+                  </td>
+                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                    <div class="switch" style="display: inline-block; margin-right: 5px;">
+                      <label>
+                        Off
+                        {% if editor %}
+                        <input type="checkbox">
+                        {% else %}
+                        <input disabled type="checkbox">
+                        {% endif %}
+                        <span class="lever"></span>
+                        On
+                      </label>
+                    </div>
+                    <a href="#modal-command-uptime" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                  </td>
+                </tr>
+                <tr class="row">
+                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                    <strong>Chatters</strong><br />
+                    Posts the total number of users logged in to chat.
+                  </td>
+                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                    <div class="switch" style="display: inline-block; margin-right: 5px;">
+                      <label>
+                        Off
+                        {% if editor %}
+                        <input type="checkbox">
+                        {% else %}
+                        <input disabled type="checkbox">
+                        {% endif %}
+                        <span class="lever"></span>
+                        On
+                      </label>
+                    </div>
+                    <a href="#modal-command-chatters" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                  </td>
+                </tr>
+                <tr class="row">
+                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                    <strong>8Ball</strong><br />
+                    Post an answer to a yes/no question from a bank of options. <sub>Don't rely on this being accurate.</sub>
+                  </td>
+                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                    <div class="switch" style="display: inline-block; margin-right: 5px;">
+                      <label>
+                        Off
+                        {% if editor %}
+                        <input type="checkbox">
+                        {% else %}
+                        <input disabled type="checkbox">
+                        {% endif %}
+                        <span class="lever"></span>
+                        On
+                      </label>
+                    </div>
+                    <a href="#modal-command-magic" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                  </td>
+                </tr>
+                <tr class="row">
+                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                    <strong>Roulette</strong><br />
+                    Anyone using this command has a chance of being timed out.
+                  </td>
+                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                    <div class="switch" style="display: inline-block; margin-right: 5px;">
+                      <label>
+                        Off
+                        {% if editor %}
+                        <input type="checkbox">
+                        {% else %}
+                        <input disabled type="checkbox">
+                        {% endif %}
+                        <span class="lever"></span>
+                        On
+                      </label>
+                    </div>
+                    <a href="#modal-command-roulette" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                  </td>
+                </tr>
+                <tr class="row">
+                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                    <strong>Love</strong><br />
+                    Posts a random percentage of love between two users.
+                  </td>
+                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                    <div class="switch" style="display: inline-block; margin-right: 5px;">
+                      <label>
+                        Off
+                        {% if editor %}
+                        <input type="checkbox">
+                        {% else %}
+                        <input disabled type="checkbox">
+                        {% endif %}
+                        <span class="lever"></span>
+                        On
+                      </label>
+                    </div>
+                    <a href="#modal-command-love" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                  </td>
+                </tr>
+                <tr class="row">
+                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                    <strong>Get</strong><br />
+                    Gets data directly from the Twitch API.
+                  </td>
+                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                    <div class="switch" style="display: inline-block; margin-right: 5px;">
+                      <label>
+                        Off
+                        {% if editor %}
+                        <input type="checkbox">
+                        {% else %}
+                        <input disabled type="checkbox">
+                        {% endif %}
+                        <span class="lever"></span>
+                        On
+                      </label>
+                    </div>
+                    <a href="#modal-command-get" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                  </td>
+                </tr>
+                <tr class="row">
+                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                    <strong>Emote</strong><br />
+                    Posts a line of Twitch Emotes. There are 6 on each line.
+                  </td>
+                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                    <div class="switch" style="display: inline-block; margin-right: 5px;">
+                      <label>
+                        Off
+                        {% if editor %}
+                        <input type="checkbox">
+                        {% else %}
+                        <input disabled type="checkbox">
+                        {% endif %}
+                        <span class="lever"></span>
+                        On
+                      </label>
+                    </div>
+                    <a href="#modal-command-emote" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                  </td>
+                </tr>
+                <tr class="row">
+                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                    <strong>OPEmote</strong><br />
+                    Posts 15 lines of Twitch Emotes. There are 6 on each line.
+                  </td>
+                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                    <div class="switch" style="display: inline-block; margin-right: 5px;">
+                      <label>
+                        Off
+                        {% if editor %}
+                        <input type="checkbox">
+                        {% else %}
+                        <input disabled type="checkbox">
+                        {% endif %}
+                        <span class="lever"></span>
+                        On
+                      </label>
+                    </div>
+                    <a href="#modal-command-opemote" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                  </td>
+                </tr>
+                <tr class="row">
+                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                    <strong>Pyramid</strong><br />
+                    Sends 5 pieces of a pyramid, in a random order.
+                  </td>
+                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                    <div class="switch" style="display: inline-block; margin-right: 5px;">
+                      <label>
+                        Off
+                        {% if editor %}
+                        <input type="checkbox">
+                        {% else %}
+                        <input disabled type="checkbox">
+                        {% endif %}
+                        <span class="lever"></span>
+                        On
+                      </label>
+                    </div>
+                    <a href="#modal-command-pyramid" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                  </td>
+                </tr>
+                <tr class="row">
+                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                    <strong>Shoutout</strong><br />
+                    Promotes a channel of your choice.
+                  </td>
+                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                    <div class="switch" style="display: inline-block; margin-right: 5px;">
+                      <label>
+                        Off
+                        {% if editor %}
+                        <input type="checkbox">
+                        {% else %}
+                        <input disabled type="checkbox">
+                        {% endif %}
+                        <span class="lever"></span>
+                        On
+                      </label>
+                    </div>
+                    <a href="#modal-command-shoutout" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
     <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px;">
-      <h5 style="display: inline-block;">Features</h5><a style="float: right; display: inline" href="javascript:;" id="toggle-features" class="btn deep-purple darken-2 white-text modal-trigger">- Hide Panel</a>
+      <h5 style="display: inline-block;">Features</h5><a style="float: right; display: inline" href="javascript:;" id="toggle-features" class="btn purple darken-4 white-text modal-trigger">- Hide Panel</a>
       <div id="panel-features">
         <ul class="tabs">
           <li class="tab col s2"><a href="#tab-users">Users</a></li>
@@ -548,7 +643,7 @@
           <li class="tab col s2"><a href="#tab-points">Points</a></li>
         </ul>
         <div id="tab-users" class="row">
-          <div class="col s6">
+          <div class="col l6 m12">
             <h5 class="center">Editors</h5>
             {% if admin %}
             <hr />
@@ -588,7 +683,7 @@
               </tbody>
             </table>
           </div>
-          <div class="col s6">
+          <div class="col l6 m12">
             <h5 class="center">Regulars</h5>
             {% if editor %}
             <hr />
@@ -629,31 +724,161 @@
             </table>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px;">
-      <h5 style="display: inline-block;">Documentation</h5><a style="float: right; display: inline" href="javascript:;" id="toggle-documentation" class="btn deep-purple darken-2 white-text modal-trigger">- Hide Panel</a>
-      <div id="panel-documentation">
-        <ul class="tabs">
-          <li class="tab col s6"><a href="#tab-levels">User Levels</a></li>
-          <li class="tab col s6"><a href="#tab-string">String Replacements</a></li>
-        </ul>
-        <div id="tab-users" class="row">
+        <div id="tab-interaction" class="row">
+          <h5 style="display: inline-block;">Raffle</h5><br />
+          {% if editor %}
+          <div class="col s2">
+            <a class="btn purple darken-4 center" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-unlock" aria-hidden="true"></i><br />Open</a>
+            <a class="btn purple darken-4 center" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-refresh" aria-hidden="true"></i><br />Update</a>
+            <a class="btn purple darken-4 center" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-gift" aria-hidden="true"></i><br />Draw</a>
+            <a class="btn purple darken-4 center" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-retweet" aria-hidden="true"></i><br />Reset</a>
+          </div>
+          {% endif %}
+          <div class="col s10">
+          </div>
+          <hr style="margin: 0"/>
+        </div>
+        <div id="tab-alerts">
+          <div class="col s12">
+            <h5 style="display: inline-block; margin-top: 0;">Follower Alert</h5><span style="float: right; display: inline">
+              <div class="switch">
+                <label>
+                  Off
+                  {% if editor %}
+                  <input type="checkbox">
+                  {% else %}
+                  <input type="checkbox" disabled>
+                  {% endif %}
+                  <span class="lever"></span>
+                  On
+                </label>
+              </div>
+            </span>
+            {% if editor %}
+            <p>Custom Message:</p><input type="text" id="follow-alert-message" />
+            {% else %}
+            <p>Custom Message:</p><input type="text" disabled id="follow-alert-message" />
+            {% endif %}
+          </div>
+          <hr />
+          {% if partner %}
+          <div class="col s12">
+            <h5 style="display: inline-block; margin-top: 0;">Subscriber Alert</h5><span style="float: right; display: inline">
+              <div class="switch">
+                <label>
+                  Off
+                  {% if editor %}
+                  <input type="checkbox">
+                  {% else %}
+                  <input type="checkbox" disabled>
+                  {% endif %}
+                  <span class="lever"></span>
+                  On
+                </label>
+              </div>
+            </span>
+            {% if editor %}
+            <p>Custom Message:</p><input type="text" id="sub-alert-message" />
+            {% else %}
+            <p>Custom Message:</p><input type="text" disabled id="sub-alert-message" />
+            {% endif %}
+          </div>
+          <hr />
+          {% endif %}
+          <div class="col s12">
+            <h5 style="display: inline-block; margin-top: 0;">Auto-Welcome</h5><span style="float: right; display: inline">
+              <div class="switch">
+                <label>
+                  Off
+                  {% if editor %}
+                  <input type="checkbox">
+                  {% else %}
+                  <input type="checkbox" disabled>
+                  {% endif %}
+                  <span class="lever"></span>
+                  On
+                </label>
+              </div>
+            </span>
+            {% if editor %}
+            <p style="border-radius: 5px; font-size: 14px; padding: 5px;" class="red lighten-4"><strong>WARNING:</strong> It is common belief that using an Auto-Welcome system can cause viewers to leave your stream. Only use this if you know what you're doing!</p>
+            <p>Custom Message:</p><input type="text" id="auto-welcome-message" />
+            {% else %}
+            <p style="border-radius: 5px; font-size: 14px; padding: 5px;" class="red lighten-4"><strong>WARNING:</strong> It is common belief that using an Auto-Welcome system can cause viewers to leave your stream. Only use this if you know what you're doing!</p>
+            <p>Custom Message:</p><input type="text" disabled id="auto-welcome-message" />
+            {% endif %}
+          </div>
+          <hr />
+        </div>
+        <div id="tab-logs">
+
+        </div>
+        <div id="tab-events">
+
+        </div>
+        <div id="tab-points" class="row">
+          <div class="col s12 center">
+            {% if editor %}
+            <h5 style="display: inline-block;">Add/Remove/Lookup Points</h5><a style="float: right; display: inline" href="#modal-points-leaderboard" class="btn purple darken-4 white-text modal-trigger">Leaderboard</a>
+            {% else %}
+            <h5 style="display: inline-block;">Lookup Points</h5><a style="float: right; display: inline" href="#modal-points-leaderboard" class="btn purple darken-4 white-text modal-trigger">Leaderboard</a>
+            {% endif %}
+            <div class="col l10 m8 s6">
+              <input type="text" placeholder="Twitch Username" id="points-user" />
+            </div>
+            <div class="col l2 m4 s6">
+              <a href="javascript:;" class="btn purple darken-4" id="get-points-user" data-channel="{{owner}}">Search</a><br />
+            </div>
+            <div class="col s12" id="user-results" style="display: none;">
+              <p style="font-size: 18px;"><span id="points_user"></span>'s Points: <span id="user-points"></span></p>
+              {% if editor %}
+              <a href="javascript:;" data-channel="{{owner}}" data-points="-100" id="points-preset" class="btn purple darken-4" style="margin: 3px;">-100</a><a href="javascript:;" data-channel="{{owner}}" data-points="-50" id="points-preset" class="btn purple darken-4" style="margin: 3px;">-50</a><a href="javascript:;" data-channel="{{owner}}" data-points="-25" id="points-preset" class="btn purple darken-4" style="margin: 3px;">-25</a><a href="javascript:;" data-channel="{{owner}}" data-points="-10" id="points-preset" class="btn purple darken-4" style="margin: 3px;">-10</a><a href="javascript:;" data-channel="{{owner}}" data-points="-5" id="points-preset" class="btn purple darken-4" style="margin: 3px;">-5</a><a href="javascript:;" data-channel="{{owner}}" data-points="-1" id="points-preset" class="btn purple darken-4" style="margin: 3px;">-1</a><a href="javascript:;" data-channel="{{owner}}" data-points="1" id="points-preset" class="btn purple darken-4" style="margin: 3px;">+1</a><a href="javascript:;" data-channel="{{owner}}" data-points="5" id="points-preset" class="btn purple darken-4" style="margin: 3px;">+5</a><a href="javascript:;" data-channel="{{owner}}" data-points="10" id="points-preset" class="btn purple darken-4" style="margin: 3px;">+10</a><a href="javascript:;" data-channel="{{owner}}" data-points="25" id="points-preset" class="btn purple darken-4" style="margin: 3px;">+25</a><a href="javascript:;" data-channel="{{owner}}" data-points="50" id="points-preset" class="btn purple darken-4" style="margin: 3px;">+50</a><a href="javascript:;" data-channel="{{owner}}" data-points="100" id="points-preset" class="btn purple darken-4" style="margin: 3px;">+100</a>
+              <br /><br />
+              <div class="col s1 offset-s4">
+                <p>Set Points: </p>
+              </div>
+              <div class="col s1">
+                <input id="points-change" type="number"/>
+              </div>
+              <div class="col s2 center">
+                <a id="points-change-save" class="btn purple darken-4" href="javascript:;" data-channel="{{owner}}">Save</a>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          <hr style="margin: 0"/>
+          <div class="col l6 s12">
+            <h5 style="display: inline-block;">Claim</h5><br />
+          </div>
+          <div class="col l6 s12">
+            <h5 style="display: inline-block;">Auto-Points</h5><br />
+          </div>
+        </div>
+        <div id="modal-points-leaderboard" class="modal">
+          <div class="modal-content">
+            <h4>Points Leaderboard</h4>
+            <table>
+              <thead>
+                <th>#</th>
+                <th>Name</th>
+                <th>Total</th>
+              </thead>
+              <tbody>
+                {% for user in points %}
+                <tr>
+                  <td>{{loop.index}}</td>
+                  <td>{{user.id}}</td>
+                  <td>{{user.total}}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <a href="#!" class="modal-close btn-flat">Close</a>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-  <div id="modal-chat-logs" class="modal">
-    <div class="modal-content">
-      <h5>Chat Logs</h5>
-      {% for log in logs %}
-      {% if loop.index < 100 %}
-      <span><strong>{{log.display_name}}:</strong> {{log.content}}</span><br />
-      {% endif %}
-      {% endfor %}
-    </div>
-    <div class="modal-footer">
-      <a href="#!" class="btn right purple darken-4 modal-close">Close</a>
     </div>
   </div>
   {% else %}
@@ -668,6 +893,7 @@
   {% endif %}
   <script src="/js/twitch_commands.js"></script>
   <script src="/js/users.js"></script>
+  <script src="/js/points.js"></script>
   {% endif %}
   <script src="/js/twitch_dashboard.js"></script>
   {% include "./footer.html" %}

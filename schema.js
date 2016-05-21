@@ -10,7 +10,8 @@ schema.primarykey = {
   discordlogs: "id",
   twitchsettings: "id",
   twitchlogs: "id",
-  commands: "id"
+  commands: "id",
+  stats: "id"
 };
 
 schema.discordlogs = {
@@ -48,5 +49,10 @@ schema.commands = {
   reactivate_discord: type.date(),
   count: type.number()
 };
+
+schema.stats = {
+  id: type.string(),
+  twitch: type.number()
+}
 
 module.exports = schema;

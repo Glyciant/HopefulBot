@@ -43,7 +43,7 @@ select {
 	background-color: #6441A5;
 }
 
-.twitch-body-theme .switch-candy a {
+/*.twitch-body-theme .switch-candy a {
 	background-color: #B9A3E3;
 	box-shadow: 0;
 }
@@ -53,9 +53,8 @@ select {
 }
 
 .switch-candy label {
-	position: relative;
-	right: 5px;
-}
+	padding: 5px !important;
+}*/
 
 .panel-hidden {
 	display: none;
