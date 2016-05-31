@@ -1,30 +1,30 @@
 {% include "./header.html" %}
 {% if twitch == "suspended" %}
 <div class="row">
-  <div class="col s10 offset-s1 white" style="border-radius:20px; margin-top:15px; padding: 15px;">
+  <div class="col s10 offset-s1 white" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
     <h4 class="center">Sorry!</h4>
   </div>
 </div>
 <div class="row">
-  <div class="col s10 offset-s1 white" style="border-radius:20px; margin-top:15px; padding: 15px;">
+  <div class="col s10 offset-s1 white" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
     <p class="center">That account appears to be suspended from Twitch.</p>
   </div>
 </div>
 {% elseif twitch == "missing" %}
 <div class="row">
-  <div class="col s10 offset-s1 white" style="border-radius:20px; margin-top:15px; padding: 15px;">
+  <div class="col s10 offset-s1 white" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
     <h4 class="center">Sorry!</h4>
   </div>
 </div>
 <div class="row">
-  <div class="col s10 offset-s1 white" style="border-radius:20px; margin-top:15px; padding: 15px;">
+  <div class="col s10 offset-s1 white" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
     <p class="center">That account doesn't seem to exist on Twitch.</p>
   </div>
 </div>
 {% else %}
 <div class="row">
   <div class="col m3 hide-on-small">
-    <div class="white center" style="border-radius:20px; margin-top:15px; padding: 15px;">
+    <div class="white center" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
       <h4>{{twitch.display_name}}{% if !ends %}'s{% else %}'{% endif %} Dashboard</h4>
       {% if admin %}
       <a href="javascript:;" id="join-channel" class="btn purple darken-4 white-text">Join</a> <a href="javascript:;" id="part-channel" class="btn purple darken-4 white-text">Part</a><br />
@@ -46,11 +46,11 @@
       <br /><br />
       {% endif %}
     </div>
-    <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px;">
+    <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
       <h5 class="center">Shortcuts</h5>
       Coming Soon
     </div>
-    <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px;">
+    <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
       <h5 class="center">Twitch Info</h5>
       <input type="text" value="{{status}}" placeholder="Stream Title" id="stream-title" data-channel="{{owner}}">
       <input type="text" value="{{game}}" placeholder="Stream Game" id="stream-game" data-channel="{{owner}}">
@@ -113,11 +113,11 @@
         </div>
       </div>
     </div>
-    <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px;">
+    <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
       <h5 class="center">Chat</h5>
       <iframe frameborder="0" scrolling="no" id="chat_embed" src="http://www.twitch.tv/{{owner}}/chat" height="600" width="100%"></iframe>
     </div>
-    <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px;">
+    <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
       <h5 class="center">Heepsbot Statistics</h5>
       <p><strong>Twitch Channels Present:</strong> {{stats.twitch_total}}</p>
       <p><strong>Discord Servers Present:</strong> {{stats.discord_total}}</p>
@@ -127,12 +127,14 @@
       <p><strong>Discord Messages Sent:</strong> {{stats.discord_messages_sent}}</p>
       <p><strong>Twitch Actions Total:</strong> {{stats.twitch_actions}}</p>
       <p><strong>Discord Actions Total:</strong> {{stats.discord_actions}}</p>
+      {% if stats.twitch_mod_total %}
       <p><strong>Twitch Mod Status Count:</strong> {{stats.twitch_mod_total}}</p>
+      {% endif %}
     </div>
   </div>
   {% if exists %}
   <div class="col m9 s12">
-    <div class="white row" style="border-radius:20px; margin-top:15px; padding: 15px;">
+    <div class="white row" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
       <h5 style="display: inline-block;">Spam Protection</h5><a style="float: right; display: inline" href="javascript:;" id="toggle-spam" class="btn purple darken-4 white-text modal-trigger">- Hide Panel</a>
       <div id="panel-spam" class="panel-shown">
         <table class="bordered">
@@ -159,7 +161,124 @@
                     On
                   </label>
                 </div>
-                <a href="#modal-link-protection" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                <a href="#modal-link-protection" class="btn purple darken-4 modal-trigger"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                <div id="modal-link-protection" class="modal">
+                  <div class="modal-content">
+                    <h4>Link Protection</h4>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Remove Messages with IPs:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="link-protection-ips">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Prevent Evasion Attempts:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="link-protection-evasion">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Post Removal Message:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="link-protection-post-message">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Custom Removal Message:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="text" id="link-protection-message" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Use Warning Timeout:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="link-protection-warning">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Warning Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" id="link-protection-warning-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Full Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" id="link-protection-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Immunity Level:</p>
+                      </div>
+                      <div class="col s6">
+                        <select id="link-protection-level">
+                          <option>Moderators and Above (500)</option>
+                          <option>Regulars and Above (600)</option>
+                          {% if partner %}
+                          <option>Subscribers and Above (700)</option>
+                          {% endif %}
+                          <option>Turbo and Above (750)</option>
+                          <option>All Users (800)</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Whitelist:</p>
+                      </div>
+                      <div class="col s6">
+                        <textarea id="link-protection-whitelist"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+                    <a href="#!" class="modal-action modal-close btn-flat">Save and Close</a>
+                  </div>
+                </div>
               </td>
             </tr>
             <tr class="row">
@@ -271,7 +390,7 @@
         </table>
       </div>
     </div>
-    <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px;">
+    <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
       <h5 style="display: inline-block;">Commands</h5><a style="float: right; display: inline" href="javascript:;" id="toggle-commands" class="btn purple darken-4 white-text modal-trigger">- Hide Panel</a>
       <div id="panel-commands">
         <ul class="tabs">
@@ -350,7 +469,7 @@
                     <h4>Edit Command - {{command.name}}</h4>
                     <form class="col s12">
                       <div class="input-field col s12">
-                        <input value="{{command.name}}" placeholder="!twitter" id="edit-command_name-{{command.id}}" type="text" class="validate">
+                        <input value="{{command.name}}" placeholder="!twitter" id="edit-command_name-{{command.id}}" type="text">
                         <label for="edit-command_name-{{command.id}}">Command Name</label>
                       </div>
                       <div class="input-field col s12">
@@ -373,15 +492,15 @@
                         </select>
                       </div>
                       <div class="input-field col s6">
-                        <input value="{{command.cost}}" placeholder="10" id="edit-command_cost-{{command.id}}" type="number" class="validate">
+                        <input value="{{command.cost}}" placeholder="10" id="edit-command_cost-{{command.id}}" type="number">
                         <label for="edit-command_cost-{{command.id}}">Command Points Cost</label>
                       </div>
                       <div class="input-field col s6">
-                        <input value="{{command.add}}" placeholder="5" id="edit-command_reward-{{command.id}}" type="number" class="validate">
+                        <input value="{{command.add}}" placeholder="5" id="edit-command_reward-{{command.id}}" type="number">
                         <label for="edit-command_reward-{{command.id}}">Command Points Reward</label>
                       </div>
                       <div class="input-field col s12">
-                        <input value="{{command.cooldown}}" placeholder="30" id="edit-command_cooldown-{{command.id}}" type="number" class="validate">
+                        <input value="{{command.cooldown}}" placeholder="30" id="edit-command_cooldown-{{command.id}}" type="number">
                         <label for="edit-command_cooldown-{{command.id}}">Command Cooldown</label>
                       </div>
                     </form>
@@ -405,233 +524,300 @@
               {% endfor %}
             </tbody>
           </table>
-          <div id="tab-aliases">
+          {%if !commands[0]%}
+          <p class="center"><i>None</i></p>
+          {%endif%}
+        </div>
+        <div id="tab-aliases">
+          {% if editor %}<a style="float: right; display: inline" href="#modal-add-alias" class="btn purple darken-4 white-text modal-trigger">+ Add Alias</a>
+          <div id="modal-add-alias" class="modal">
+            <div class="modal-content">
+              <h4>Add Alias</h4>
+              <form class="col s12">
+                <div class="input-field col s12">
+                  <input placeholder="!twitter" id="command_name" type="text">
+                  <label for="command_name">Alias Name</label>
+                </div>
+                <div class="input-field col s12">
+                  <select id="alias-command">
 
+                  </select>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <a href="#!" class="modal-close btn-flat" id="add-alias" data-user="{{owner}}">Add</a>
+            </div>
           </div>
-          <div id="tab-commands">
-            <table>
-              <thead class="row">
-                <th class="col s10">Command</th>
-                <th class="col s2">Options</th>
-              </thead>
-              <tbody>
-                <tr class="row">
-                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                    <strong>Uptime</strong><br />
-                    Allows users to be able to check how long the stream has been live.
-                  </td>
-                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                    <div class="switch" style="display: inline-block; margin-right: 5px;">
-                      <label>
-                        Off
-                        {% if editor %}
-                        <input type="checkbox">
-                        {% else %}
-                        <input disabled type="checkbox">
-                        {% endif %}
-                        <span class="lever"></span>
-                        On
-                      </label>
-                    </div>
-                    <a href="#modal-command-uptime" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                  </td>
-                </tr>
-                <tr class="row">
-                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                    <strong>Chatters</strong><br />
-                    Posts the total number of users logged in to chat.
-                  </td>
-                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                    <div class="switch" style="display: inline-block; margin-right: 5px;">
-                      <label>
-                        Off
-                        {% if editor %}
-                        <input type="checkbox">
-                        {% else %}
-                        <input disabled type="checkbox">
-                        {% endif %}
-                        <span class="lever"></span>
-                        On
-                      </label>
-                    </div>
-                    <a href="#modal-command-chatters" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                  </td>
-                </tr>
-                <tr class="row">
-                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                    <strong>8Ball</strong><br />
-                    Post an answer to a yes/no question from a bank of options. <sub>Don't rely on this being accurate.</sub>
-                  </td>
-                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                    <div class="switch" style="display: inline-block; margin-right: 5px;">
-                      <label>
-                        Off
-                        {% if editor %}
-                        <input type="checkbox">
-                        {% else %}
-                        <input disabled type="checkbox">
-                        {% endif %}
-                        <span class="lever"></span>
-                        On
-                      </label>
-                    </div>
-                    <a href="#modal-command-magic" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                  </td>
-                </tr>
-                <tr class="row">
-                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                    <strong>Roulette</strong><br />
-                    Anyone using this command has a chance of being timed out.
-                  </td>
-                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                    <div class="switch" style="display: inline-block; margin-right: 5px;">
-                      <label>
-                        Off
-                        {% if editor %}
-                        <input type="checkbox">
-                        {% else %}
-                        <input disabled type="checkbox">
-                        {% endif %}
-                        <span class="lever"></span>
-                        On
-                      </label>
-                    </div>
-                    <a href="#modal-command-roulette" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                  </td>
-                </tr>
-                <tr class="row">
-                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                    <strong>Love</strong><br />
-                    Posts a random percentage of love between two users.
-                  </td>
-                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                    <div class="switch" style="display: inline-block; margin-right: 5px;">
-                      <label>
-                        Off
-                        {% if editor %}
-                        <input type="checkbox">
-                        {% else %}
-                        <input disabled type="checkbox">
-                        {% endif %}
-                        <span class="lever"></span>
-                        On
-                      </label>
-                    </div>
-                    <a href="#modal-command-love" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                  </td>
-                </tr>
-                <tr class="row">
-                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                    <strong>Get</strong><br />
-                    Gets data directly from the Twitch API.
-                  </td>
-                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                    <div class="switch" style="display: inline-block; margin-right: 5px;">
-                      <label>
-                        Off
-                        {% if editor %}
-                        <input type="checkbox">
-                        {% else %}
-                        <input disabled type="checkbox">
-                        {% endif %}
-                        <span class="lever"></span>
-                        On
-                      </label>
-                    </div>
-                    <a href="#modal-command-get" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                  </td>
-                </tr>
-                <tr class="row">
-                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                    <strong>Emote</strong><br />
-                    Posts a line of Twitch Emotes. There are 6 on each line.
-                  </td>
-                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                    <div class="switch" style="display: inline-block; margin-right: 5px;">
-                      <label>
-                        Off
-                        {% if editor %}
-                        <input type="checkbox">
-                        {% else %}
-                        <input disabled type="checkbox">
-                        {% endif %}
-                        <span class="lever"></span>
-                        On
-                      </label>
-                    </div>
-                    <a href="#modal-command-emote" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                  </td>
-                </tr>
-                <tr class="row">
-                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                    <strong>OPEmote</strong><br />
-                    Posts 15 lines of Twitch Emotes. There are 6 on each line.
-                  </td>
-                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                    <div class="switch" style="display: inline-block; margin-right: 5px;">
-                      <label>
-                        Off
-                        {% if editor %}
-                        <input type="checkbox">
-                        {% else %}
-                        <input disabled type="checkbox">
-                        {% endif %}
-                        <span class="lever"></span>
-                        On
-                      </label>
-                    </div>
-                    <a href="#modal-command-opemote" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                  </td>
-                </tr>
-                <tr class="row">
-                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                    <strong>Pyramid</strong><br />
-                    Sends 5 pieces of a pyramid, in a random order.
-                  </td>
-                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                    <div class="switch" style="display: inline-block; margin-right: 5px;">
-                      <label>
-                        Off
-                        {% if editor %}
-                        <input type="checkbox">
-                        {% else %}
-                        <input disabled type="checkbox">
-                        {% endif %}
-                        <span class="lever"></span>
-                        On
-                      </label>
-                    </div>
-                    <a href="#modal-command-pyramid" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                  </td>
-                </tr>
-                <tr class="row">
-                  <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
-                    <strong>Shoutout</strong><br />
-                    Promotes a channel of your choice.
-                  </td>
-                  <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
-                    <div class="switch" style="display: inline-block; margin-right: 5px;">
-                      <label>
-                        Off
-                        {% if editor %}
-                        <input type="checkbox">
-                        {% else %}
-                        <input disabled type="checkbox">
-                        {% endif %}
-                        <span class="lever"></span>
-                        On
-                      </label>
-                    </div>
-                    <a href="#modal-command-shoutout" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          {% endif %}
+          <table class="bordered">
+            <thead class="row">
+              <th style="padding: 5px;" class="col s2">Alias Name</th>
+              <th style="padding: 5px;" class="col s8">Command Name</th>
+              {% if editor %}
+              <th  style="padding: 5px;"class="col s2">Actions</th>
+              {% endif %}
+            </thead>
+            <tbody>
+              {% for alias in aliases %}
+              <tr class="row" style="margin-top: 5px;">
+                <td class="col s2" style="padding: 5px;">{{alias.name}}</td>
+                <td class="col s8" style="padding: 5px;">{{alias.response}}</td>
+                {% if editor %}
+                <td class="col s2" style="padding: 5px;">
+                  <a class="btn orange darken-4 white-text modal-trigger" href="#modal-edit-{{alias.name}}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                  <a class="btn red darken-4 white-text modal-trigger" href="#modal-delete-{{alias.name}}"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                </td>
+                <div id="modal-edit-{{command.name}}" class="modal">
+                  <div class="modal-content">
+                    <h4>Edit Alias - {{alias.name}}</h4>
+                  </div>
+                  <div class="modal-footer">
+                    <a href="#!" class="modal-close btn-flat" id="edit-alias" data-channel="{{owner}}" data-id="{{alias.id}}">Edit</a>
+                  </div>
+                </div>
+                <div id="modal-delete-{{alias.name}}" class="modal">
+                  <div class="modal-content">
+                    <h4>Confirm Action</h4>
+                    <p>Are you sure you want to delete alias {{alias.name}}?</p>
+                  </div>
+                  <div class="modal-footer">
+                    <a href="#!" class="modal-close btn-flat">No</a>
+                    <a href="#!" class="modal-close btn-flat" id="delete-alias" data-id="{{alias.id}}">Yes</a>
+                  </div>
+                </div>
+                {% endif %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {%if !aliases[0]%}
+          <p class="center"><i>None</i></p>
+          {%endif%}
+        </div>
+        <div id="tab-commands">
+          <table>
+            <thead class="row">
+              <th class="col s10">Command</th>
+              <th class="col s2">Options</th>
+            </thead>
+            <tbody>
+              <tr class="row">
+                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                  <strong>Uptime</strong><br />
+                  Allows users to be able to check how long the stream has been live.
+                </td>
+                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                  <div class="switch" style="display: inline-block; margin-right: 5px;">
+                    <label>
+                      Off
+                      {% if editor %}
+                      <input type="checkbox">
+                      {% else %}
+                      <input disabled type="checkbox">
+                      {% endif %}
+                      <span class="lever"></span>
+                      On
+                    </label>
+                  </div>
+                  <a href="#modal-command-uptime" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                </td>
+              </tr>
+              <tr class="row">
+                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                  <strong>Chatters</strong><br />
+                  Posts the total number of users logged in to chat.
+                </td>
+                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                  <div class="switch" style="display: inline-block; margin-right: 5px;">
+                    <label>
+                      Off
+                      {% if editor %}
+                      <input type="checkbox">
+                      {% else %}
+                      <input disabled type="checkbox">
+                      {% endif %}
+                      <span class="lever"></span>
+                      On
+                    </label>
+                  </div>
+                  <a href="#modal-command-chatters" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                </td>
+              </tr>
+              <tr class="row">
+                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                  <strong>8Ball</strong><br />
+                  Post an answer to a yes/no question from a bank of options. <sub>Don't rely on this being accurate.</sub>
+                </td>
+                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                  <div class="switch" style="display: inline-block; margin-right: 5px;">
+                    <label>
+                      Off
+                      {% if editor %}
+                      <input type="checkbox">
+                      {% else %}
+                      <input disabled type="checkbox">
+                      {% endif %}
+                      <span class="lever"></span>
+                      On
+                    </label>
+                  </div>
+                  <a href="#modal-command-magic" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                </td>
+              </tr>
+              <tr class="row">
+                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                  <strong>Roulette</strong><br />
+                  Anyone using this command has a chance of being timed out.
+                </td>
+                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                  <div class="switch" style="display: inline-block; margin-right: 5px;">
+                    <label>
+                      Off
+                      {% if editor %}
+                      <input type="checkbox">
+                      {% else %}
+                      <input disabled type="checkbox">
+                      {% endif %}
+                      <span class="lever"></span>
+                      On
+                    </label>
+                  </div>
+                  <a href="#modal-command-roulette" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                </td>
+              </tr>
+              <tr class="row">
+                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                  <strong>Love</strong><br />
+                  Posts a random percentage of love between two users.
+                </td>
+                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                  <div class="switch" style="display: inline-block; margin-right: 5px;">
+                    <label>
+                      Off
+                      {% if editor %}
+                      <input type="checkbox">
+                      {% else %}
+                      <input disabled type="checkbox">
+                      {% endif %}
+                      <span class="lever"></span>
+                      On
+                    </label>
+                  </div>
+                  <a href="#modal-command-love" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                </td>
+              </tr>
+              <tr class="row">
+                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                  <strong>Get</strong><br />
+                  Gets data directly from the Twitch API.
+                </td>
+                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                  <div class="switch" style="display: inline-block; margin-right: 5px;">
+                    <label>
+                      Off
+                      {% if editor %}
+                      <input type="checkbox">
+                      {% else %}
+                      <input disabled type="checkbox">
+                      {% endif %}
+                      <span class="lever"></span>
+                      On
+                    </label>
+                  </div>
+                  <a href="#modal-command-get" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                </td>
+              </tr>
+              <tr class="row">
+                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                  <strong>Emote</strong><br />
+                  Posts a line of Twitch Emotes. There are 6 on each line.
+                </td>
+                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                  <div class="switch" style="display: inline-block; margin-right: 5px;">
+                    <label>
+                      Off
+                      {% if editor %}
+                      <input type="checkbox">
+                      {% else %}
+                      <input disabled type="checkbox">
+                      {% endif %}
+                      <span class="lever"></span>
+                      On
+                    </label>
+                  </div>
+                  <a href="#modal-command-emote" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                </td>
+              </tr>
+              <tr class="row">
+                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                  <strong>OPEmote</strong><br />
+                  Posts 15 lines of Twitch Emotes. There are 6 on each line.
+                </td>
+                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                  <div class="switch" style="display: inline-block; margin-right: 5px;">
+                    <label>
+                      Off
+                      {% if editor %}
+                      <input type="checkbox">
+                      {% else %}
+                      <input disabled type="checkbox">
+                      {% endif %}
+                      <span class="lever"></span>
+                      On
+                    </label>
+                  </div>
+                  <a href="#modal-command-opemote" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                </td>
+              </tr>
+              <tr class="row">
+                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                  <strong>Pyramid</strong><br />
+                  Sends 5 pieces of a pyramid, in a random order.
+                </td>
+                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                  <div class="switch" style="display: inline-block; margin-right: 5px;">
+                    <label>
+                      Off
+                      {% if editor %}
+                      <input type="checkbox">
+                      {% else %}
+                      <input disabled type="checkbox">
+                      {% endif %}
+                      <span class="lever"></span>
+                      On
+                    </label>
+                  </div>
+                  <a href="#modal-command-pyramid" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                </td>
+              </tr>
+              <tr class="row">
+                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                  <strong>Shoutout</strong><br />
+                  Promotes a channel of your choice.
+                </td>
+                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                  <div class="switch" style="display: inline-block; margin-right: 5px;">
+                    <label>
+                      Off
+                      {% if editor %}
+                      <input type="checkbox">
+                      {% else %}
+                      <input disabled type="checkbox">
+                      {% endif %}
+                      <span class="lever"></span>
+                      On
+                    </label>
+                  </div>
+                  <a href="#modal-command-shoutout" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
-    <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px;">
+    <div class="white" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
       <h5 style="display: inline-block;">Features</h5><a style="float: right; display: inline" href="javascript:;" id="toggle-features" class="btn purple darken-4 white-text modal-trigger">- Hide Panel</a>
       <div id="panel-features">
         <ul class="tabs">
@@ -649,7 +835,7 @@
             <hr />
             <div class="row">
               <div class="input-field col s6 offset-s1">
-                <input id="new_editor" type="text" class="validate">
+                <input id="new_editor" type="text">
                 <label for="new_editor">Add Editor</label>
               </div>
               <div class="col s2 offset-s1">
@@ -674,12 +860,15 @@
                     <p>Are you sure you want to remove {{user}} as an editor?</p>
                   </div>
                   <div class="modal-footer">
-                    <a href="#!" class="modal-close btn-flat white-text green darken-4">No</a>
-                    <a href="#!" class="modal-close btn-flat white-text red darken-4" id="remove-editor" data-user="{{user}}" data-channel="{{username}}">Yes</a>
+                    <a href="#!" class="modal-close btn-flat">No</a>
+                    <a href="#!" class="modal-close btn-flat" id="remove-editor" data-user="{{user}}" data-channel="{{username}}">Yes</a>
                   </div>
                 </div>
                 {% endif %}
                 {% endfor %}
+                {%if !editors[0]%}
+                <p class="center"><i>None</i></p>
+                {%endif%}
               </tbody>
             </table>
           </div>
@@ -689,7 +878,7 @@
             <hr />
             <div class="row">
               <div class="input-field col s6 offset-s1">
-                <input id="new_regular" type="text" class="validate">
+                <input id="new_regular" type="text">
                 <label for="new_regular">Add Regular</label>
               </div>
               <div class="col s2 offset-s1">
@@ -714,29 +903,178 @@
                     <p>Are you sure you want to remove {{regular}} as a regular?</p>
                   </div>
                   <div class="modal-footer">
-                    <a href="#!" class="modal-close btn-flat white-text green darken-4">No</a>
-                    <a href="#!" class="modal-close btn-flat white-text red darken-4" id="remove-regular" data-user="{{regular}}" data-channel="{{username}}">Yes</a>
+                    <a href="#!" class="modal-close btn-flat">No</a>
+                    <a href="#!" class="modal-close btn-flat" id="remove-regular" data-user="{{regular}}" data-channel="{{username}}">Yes</a>
                   </div>
                 </div>
                 {% endif %}
                 {% endfor %}
+                {%if !regulars[0]%}
+                <p class="center"><i>None</i></p>
+                {%endif%}
               </tbody>
             </table>
           </div>
         </div>
         <div id="tab-interaction" class="row">
-          <h5 style="display: inline-block;">Raffle</h5><br />
-          {% if editor %}
-          <div class="col s2">
-            <a class="btn purple darken-4 center" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-unlock" aria-hidden="true"></i><br />Open</a>
-            <a class="btn purple darken-4 center" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-refresh" aria-hidden="true"></i><br />Update</a>
-            <a class="btn purple darken-4 center" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-gift" aria-hidden="true"></i><br />Draw</a>
-            <a class="btn purple darken-4 center" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-retweet" aria-hidden="true"></i><br />Reset</a>
-          </div>
-          {% endif %}
-          <div class="col s10">
+          <div class="col s12">
+            <h5 class="center">Raffle</h5><br />
+            {% if editor %}
+            <div class="col s2">
+              {% if !raffle.key && !raffle.open %}
+              <a class="btn purple darken-4 center modal-trigger" id="raffle-setup" href="#modal-open-raffle" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-unlock" aria-hidden="true"></i><br />Open</a>
+              <a class="btn purple darken-4 center panel-hidden" href="javascript:;" id="raffle-reopen" data-channel="{{owner}}" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-unlock" aria-hidden="true"></i><br />Open</a>
+              <a class="btn purple darken-4 center panel-hidden" href="javascript:;" id="raffle-close" data-channel="{{owner}}" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-lock" aria-hidden="true"></i><br />Close</a>
+              <a class="btn purple darken-4 center" href="javascript:;" id="raffle-update" data-channel="{{owner}}" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-refresh" aria-hidden="true"></i><br />Update</a>
+              <a class="btn purple darken-4 center" href="javascript:;" id="raffle-draw" data-channel="{{owner}}" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-gift" aria-hidden="true"></i><br />Draw</a>
+              <a class="btn purple darken-4 center" href="javascript:;" id="raffle-reset" data-channel="{{owner}}" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-retweet" aria-hidden="true"></i><br />Reset</a>
+              {% elseif !raffle.open %}
+              <a class="btn purple darken-4 center modal-trigger panel-hidden" id="raffle-setup" href="#modal-open-raffle" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-unlock" aria-hidden="true"></i><br />Open</a>
+              <a class="btn purple darken-4 center" href="javascript:;" id="raffle-reopen" data-channel="{{owner}}" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-unlock" aria-hidden="true"></i><br />Open</a>
+              <a class="btn purple darken-4 center panel-hidden" href="javascript:;" id="raffle-close" data-channel="{{owner}}" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-lock" aria-hidden="true"></i><br />Close</a>
+              <a class="btn purple darken-4 center" href="javascript:;" id="raffle-update" data-channel="{{owner}}" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-refresh" aria-hidden="true"></i><br />Update</a>
+              <a class="btn purple darken-4 center" href="javascript:;" id="raffle-draw" data-channel="{{owner}}" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-gift" aria-hidden="true"></i><br />Draw</a>
+              <a class="btn purple darken-4 center" href="javascript:;" id="raffle-reset" data-channel="{{owner}}" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-retweet" aria-hidden="true"></i><br />Reset</a>
+              {% else %}
+              <a class="btn purple darken-4 center modal-trigger panel-hidden" id="raffle-setup" href="#modal-open-raffle" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-unlock" aria-hidden="true"></i><br />Open</a>
+              <a class="btn purple darken-4 center panel-hidden" href="javascript:;" id="raffle-reopen" data-channel="{{owner}}" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-unlock" aria-hidden="true"></i><br />Open</a>
+              <a class="btn purple darken-4 center" href="javascript:;" id="raffle-close" data-channel="{{owner}}" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-lock" aria-hidden="true"></i><br />Close</a>
+              <a class="btn purple darken-4 center" href="javascript:;" id="raffle-update" data-channel="{{owner}}" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-refresh" aria-hidden="true"></i><br />Update</a>
+              <a class="btn purple darken-4 center" href="javascript:;" id="raffle-draw" data-channel="{{owner}}" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-gift" aria-hidden="true"></i><br />Draw</a>
+              <a class="btn purple darken-4 center" href="javascript:;" id="raffle-reset" data-channel="{{owner}}" style="height: auto; width: 100%; margin-bottom: 5px;"><i class="fa fa-retweet" aria-hidden="true"></i><br />Reset</a>
+              {% endif %}
+            </div>
+            <div id="modal-open-raffle" class="modal">
+              <div class="modal-content">
+                <h4>Open Raffle</h4>
+                <form class="col s12">
+                  <div class="input-field col s6">
+                    <input placeholder="!raffle" id="raffle-key" type="text">
+                    <label for="raffle-key">Key</label>
+                  </div>
+                  <div class="input-field col s3">
+                    <input id="raffle-cost" type="number">
+                    <label for="raffle-cost">Points Cost</label>
+                  </div>
+                  <div class="input-field col s3">
+                    Exclude Cheaters:
+                    <div class="switch">
+                       <label style="margin-top: 17px;">
+                         Off
+                         <input type="checkbox" id="raffle-exclude-cheaters">
+                         <span class="lever"></span>
+                         On
+                       </label>
+                     </div>
+                  </div>
+                  {% if partner %}
+                  <div class="input-field col s6">
+                    Subscriber Mutliplier:
+                    <p class="range-field">
+                      <input type="range" id="raffle-subscriber-multiplier" value="1" min="1" max="10" />
+                    </p>
+                  </div>
+                  <div class="input-field col s6">
+                    Regular Mutliplier:
+                    <p class="range-field">
+                      <input type="range" id="raffle-regular-multiplier" value="1" min="1" max="10" />
+                    </p>
+                  </div>
+                  {% else %}
+                  <div class="input-field col s12">
+                    Regular Mutliplier:
+                    <p class="range-field">
+                      <input type="range" id="raffle-regular-multiplier" value="1" min="1" max="10" />
+                    </p>
+                  </div>
+                  {% endif %}
+                </form>
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-close btn-flat">Cancel</a>
+                <a href="#!" class="modal-close btn-flat" id="raffle-open" data-channel="{{owner}}">Open</a>
+              </div>
+            </div>
+            {% endif %}
+            <div class="offset-s2 col s6">
+              <p>Status: <span id="raffle-status">
+                {% if raffle.key && raffle.open %}
+                  Open
+                {% elseif raffle.key %}
+                  Closed
+                {% else %}
+                  Not Setup
+                {% endif %}
+              </span></p>
+              <p>Command: <span id="raffle-command">
+                {% if raffle.key %}
+                  {{raffle.key}}
+                {% endif %}</span></p>
+              <p>Cost: <span id="raffle-points">
+                {% if raffle.cost %}
+                  {{raffle.cost}}
+                {% endif %}
+              </span></p>
+              <p>Entrants: <span id="raffle-entrant">
+                {% if raffle.users %}
+                  {{raffle.users.length}}
+                {% endif %}</span></p>
+              <p>Excluding Cheaters: <span id="raffle-excluding-cheaters">
+                {% if raffle.exclude_cheaters %}
+                  Yes
+                {% else %}
+                  No
+                {% endif %}</span></p>
+              <p>Regular Multiplier: <span id="raffle-regular_multiplier">
+                {% if raffle.regular_multiplier %}
+                  {{raffle.regular_multiplier}}
+                {% endif %}</span></p>
+              {% if partner %}
+              <p>Subscriber Multiplier: <span id="raffle-sub_multiplier">
+                {% if raffle.sub_multiplier%}
+                  {{raffle.sub_multiplier}}
+                {% endif %}</span></p>
+              {% endif %}
+            </div>
+            <div id="modal-raffle-winner" class="modal">
+             <div class="modal-content row">
+               <h4>Raffle Winner</h4>
+               <center class="col s4 offset-s4">
+                 <img id="raffle-winner-icon" style="width: 60%;" />
+                 <br />
+                 <h3 id="raffle-winner-name" style="width: 100%;"></h3>
+                 <hr />
+                 <h5 id="raffle-winner-message" style="width: 100%;"></h5>
+                 <h5 id="raffle-winner-follower" style="width: 100%;"></h5>
+                 <h5 id="raffle-winner-subscriber" style="width: 100%;"></h5>
+                 <a href="javascript:;" class="btn purple darken-4 center" data-channel="{{owner}}" id="raffle-winner-announce">Announce In Chat</a>
+                 <a href="javascript:;" class="btn purple darken-4 center" data-channel="{{owner}}" id="raffle-winner-remove" style="margin-top: 5px;">Remove Further Entries</a>
+               </center>
+             </div>
+             <div class="modal-footer row">
+               <a href="#!" class="modal-close modal-action btn-flat">Close</a>
+             </div>
+           </div>
           </div>
           <hr style="margin: 0"/>
+          <div class="col s12">
+            <h5 class="center">Poll</h5><br />
+          </div>
+          <hr style="margin: 0"/>
+          <div class="col s12">
+            <h5 class="center">Song Requests</h5><br />
+          </div>
+          <hr style="margin: 0"/>
+          <div class="col s12">
+            <h5 class="center">Highlight Times</h5><br />
+          </div>
+          <hr style="margin: 0"/>
+          <div class="col m8 s12">
+            <h5 class="center">Quotes</h5><br />
+          </div>
+          <div class="col m4 s12">
+            <h5 class="center">Shoutout</h5><br />
+          </div>
         </div>
         <div id="tab-alerts">
           <div class="col s12">
@@ -811,10 +1149,72 @@
           <hr />
         </div>
         <div id="tab-logs">
-
+          <div class="row">
+            <div class="col l6 s12">
+              <h5 class="center" style="display: inline-block;">Chat Logs (Last 50)</h5><a style="float: right; display: inline" href="#modal-chat-logs" class="btn purple darken-4 white-text modal-trigger">More</a>
+              <hr />
+              <table class="bordered striped">
+                <thead class="row">
+                  <th class="col s3">Date</th>
+                  <th class="col s3">Username</th>
+                  <th class="col s6">Message</th>
+                </thead>
+                <tbody>
+                  {% for log in twitch_chat_logs %}
+                  {% if log.display_name !== "Heepsbot" && loop.index < 51 %}
+                  <tr class="row" data-user="{{log.display_name|lower}}" style="margin-top: 5px;">
+                    <td class="col s3">{{log.date|date("j/n\/y H\:i")}}</td>
+                    <td class="col s3">{{log.display_name}}</td>
+                    <td class="col s6">{{log.content}}</td>
+                  </tr>
+                  {% endif %}
+                  {% endfor %}
+                </tbody>
+              </table>
+              {%if !twitch_chat_logs[0]%}
+              <p class="center"><i>No Logs Found</i></p>
+              {%endif%}
+              <div id="modal-chat-logs" class="modal">
+                <div class="modal-content">
+                  <h4>Chat Logs</h4>
+                  <table class="bordered striped">
+                    <thead class="row">
+                      <th class="col s3">Date (UTC)</th>
+                      <th class="col s3">Username</th>
+                      <th class="col s6">Message</th>
+                    </thead>
+                    <tbody>
+                      {% for log in twitch_chat_logs %}
+                      {% if log.display_name !== "Heepsbot" %}
+                      <tr class="row" data-user="{{log.display_name|lower}}" style="margin-top: 5px;">
+                        <td class="col s3">{{log.date|date("j/n\/y H\:i")}}</td>
+                        <td class="col s3">{{log.display_name}}</td>
+                        <td class="col s6">{{log.content}}</td>
+                      </tr>
+                      {% endif %}
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  {%if !twitch_chat_logs[0]%}
+                  <p class="center"><i>No Logs Found</i></p>
+                  {%endif%}
+                </div>
+                <div class="modal-footer">
+                  <a href="#!" class="modal-close btn-flat">Close</a>
+                </div>
+              </div>
+            </div>
+            <div class="col l6 s12">
+              <h5 class="center" style="display: inline-block;">Event Logs (Last 50)</h5><a style="float: right; display: inline" href="#modal-event-logs" class="btn purple darken-4 white-text modal-trigger">More</a>
+              <hr />
+            </div>
+          </div>
         </div>
         <div id="tab-events">
-
+          <div class="col s12">
+            <h5 class="center">Timers</h5><br />
+            <h5 class="center">Auto-Host</h5><br />
+          </div>
         </div>
         <div id="tab-points" class="row">
           <div class="col s12 center">
@@ -873,6 +1273,9 @@
                 {% endfor %}
               </tbody>
             </table>
+            {%if !points[0]%}
+            <p class="center"><i>No Users Found</i></p>
+            {%endif%}
           </div>
           <div class="modal-footer">
             <a href="#!" class="modal-close btn-flat">Close</a>
@@ -883,17 +1286,18 @@
   </div>
   {% else %}
   <div class="row">
-    <div class="col m9 s12 white" style="border-radius:20px; margin-top:15px; padding: 15px;">
+    <div class="col m9 s12 white" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
       <h4 class="center">Sorry!</h4>
     </div>
-    <div class="col m9 s12 white" style="border-radius:20px; margin-top:15px; padding: 15px;">
+    <div class="col m9 s12 white" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
       <p class="center">It appears that {{twitch.display_name}} has not set up Heepsbot correctly, and this part of the dashboard therefore cannot be displayed.</p>
     </div>
   </div>
   {% endif %}
   <script src="/js/twitch_commands.js"></script>
   <script src="/js/users.js"></script>
-  <script src="/js/points.js"></script>
+  <script src="/js/twitch_points.js"></script>
+    <script src="/js/twitch_raffle.js"></script>
   {% endif %}
   <script src="/js/twitch_dashboard.js"></script>
   {% include "./footer.html" %}

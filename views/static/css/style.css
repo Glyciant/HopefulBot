@@ -23,7 +23,7 @@ select {
 	display: none;
 }
 
-.twitch-body-theme .tabs .tab a {
+.twitch-body-theme .tabs .tab a, input:not([type]):focus:not([readonly])+label, input[type=text]:focus:not([readonly])+label, input[type=password]:focus:not([readonly])+label, input[type=email]:focus:not([readonly])+label, input[type=url]:focus:not([readonly])+label, input[type=time]:focus:not([readonly])+label, input[type=date]:focus:not([readonly])+label, input[type=datetime-local]:focus:not([readonly])+label, input[type=tel]:focus:not([readonly])+label, input[type=number]:focus:not([readonly])+label, input[type=search]:focus:not([readonly])+label, textarea.materialize-textarea:focus:not([readonly])+label {
 	color: #6441A5;
 }
 
@@ -39,23 +39,31 @@ select {
 	background-color: #9a7fcc;
 }
 
-.twitch-body-theme .switch label input[type=checkbox]:checked+.lever:after {
+.twitch-body-theme .switch label input[type=checkbox]:checked+.lever:after, input[type=range]+.thumb {
 	background-color: #6441A5;
 }
 
-/*.twitch-body-theme .switch-candy a {
-	background-color: #B9A3E3;
-	box-shadow: 0;
+input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]), input[type=password]:focus:not([readonly]), input[type=email]:focus:not([readonly]), input[type=url]:focus:not([readonly]), input[type=time]:focus:not([readonly]), input[type=date]:focus:not([readonly]), input[type=datetime-local]:focus:not([readonly]), input[type=tel]:focus:not([readonly]), input[type=number]:focus:not([readonly]), input[type=search]:focus:not([readonly]), textarea.materialize-textarea:focus:not([readonly]) {
+	border-bottom: 1px solid #6441A5;
+	box-shadow: 0 1px 0 0 #6441A5;
 }
-
-.switch-candy.switch-toggle {
-	padding: 20px 0 !important;
-}
-
-.switch-candy label {
-	padding: 5px !important;
-}*/
 
 .panel-hidden {
 	display: none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  background: #6441A5;
+}
+
+input[type=range]::-moz-range-thumb {
+  background: #6441A5;
+}
+
+input[type=range]::-ms-thumb {
+  background: #6441A5;
+}
+
+input[type=range]+.thumb .value {
+	color: #6441A5;
 }

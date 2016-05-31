@@ -109,15 +109,33 @@ var isTwitchEditor = function(user, channel, auth) {
 var getModChannels = function() {
   return new Promise(function(resolve, reject) {
     needle.get("https://twitchstuff.3v.fi/api/mods/heepsbot", (err, data) => {
-      if (data.body.count) {
-        resolve(data.body.count)
+      if (!err) {
+        if (data.body.count) {
+          resolve(data.body.count)
+        }
+        else {
+          resolve("")
+        }
       }
       else {
-        resolve("Error")
+        resolve("")
       }
     });
   });
 };
+
+var isFollowing = function(user, channel) {
+  return new Promise(function(resolve, reject) {
+    needle.get("https://api.twitch.tv/kraken/users/" + user + "/follows/channels/" + channel + "?limit=1", (err, data) => {
+      if (!data.body.error) {
+        resolve(data.body.created_at)
+      }
+      else {
+        resolve("")
+      }
+    });
+  });
+}
 
 module.exports = {
   isAdmin: isAdmin,
@@ -127,5 +145,6 @@ module.exports = {
   getHosts: getHosts,
   updateTwitch: updateTwitch,
   isTwitchEditor: isTwitchEditor,
-  getModChannels: getModChannels
+  getModChannels: getModChannels,
+  isFollowing: isFollowing
 };

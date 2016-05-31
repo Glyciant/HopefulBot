@@ -35,287 +35,6 @@ app.locals = {
   authurl: config.auth.authurl
 };
 
-app.get('*', function(req, res, next) {
-  app.locals.loggedin = req.session.display_name;
-  app.locals.username = req.session.name;
-  app.locals.isAdmin = helpers.isAdmin(app.locals.username);
-  app.locals.authurl = config.auth.authurl + "&state=" + req.originalUrl;
-	next();
-});
-
-// API
-app.get('/api/v1/twitch/:user/', function(req, res) {
-  db.twitch_settings.get("#" + req.params.user).then(function(data) {
-    res.send(data[0]);
-  });
-});
-
-app.get('/api/v1/twitch/:user/logs/', function(req, res) {
-  db.twitch_logs.getChannel("#" + req.params.user).then(function(data) {
-    res.send(data);
-  });
-});
-
-app.get('/api/v1/discord/:id/', function(req, res) {
-  db.discord_settings.get(req.params.id).then(function(data) {
-    res.send(data[0]);
-  });
-});
-
-app.get('/api/v1/discord/:id/logs/', function(req, res) {
-  db.discord_logs.getAll(req.params.id).then(function(data) {
-    res.send(data);
-  });
-});
-
-app.get('/api/v1/commands/:user/', function(req, res) {
-  db.commands.getAll("#" + req.params.user).then(function(data) {
-    res.send(data);
-  });
-});
-
-app.get('/api/*/', function(req, res) {
-  res.send({error: 404, message: "API data not found."});
-});
-
-// Web Panel
-app.get('/', function(req, res) {
-  res.render("index", {title: "Home", theme: "Neutral"});
-});
-
-app.get('/auth/login/', function(req, res) {
-  var state = req.query.state;
-  needle.post('https://api.twitch.tv/kraken/oauth2/token', {
-		client_id: config.auth.cid,
-		client_secret: config.auth.secret,
-		grant_type: 'authorization_code',
-		redirect_uri: config.app.baseurl + '/auth/login/',
-		code: req.query.code
-	}, function(err, resp, body) {
-		if(!err) {
-			needle.get('https://api.twitch.tv/kraken/user?oauth_token=' + body.access_token, function(error, data) {
-        if(!error) {
-					req.session.auth = body.access_token;
-					req.session.name = data.body.name;
-          req.session.display_name = data.body.display_name;
-					res.redirect(state);
-				}
-        else{
-					res.render("error", {title: "Error", theme: "Neutral", code: "404", description: "Could not authenticate via the Twitch API."});
-				}
-			});
-		}
-    else{
-			res.render("error", {title: "Error", theme: "Neutral", code: "404", description: "Twitch API appears to be having issues."});
-		}
-	});
-});
-
-app.get('/auth/logout/', function(req, res) {
-	req.session.destroy(function() {
-		res.redirect('/');
-	});
-});
-
-app.get('/help/', function(req, res) {
-  res.render("index", {title: "Help", theme: "Neutral"});
-});
-
-app.get('*', function(req, res, next) {
-  if (app.locals.loggedin) {
-    next();
-  }
-  else {
-    res.redirect(app.locals.authurl);
-  }
-});
-
-app.get('/dashboard/', function(req, res) {
-  db.twitch_settings.getAll().then(function(twitch) {
-    db.discord_settings.getAll().then(function(discord) {
-      var channels = [];
-      for (var i in twitch) {
-        var discordPos = discord.map(function(x) { return x.id; }).indexOf(twitch[i].discord)
-        if (i !== "remove") {
-          if (twitch[i].editors.indexOf(app.locals.username) > -1 || twitch[i].id == "#" + app.locals.username) {
-            if (discord[discordPos]) {
-              channels.push({twitch: twitch[i].id.replace("#", ""), twitch_name: twitch[i].name, twitch_image: twitch[i].logo, discord_id: twitch[i].discord, discord_name: discord[discordPos].name, discord_image: discord[discordPos].image });
-            }
-            else {
-              channels.push({twitch: twitch[i].id.replace("#", ""), twitch_name: twitch[i].name, twitch_image: twitch[i].logo });
-            }
-          }
-        }
-      }
-      res.render("dashboard", {title: "Dashboard", theme: "Neutral", data: channels});
-    });
-  });
-});
-
-app.get('/dashboard/:user/security/', function(req, res) {
-  res.render("security", {title: "Manage Security", theme: "Neutral"});
-});
-
-app.get('/dashboard/:user/twitch/', function(req, res) {
-  db.twitch_settings.get("#" + req.params.user).then(function(channel) {
-    if (channel.length > 0) {
-      if (helpers.isEditor(app.locals.username, channel[0]) || helpers.isAdmin(app.locals.username) || req.params.user == app.locals.username) {
-        var editor = true;
-      }
-      if (helpers.isAdmin(app.locals.username) || req.params.user == app.locals.username) {
-        var admin = true;
-      }
-      var editors = channel[0].editors,
-          regulars = channel[0].regulars,
-          exists = true,
-          points = _.sortBy(channel[0].settings.points.totals, "total").reverse();
-    }
-    db.twitch_logs.getChannel("#" + req.params.user).then(function(twitch_chat_logs) {
-      db.commands.getAll("#" + req.params.user).then(function(commands) {
-        helpers.getChannel(req.params.user).then(function(twitch) {
-          if (twitch !== "suspended") {
-            if (twitch.display_name.substr(twitch.display_name.length - 1) == "s") {
-              var ends = true;
-            }
-            var partner = twitch.partner,
-                status = twitch.status,
-                game = twitch.game;
-          }
-          if (channel.length > 0) {
-            channel[0].name = twitch.display_name;
-            channel[0].logo = twitch.logo;
-            db.twitch_settings.update(channel[0].id, channel[0]);
-          }
-          helpers.getHosts(twitch._id).then(function(hosts) {
-            helpers.isTwitchEditor(app.locals.username, req.params.user, req.session.auth).then(function(twitchEditor) {
-              db.stats.get().then(function(main_stats) {
-                Promise.all([db.discord_logs.getAll(), db.discord_logs.bot(), db.twitch_logs.bot(), helpers.getModChannels()]).then(function(misc_stats) {
-                  var stats = {};
-                  stats.twitch_total = main_stats[0].twitch,
-                  stats.discord_total = main_stats[0].discord,
-                  stats.twitch_messages_logged = twitch_chat_logs.length,
-                  stats.discord_messages_logged = misc_stats[0].length,
-                  stats.discord_messages_sent = misc_stats[1].length,
-                  stats.twitch_messages_sent = misc_stats[2].length,
-                  stats.twitch_mod_total = misc_stats[3];
-                  res.render("twitch", {title: "Twitch Dashboard", theme: "Twitch", owner: req.params.user, twitch_chat_logs: twitch_chat_logs, editors: editors, regulars: regulars, editor: editor, admin: admin, commands: commands, twitch: twitch, exists: exists, ends: ends, points: points, partner: partner, status: status, game: game, hosts: hosts, twitchEditor: twitchEditor, stats: stats });
-                })
-              });
-            });
-          });
-        });
-      });
-    });
-  });
-});
-
-app.get('/dashboard/:server/discord/', function(req, res) {
-  res.render("discord", {title: "Discord Dashboard", theme: "Discord"});
-});
-
-app.get('*', function(req, res) {
-  res.render("error", {title: "404", theme: "Neutral", code: "404", description: "The page was not found."});
-});
-
-// Posts
-app.post('/twitch/users/add_editor/', function(req, res) {
-  db.twitch_settings.get("#" + req.body.channel).then(function(data) {
-    if (data[0].editors.indexOf(req.body.editor) == -1) {
-      data[0].editors.push(req.body.editor);
-    }
-    db.twitch_settings.update("#" + req.body.channel, data[0]);
-  });
-});
-
-app.post('/twitch/users/add_regular/', function(req, res) {
-  db.twitch_settings.get("#" + req.body.channel).then(function(data) {
-    if (data[0].regulars.indexOf(req.body.regular) == -1) {
-      data[0].regulars.push(req.body.regular);
-    }
-    db.twitch_settings.update("#" + req.body.channel, data[0]);
-  });
-});
-
-app.post('/twitch/users/remove_editor/', function(req, res) {
-  db.twitch_settings.get("#" + req.body.channel).then(function(data) {
-    data[0].editors.splice(data[0].editors.indexOf(req.body.editor), 1);
-    db.twitch_settings.update("#" + req.body.channel, data[0]);
-  });
-});
-
-app.post('/twitch/users/remove_regular/', function(req, res) {
-  db.twitch_settings.get("#" + req.body.channel).then(function(data) {
-    data[0].regulars.splice(data[0].regulars.indexOf(req.body.regular), 1);
-    db.twitch_settings.update("#" + req.body.channel, data[0]);
-  });
-});
-
-app.post('/twitch/commands/add', function(req, res) {
-  req.body.level = parseInt(req.body.level);
-  req.body.cost = parseInt(req.body.cost);
-  req.body.add = parseInt(req.body.add);
-  req.body.cooldown = parseInt(req.body.cooldown);
-  req.body.count = 0;
-
-  db.commands.add(req.body);
-});
-
-app.post('/twitch/commands/edit', function(req, res) {
-  req.body.level = parseInt(req.body.level);
-  req.body.cost = parseInt(req.body.cost);
-  req.body.add = parseInt(req.body.add);
-  req.body.cooldown = parseInt(req.body.cooldown);
-  req.body.count = 0;
-
-  db.commands.update(req.body);
-});
-
-app.post('/twitch/commands/delete', function(req, res) {
-  db.commands.delete(req.body.id);
-});
-
-app.post('/twitch/points/get', function(req, res) {
-  db.twitch_settings.get("#" + req.body.channel).then(function(data) {
-    var index = data[0].settings.points.totals.map(function(x) { return x.id; }).indexOf(req.body.user)
-    if (index > -1) {
-      res.status(200).send({ points: data[0].settings.points.totals[index].total});
-    }
-    else {
-      res.status(200).send({ points: "0" });
-    }
-  });
-});
-
-app.post('/twitch/points/update', function(req, res) {
-  db.twitch_settings.get("#" + req.body.channel).then(function(data) {
-    if (req.body.type !== "set") {
-      var index = data[0].settings.points.totals.map(function(x) { return x.id; }).indexOf(req.body.user);
-      if (index > -1) {
-        var oldval = data[0].settings.points.totals[index].total
-        data[0].settings.points.totals.splice(index, 1);
-      }
-      if (oldval) {
-        data[0].settings.points.totals.push({id: req.body.user, total: parseInt(oldval) + parseInt(req.body.points)});
-      }
-      else {
-        data[0].settings.points.totals.push({id: req.body.user, total: parseInt(req.body.points)});
-      }
-    }
-    else {
-      var index = data[0].settings.points.totals.map(function(x) { return x.id; }).indexOf(req.body.user);
-      if (index > -1) {
-        data[0].settings.points.totals.splice(index, 1);
-      }
-      data[0].settings.points.totals.push({id: req.body.user, total: parseInt(req.body.points)});
-    }
-    db.twitch_settings.update(data[0].id, data[0])
-  });
-});
-
-app.post('/twitch/api/update/', function(req, res) {
-  helpers.updateTwitch(req.body.status, req.body.game, req.body.channel, req.session.auth)
-});
-
 var channels = [];
 db.twitch_settings.getAll().then(function(data) {
   for (var i in data) {
@@ -349,6 +68,444 @@ db.twitch_settings.getAll().then(function(data) {
 
   var client = new tmi.client(ircoptions);
   client.connect();
+
+  app.get('*', function(req, res, next) {
+    app.locals.loggedin = req.session.display_name;
+    app.locals.username = req.session.name;
+    app.locals.isAdmin = helpers.isAdmin(app.locals.username);
+    app.locals.authurl = config.auth.authurl + "&state=" + req.originalUrl;
+  	next();
+  });
+
+  // API
+  app.get('/api/v1/twitch/:user/', function(req, res) {
+    db.twitch_settings.get("#" + req.params.user).then(function(data) {
+      res.send(data[0]);
+    });
+  });
+
+  app.get('/api/v1/twitch/:user/logs/', function(req, res) {
+    db.twitch_logs.getChannel("#" + req.params.user).then(function(data) {
+      res.send(data);
+    });
+  });
+
+  app.get('/api/v1/discord/:id/', function(req, res) {
+    db.discord_settings.get(req.params.id).then(function(data) {
+      res.send(data[0]);
+    });
+  });
+
+  app.get('/api/v1/discord/:id/logs/', function(req, res) {
+    db.discord_logs.getAll(req.params.id).then(function(data) {
+      res.send(data);
+    });
+  });
+
+  app.get('/api/v1/commands/:user/', function(req, res) {
+    db.commands.getAll("#" + req.params.user).then(function(data) {
+      res.send(data);
+    });
+  });
+
+  app.get('/api/*/', function(req, res) {
+    res.send({error: 404, message: "API data not found."});
+  });
+
+  // Web Panel
+  app.get('/', function(req, res) {
+    res.render("index", {title: "Home", theme: "Neutral"});
+  });
+
+  app.get('/auth/login/', function(req, res) {
+    var state = req.query.state;
+    needle.post('https://api.twitch.tv/kraken/oauth2/token', {
+  		client_id: config.auth.cid,
+  		client_secret: config.auth.secret,
+  		grant_type: 'authorization_code',
+  		redirect_uri: config.app.baseurl + '/auth/login/',
+  		code: req.query.code
+  	}, function(err, resp, body) {
+  		if(!err) {
+  			needle.get('https://api.twitch.tv/kraken/user?oauth_token=' + body.access_token, function(error, data) {
+          if(!error) {
+  					req.session.auth = body.access_token;
+  					req.session.name = data.body.name;
+            req.session.display_name = data.body.display_name;
+  					res.redirect(state);
+  				}
+          else{
+  					res.render("error", {title: "Error", theme: "Neutral", code: "404", description: "Could not authenticate via the Twitch API."});
+  				}
+  			});
+  		}
+      else{
+  			res.render("error", {title: "Error", theme: "Neutral", code: "404", description: "Twitch API appears to be having issues."});
+  		}
+  	});
+  });
+
+  app.get('/auth/logout/', function(req, res) {
+  	req.session.destroy(function() {
+  		res.redirect('/');
+  	});
+  });
+
+  app.get('/help/', function(req, res) {
+    res.render("index", {title: "Help", theme: "Neutral"});
+  });
+
+  app.get('*', function(req, res, next) {
+    if (app.locals.loggedin) {
+      next();
+    }
+    else {
+      res.redirect(app.locals.authurl);
+    }
+  });
+
+  app.get('/dashboard/', function(req, res) {
+    db.twitch_settings.getAll().then(function(twitch) {
+      db.discord_settings.getAll().then(function(discord) {
+        var channels = [];
+        for (var i in twitch) {
+          var discordPos = discord.map(function(x) { return x.id; }).indexOf(twitch[i].discord)
+          if (i !== "remove") {
+            if (twitch[i].editors.indexOf(app.locals.username) > -1 || twitch[i].id == "#" + app.locals.username) {
+              if (discord[discordPos]) {
+                channels.push({twitch: twitch[i].id.replace("#", ""), twitch_name: twitch[i].name, twitch_image: twitch[i].logo, discord_id: twitch[i].discord, discord_name: discord[discordPos].name, discord_image: discord[discordPos].image });
+              }
+              else {
+                channels.push({twitch: twitch[i].id.replace("#", ""), twitch_name: twitch[i].name, twitch_image: twitch[i].logo });
+              }
+            }
+          }
+        }
+        res.render("dashboard", {title: "Dashboard", theme: "Neutral", data: channels});
+      });
+    });
+  });
+
+  app.get('/dashboard/:user/security/', function(req, res) {
+    res.render("security", {title: "Manage Security", theme: "Neutral"});
+  });
+
+  app.get('/dashboard/:user/twitch/', function(req, res) {
+    db.twitch_settings.get("#" + req.params.user).then(function(channel) {
+      if (channel.length > 0) {
+        if (helpers.isEditor(app.locals.username, channel[0]) || helpers.isAdmin(app.locals.username) || req.params.user == app.locals.username) {
+          var editor = true;
+        }
+        if (helpers.isAdmin(app.locals.username) || req.params.user == app.locals.username) {
+          var admin = true;
+        }
+        var editors = channel[0].editors,
+            regulars = channel[0].regulars,
+            exists = true,
+            points = _.sortBy(channel[0].settings.points.totals, "total").reverse();
+            raffle = channel[0].settings.raffle;
+      }
+      db.twitch_logs.getChannel("#" + req.params.user).then(function(twitch_chat_logs) {
+        twitch_chat_logs = _.sortBy(twitch_chat_logs, "date").reverse();
+        db.commands.getAll("#" + req.params.user).then(function(commands) {
+          helpers.getChannel(req.params.user).then(function(twitch) {
+            if (twitch !== "suspended") {
+              if (twitch.display_name.substr(twitch.display_name.length - 1) == "s") {
+                var ends = true;
+              }
+              var partner = twitch.partner,
+                  status = twitch.status,
+                  game = twitch.game;
+            }
+            if (channel.length > 0) {
+              channel[0].name = twitch.display_name;
+              channel[0].logo = twitch.logo;
+              db.twitch_settings.update(channel[0].id, channel[0]);
+            }
+            helpers.getHosts(twitch._id).then(function(hosts) {
+              helpers.isTwitchEditor(app.locals.username, req.params.user, req.session.auth).then(function(twitchEditor) {
+                db.stats.get().then(function(main_stats) {
+                  Promise.all([db.twitch_logs.getAll(), db.discord_logs.getAll(), db.discord_logs.bot(), db.twitch_logs.bot(), helpers.getModChannels()]).then(function(misc_stats) {
+                    var stats = {};
+                    stats.twitch_total = main_stats[0].twitch,
+                    stats.discord_total = main_stats[0].discord,
+                    stats.twitch_messages_logged = misc_stats[0].length,
+                    stats.discord_messages_logged = misc_stats[1].length,
+                    stats.discord_messages_sent = misc_stats[2].length,
+                    stats.twitch_messages_sent = misc_stats[3].length,
+                    stats.twitch_mod_total = misc_stats[4];
+                    res.render("twitch", {title: "Twitch Dashboard", theme: "Twitch", owner: req.params.user, twitch_chat_logs: twitch_chat_logs, editors: editors, regulars: regulars, editor: editor, admin: admin, commands: commands, twitch: twitch, exists: exists, ends: ends, points: points, partner: partner, status: status, game: game, hosts: hosts, twitchEditor: twitchEditor, stats: stats, raffle: raffle });
+                  })
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+
+  app.get('/dashboard/:server/discord/', function(req, res) {
+    res.render("discord", {title: "Discord Dashboard", theme: "Discord"});
+  });
+
+  app.get('*', function(req, res) {
+    res.render("error", {title: "404", theme: "Neutral", code: "404", description: "The page was not found."});
+  });
+
+  // Posts
+  app.post('/twitch/users/add_editor/', function(req, res) {
+    db.twitch_settings.get("#" + req.body.channel).then(function(data) {
+      if (data[0].editors.indexOf(req.body.editor) == -1) {
+        data[0].editors.push(req.body.editor);
+      }
+      db.twitch_settings.update("#" + req.body.channel, data[0]);
+    });
+  });
+
+  app.post('/twitch/users/add_regular/', function(req, res) {
+    db.twitch_settings.get("#" + req.body.channel).then(function(data) {
+      if (data[0].regulars.indexOf(req.body.regular) == -1) {
+        data[0].regulars.push(req.body.regular);
+      }
+      db.twitch_settings.update("#" + req.body.channel, data[0]);
+    });
+  });
+
+  app.post('/twitch/users/remove_editor/', function(req, res) {
+    db.twitch_settings.get("#" + req.body.channel).then(function(data) {
+      data[0].editors.splice(data[0].editors.indexOf(req.body.editor), 1);
+      db.twitch_settings.update("#" + req.body.channel, data[0]);
+    });
+  });
+
+  app.post('/twitch/users/remove_regular/', function(req, res) {
+    db.twitch_settings.get("#" + req.body.channel).then(function(data) {
+      data[0].regulars.splice(data[0].regulars.indexOf(req.body.regular), 1);
+      db.twitch_settings.update("#" + req.body.channel, data[0]);
+    });
+  });
+
+  app.post('/twitch/commands/add', function(req, res) {
+    req.body.level = parseInt(req.body.level);
+    req.body.cost = parseInt(req.body.cost);
+    req.body.add = parseInt(req.body.add);
+    req.body.cooldown = parseInt(req.body.cooldown);
+    req.body.count = 0;
+
+    db.commands.add(req.body);
+  });
+
+  app.post('/twitch/commands/edit', function(req, res) {
+    req.body.level = parseInt(req.body.level);
+    req.body.cost = parseInt(req.body.cost);
+    req.body.add = parseInt(req.body.add);
+    req.body.cooldown = parseInt(req.body.cooldown);
+    req.body.count = 0;
+
+    db.commands.update(req.body);
+  });
+
+  app.post('/twitch/commands/delete', function(req, res) {
+    db.commands.delete(req.body.id);
+  });
+
+  app.post('/twitch/points/get', function(req, res) {
+    db.twitch_settings.get("#" + req.body.channel).then(function(data) {
+      var index = data[0].settings.points.totals.map(function(x) { return x.id; }).indexOf(req.body.user)
+      if (index > -1) {
+        res.status(200).send({ points: data[0].settings.points.totals[index].total});
+      }
+      else {
+        res.status(200).send({ points: "0" });
+      }
+    });
+  });
+
+  app.post('/twitch/points/update', function(req, res) {
+    db.twitch_settings.get("#" + req.body.channel).then(function(data) {
+      if (req.body.type !== "set") {
+        var index = data[0].settings.points.totals.map(function(x) { return x.id; }).indexOf(req.body.user);
+        if (index > -1) {
+          var oldval = data[0].settings.points.totals[index].total
+          data[0].settings.points.totals.splice(index, 1);
+        }
+        if (oldval) {
+          data[0].settings.points.totals.push({id: req.body.user, total: parseInt(oldval) + parseInt(req.body.points)});
+        }
+        else {
+          data[0].settings.points.totals.push({id: req.body.user, total: parseInt(req.body.points)});
+        }
+      }
+      else {
+        var index = data[0].settings.points.totals.map(function(x) { return x.id; }).indexOf(req.body.user);
+        if (index > -1) {
+          data[0].settings.points.totals.splice(index, 1);
+        }
+        data[0].settings.points.totals.push({id: req.body.user, total: parseInt(req.body.points)});
+      }
+      db.twitch_settings.update(data[0].id, data[0])
+    });
+  });
+
+  app.post('/twitch/api/update/', function(req, res) {
+    helpers.updateTwitch(req.body.status, req.body.game, req.body.channel, req.session.auth)
+  });
+
+  app.post('/twitch/raffle/open', function(req,res) {
+    db.twitch_settings.get("#" + req.body.channel).then(function(data) {
+      data[0].settings.raffle.open = false; // REMOVE THIS WHEN COMPLETED TESTING
+      if (data[0].settings.raffle.open !== true) {
+        if (!data[0].settings.raffle.key) {
+          data[0].settings.raffle.open = true;
+          data[0].settings.raffle.key = req.body.key;
+          data[0].settings.raffle.cost = req.body.cost;
+          data[0].settings.raffle.exclude_cheaters = (req.body.exclude_cheaters == "on");
+          data[0].settings.raffle.regular_multiplier = parseInt(req.body.regular_multiplier);
+          if (req.body.sub_multiplier) {
+            data[0].settings.raffle.regular_subscriber = parseInt(req.body.sub_multiplier);
+          }
+          db.twitch_settings.update(data[0].id, data[0])
+          if (req.body.cost > 0) {
+            client.say("#" + req.body.channel, "Raffle is now open! Type " + req.body.key + " to enter (costs " + req.body.cost + " points).")
+          }
+          else {
+            client.say("#" + req.body.channel, "Raffle is now open! Type " + req.body.key + " to enter.")
+          }
+          res.send({ action: "success", message: "The raffle has been opened!" });
+        }
+        else {
+          res.send({ action: "error", message: "Error opening raffle: a raffle is set-up!" });
+        }
+      }
+      else {
+        res.send({ action: "error", message: "Error opening raffle: a raffle is already open!" });
+      }
+    })
+  });
+
+  app.post('/twitch/raffle/reopen', function(req,res) {
+    db.twitch_settings.get("#" + req.body.channel).then(function(data) {
+      if (data[0].settings.raffle.open === false) {
+        if (data[0].settings.raffle.key) {
+          data[0].settings.raffle.open = true;
+          db.twitch_settings.update(data[0].id, data[0]);
+          if (data[0].settings.raffle.cost > 0) {
+            client.say("#" + req.body.channel, "Raffle is now re-open! Type " + data[0].settings.raffle.key + " to enter (costs " + data[0].settings.raffle.cost + " points).")
+          }
+          else {
+            client.say("#" + req.body.channel, "Raffle is now re-open! Type " + data[0].settings.raffle.key + " to enter.")
+          }
+          res.send({ action: "success", message: "The raffle has been re-opened!" });
+        }
+        else {
+          res.send({ action: "error", message: "Error re-opening raffle: a raffle has not been set-up!" });
+        }
+      }
+      else {
+        res.send({ action: "error", message: "Error re-opening raffle: the raffle is already open!" });
+      }
+    });
+  });
+
+  app.post('/twitch/raffle/close', function(req,res) {
+    db.twitch_settings.get("#" + req.body.channel).then(function(data) {
+      if (data[0].settings.raffle.open === true) {
+        data[0].settings.raffle.open = false;
+        db.twitch_settings.update(data[0].id, data[0]);
+        client.say("#" + req.body.channel, "Raffle is closed. No more entires will be counted!")
+        res.send({ action: "success", message: "The raffle has been closed!" });
+      }
+      else {
+        res.send({ action: "error", message: "Error closing raffle: the raffle is not currently open!" });
+      }
+    });
+  });
+
+  app.post('/twitch/raffle/update', function(req, res) {
+    db.twitch_settings.get("#" + req.body.channel).then(function(data) {
+      res.send(data[0].settings.raffle);
+    });
+  })
+
+  app.post('/twitch/raffle/reset', function(req, res) {
+    db.twitch_settings.get("#" + req.body.channel).then(function(data) {
+      if (data[0].settings.raffle.open === false) {
+        data[0].settings.raffle.open = false;
+        data[0].settings.raffle.key = null;
+        data[0].settings.raffle.cost = null;
+        data[0].settings.raffle.exclude_cheaters = null;
+        data[0].settings.raffle.excluded_users = [];
+        data[0].settings.raffle.users = [];
+        data[0].settings.raffle.exclude_cheaters = null;
+        data[0].settings.raffle.regular_multiplier = null;
+        data[0].settings.raffle.subscriber_multiplier = null;
+        db.twitch_settings.update(data[0].id, data[0]);
+        res.send({ action: "success", message: "The raffle has been reset!" });
+      }
+      else {
+        res.send({ action: "error", message: "Error resetting raffle: the raffle is currently open!" });
+      }
+    });
+  })
+
+  app.post('/twitch/raffle/draw', function(req, res) {
+    db.twitch_settings.get("#" + req.body.channel).then(function(data) {
+      if (data[0].settings.raffle.open === false) {
+        if (data[0].settings.raffle.key) {
+          if (data[0].settings.raffle.users[0]) {
+            var index = Math.floor((Math.random() * data[0].settings.raffle.users.length) + 1) - 1;
+            helpers.getChannel(data[0].settings.raffle.users[index].name).then(function(twitch) {
+              helpers.isFollowing(data[0].settings.raffle.users[index].name, req.body.channel).then(function(following) {
+                res.send({
+                  name: twitch.display_name,
+                  icon: twitch.logo,
+                  message: data[0].settings.raffle.users[index].message,
+                  following: following,
+                  subscriber: data[0].settings.raffle.users[index].subscriber
+                });
+              });
+            });
+          }
+          else {
+            res.send({ action: "error", message: "Error drawing raffle: nobody entered!" });
+          }
+        }
+        else {
+          res.send({ action: "error", message: "Error drawing raffle: a raffle has not been set-up!" });
+        }
+      }
+      else {
+        res.send({ action: "error", message: "Error drawing raffle: the raffle is currently open!" });
+      }
+    });
+  });
+
+  app.post('/twitch/raffle/announce', function(req, res) {
+    if (req.body.user) {
+      client.say("#" + req.body.channel, "A winner has been drawn: " + req.body.user + ". Congratulations!")
+    }
+    else {
+      res.send({ action: "error", message: "Error announcing winner: could not find winner!" })
+    }
+  });
+
+  app.post('/twitch/raffle/remove', function(req, res) {
+    db.twitch_settings.get("#" + req.body.channel).then(function(data) {
+      if (req.body.user) {
+        for (var i = data[0].settings.raffle.users.length - 1; i >= 0; i--) {
+          if (data[0].settings.raffle.users[i].name == req.body.user.toLowerCase()) {
+            data[0].settings.raffle.users.splice(i, 1)
+          }
+        }
+        db.twitch_settings.update(data[0].id, data[0]);
+        res.send({ action: "success", message: req.body.user + "'s entries have been removed!" })
+      }
+      else {
+        res.send({ action: "error", message: "Error removing entries: could not find user!" })
+      }
+    });
+  })
 
   var twitchStats = new CronJob("* */5 * * * *", function() {
     db.stats.get().then(function(stats) {
@@ -494,8 +651,7 @@ db.twitch_settings.getAll().then(function(data) {
               options: []
             },
             raffle: {
-              open: false,
-              users: []
+              open: false
             },
             magic: {
               level: 800,
@@ -777,13 +933,61 @@ db.twitch_settings.getAll().then(function(data) {
 
         // Trigger Commands
         db.commands.getCommand(params[0], channel).then(function(command) {
-          var command = command[0];
-          client.say(channel, command.response);
-          command.count = command.count + 1;
-          db.commands.update(command);
+          if (command[0]) {
+            var command = command[0];
+            client.say(channel, command.response);
+            command.count = command.count + 1;
+            db.commands.update(command);
+          }
         });
+
+        // Enter Raffle
+        if (params[0] == data.settings.raffle.key) {
+          if (data.settings.raffle.open === true) {
+            if (!data.settings.raffle.users[0] || data.settings.raffle.excluded_users.indexOf(user.username) == -1) {
+              if (!data.settings.raffle.users[0] || data.settings.raffle.users.map(function(x) { return x.name; }).indexOf(user.username) == -1) {
+                if (helpers.userLevel(user, data) <= 600) {
+                  var i = parseInt(data.settings.raffle.regular_multiplier);
+                }
+                else if (helpers.userLevel(user, data) <= 700) {
+                  var i = parseInt(data.settings.raffle.sub_multiplier);
+                }
+                else {
+                  var i = 1;
+                }
+                var j = 1,
+                    arr = [];
+                while (i >= j) {
+                  var obj = {
+                    name: user.username,
+                    message: message.replace(params[0], "").trim(),
+                    subscriber: user.subscriber
+                  }
+                  data.settings.raffle.users.push(obj)
+                  j++;
+                }
+              }
+              else {
+                if (data.settings.raffle.exclude_cheaters == true) {
+                  for (var i = data.settings.raffle.users.length - 1; i >= 0; i--) {
+                    if (data.settings.raffle.users[i].name == user.username) {
+                      if (data.settings.raffle.excluded_users.indexOf(user.username) == -1) {
+                        data.settings.raffle.excluded_users.push(user.username)
+                      }
+                      data.settings.raffle.users.splice(i, 1)
+                    }
+                  }
+                }
+              }
+              db.twitch_settings.update(data.id, data)
+            }
+          }
+        }
       });
     });
+  });
+  client.on("host", function(channel, username, viewers) {
+    client.say(channel, username + " is now hosting you for " + viewers + "viewers!")
   });
 });
 
