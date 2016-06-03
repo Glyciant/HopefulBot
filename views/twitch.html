@@ -23,7 +23,7 @@
 </div>
 {% else %}
 <div class="row">
-  <div class="col m3 hide-on-small">
+  <div class="col m3 s12">
     <div class="white center" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
       <h4>{{twitch.display_name}}{% if !ends %}'s{% else %}'{% endif %} Dashboard</h4>
       {% if admin %}
@@ -215,7 +215,7 @@
                         <p>Custom Removal Message:</p>
                       </div>
                       <div class="col s6">
-                        <input type="text" id="link-protection-message" />
+                        <input type="text" placeholder="Links require prior permission from a moderator!" id="link-protection-message" />
                       </div>
                     </div>
                     <div class="row">
@@ -238,7 +238,7 @@
                         <p>Warning Timeout Length:</p>
                       </div>
                       <div class="col s6">
-                        <input type="number" id="link-protection-warning-length" />
+                        <input type="number" placeholder="1" id="link-protection-warning-length" />
                       </div>
                     </div>
                     <div class="row">
@@ -246,7 +246,7 @@
                         <p>Full Timeout Length:</p>
                       </div>
                       <div class="col s6">
-                        <input type="number" id="link-protection-length" />
+                        <input type="number" placeholder="600" id="link-protection-length" />
                       </div>
                     </div>
                     <div class="row">
@@ -269,8 +269,8 @@
                       <div class="col s6">
                         <p>Whitelist:</p>
                       </div>
-                      <div class="col s6">
-                        <textarea id="link-protection-whitelist"></textarea>
+                      <div class="col s6 input-field">
+                        <textarea id="link-protection-whitelist" class="materialize-textarea"></textarea>
                       </div>
                     </div>
                   </div>
@@ -299,7 +299,102 @@
                     On
                   </label>
                 </div>
-                <a href="#modal-caps-filter" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                <a href="#modal-caps-filter" class="btn purple darken-4 modal-trigger"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                <div id="modal-caps-filter" class="modal">
+                  <div class="modal-content">
+                    <h4>Caps Filter</h4>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Caps Percentage Limit:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="60" id="caps-protection-percentage" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Minimum Message Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="8" id="caps-protection-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Post Removal Message:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="caps-protection-post-message">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Custom Removal Message:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="text" placeholder="Please do not SHOUT in chat!" id="caps-protection-message" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Use Warning Timeout:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="caps-protection-warning">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Warning Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="1" id="caps-protection-warning-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Full Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="600" id="caps-protection-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Immunity Level:</p>
+                      </div>
+                      <div class="col s6">
+                        <select id="caps-protection-level">
+                          <option>Moderators and Above (500)</option>
+                          <option>Regulars and Above (600)</option>
+                          {% if partner %}
+                          <option>Subscribers and Above (700)</option>
+                          {% endif %}
+                          <option>Turbo and Above (750)</option>
+                          <option>All Users (800)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+                    <a href="#!" class="modal-action modal-close btn-flat">Save and Close</a>
+                  </div>
+                </div>
               </td>
             </tr>
             <tr class="row">
@@ -320,7 +415,86 @@
                     On
                   </label>
                 </div>
-                <a href="#modal-actions-filter" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                <a href="#modal-actions-filter" class="btn purple darken-4 modal-trigger"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                <div id="modal-actions-filter" class="modal">
+                  <div class="modal-content">
+                    <h4>Actions Filter</h4>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Post Removal Message:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="actions-protection-post-message">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Custom Removal Message:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="text" placeholder="Please do not use coloured text." id="actions-protection-message" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Use Warning Timeout:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="actions-protection-warning">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Warning Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="1" id="actions-protection-warning-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Full Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="600" id="actions-protection-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Immunity Level:</p>
+                      </div>
+                      <div class="col s6">
+                        <select id="actions-protection-level">
+                          <option>Moderators and Above (500)</option>
+                          <option>Regulars and Above (600)</option>
+                          {% if partner %}
+                          <option>Subscribers and Above (700)</option>
+                          {% endif %}
+                          <option>Turbo and Above (750)</option>
+                          <option>All Users (800)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+                    <a href="#!" class="modal-action modal-close btn-flat">Save and Close</a>
+                  </div>
+                </div>
               </td>
             </tr>
             <tr class="row">
@@ -341,7 +515,94 @@
                     On
                   </label>
                 </div>
-                <a href="#modal-banned-words" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                <a href="#modal-banned-words" class="btn purple darken-4 modal-trigger"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                <div id="modal-banned-words" class="modal">
+                  <div class="modal-content">
+                    <h4>Banned Words</h4>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Post Removal Message:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="banned-words-post-message">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Custom Removal Message:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="text" placeholder="Please refrain from using banned words in this channel." id="banned-words-message" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Use Warning Timeout:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="banned-words-warning">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Warning Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="1" id="banned-words-warning-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Full Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="600" id="banned-words-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Immunity Level:</p>
+                      </div>
+                      <div class="col s6">
+                        <select id="banned-words-level">
+                          <option>Moderators and Above (500)</option>
+                          <option>Regulars and Above (600)</option>
+                          {% if partner %}
+                          <option>Subscribers and Above (700)</option>
+                          {% endif %}
+                          <option>Turbo and Above (750)</option>
+                          <option>All Users (800)</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Blacklist:</p>
+                      </div>
+                      <div class="col s6 input-field">
+                        <textarea id="banned-words-blacklist" class="materialize-textarea"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+                    <a href="#!" class="modal-action modal-close btn-flat">Save and Close</a>
+                  </div>
+                </div>
               </td>
             </tr>
             <tr>
@@ -362,7 +623,94 @@
                     On
                   </label>
                 </div>
-                <a href="#modal-paragraph-protection" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                <a href="#modal-paragraph-protection" class="btn purple darken-4 modal-trigger"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                <div id="modal-paragraph-protection" class="modal">
+                  <div class="modal-content">
+                    <h4>Paragraph Protection</h4>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Maximum Message Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="350" id="paragraph-protection-message-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Post Removal Message:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="paragraph-protection-post-message">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Custom Removal Message:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="text" placeholder="Please keep your chat messages shorter!" id="paragraph-protection-message" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Use Warning Timeout:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="paragraph-protection-warning">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Warning Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="1" id="paragraph-protection-warning-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Full Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="600" id="paragraph-protection-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Immunity Level:</p>
+                      </div>
+                      <div class="col s6">
+                        <select id="paragraph-protection-level">
+                          <option>Moderators and Above (500)</option>
+                          <option>Regulars and Above (600)</option>
+                          {% if partner %}
+                          <option>Subscribers and Above (700)</option>
+                          {% endif %}
+                          <option>Turbo and Above (750)</option>
+                          <option>All Users (800)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+                    <a href="#!" class="modal-action modal-close btn-flat">Save and Close</a>
+                  </div>
+                </div>
               </td>
             </tr>
             <tr>
@@ -383,7 +731,471 @@
                     On
                   </label>
                 </div>
-                <a href="#modal-symbols-protection" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                <a href="#modal-symbols-protection" class="btn purple darken-4 modal-trigger"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                <div id="modal-symbols-protection" class="modal">
+                  <div class="modal-content">
+                    <h4>Symbols Protection</h4>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Symbols Percentage Limit:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="40" id="symbols-protection-percentage" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Minimum Message Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="8" id="symbols-protection-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Post Removal Message:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="symbols-protection-post-message">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Custom Removal Message:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="text" placeholder="Stop spamming symbols!" id="symbols-protection-message" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Use Warning Timeout:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="symbols-protection-warning">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Warning Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="1" id="symbols-protection-warning-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Full Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="600" id="symbols-protection-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Immunity Level:</p>
+                      </div>
+                      <div class="col s6">
+                        <select id="symbols-protection-level">
+                          <option>Moderators and Above (500)</option>
+                          <option>Regulars and Above (600)</option>
+                          {% if partner %}
+                          <option>Subscribers and Above (700)</option>
+                          {% endif %}
+                          <option>Turbo and Above (750)</option>
+                          <option>All Users (800)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+                    <a href="#!" class="modal-action modal-close btn-flat">Save and Close</a>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                <strong>Emote Filter</strong><br />
+                This filter will remove any messages with emote spam. It can also be used to remove messages with lone emotes.
+              </td>
+              <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                <div class="switch" style="display: inline-block; margin-right: 5px;">
+                  <label>
+                    Off
+                    {% if editor %}
+                    <input type="checkbox">
+                    {% else %}
+                    <input disabled type="checkbox">
+                    {% endif %}
+                    <span class="lever"></span>
+                    On
+                  </label>
+                </div>
+                <a href="#modal-emotes-protection" class="btn purple darken-4 modal-trigger"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                <div id="modal-emotes-protection" class="modal">
+                  <div class="modal-content">
+                    <h4>Emotes Protection</h4>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Emotes Limit:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="40" id="emotes-protection-percentage" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Minimum Message Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="8" id="emotes-protection-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Post Removal Message:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="emotes-protection-post-message">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Custom Removal Message:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="text" placeholder="Please do not spam emotes!" id="emotes-protection-message" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Use Warning Timeout:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="emotes-protection-warning">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Warning Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="1" id="emotes-protection-warning-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Full Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="600" id="emotes-protection-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Immunity Level:</p>
+                      </div>
+                      <div class="col s6">
+                        <select id="emotes-protection-level">
+                          <option>Moderators and Above (500)</option>
+                          <option>Regulars and Above (600)</option>
+                          {% if partner %}
+                          <option>Subscribers and Above (700)</option>
+                          {% endif %}
+                          <option>Turbo and Above (750)</option>
+                          <option>All Users (800)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+                    <a href="#!" class="modal-action modal-close btn-flat">Save and Close</a>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                <strong>Language Filter</strong><br />
+                This filter will keep your chat in a language of your choice. The timeout message will be posted in the user's own language.
+              </td>
+              <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                <div class="switch" style="display: inline-block; margin-right: 5px;">
+                  <label>
+                    Off
+                    {% if editor %}
+                    <input type="checkbox">
+                    {% else %}
+                    <input disabled type="checkbox">
+                    {% endif %}
+                    <span class="lever"></span>
+                    On
+                  </label>
+                </div>
+                <a href="#modal-language-filter" class="btn purple darken-4 modal-trigger"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                <div id="modal-language-filter" class="modal">
+                  <div class="modal-content">
+                    <h4>Language Filter</h4>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Language:</p>
+                      </div>
+                      <div class="col s6">
+                        <select id="language-filter-language">
+                          <option>Albanian</option>
+                          <option>Arabic</option>
+                          <option>Azeri</option>
+                          <option>Bengali</option>
+                          <option>Bulgarian</option>
+                          <option>Cebuano</option>
+                          <option>Croatian</option>
+                          <option>Czech</option>
+                          <option>Danish</option>
+                          <option>Dutch</option>
+                          <option>English</option>
+                          <option>Estonian</option>
+                          <option>Farsi</option>
+                          <option>Finnish</option>
+                          <option>French</option>
+                          <option>German</option>
+                          <option>Hausa</option>
+                          <option>Hawaiian</option>
+                          <option>Hindi</option>
+                          <option>Hungarian</option>
+                          <option>Icelandic</option>
+                          <option>Indonesian</option>
+                          <option>Italian</option>
+                          <option>Kazakh</option>
+                          <option>Kyrgyz</option>
+                          <option>Latin</option>
+                          <option>Latvian</option>
+                          <option>Lithuanian</option>
+                          <option>Macedonian</option>
+                          <option>Mongolian</option>
+                          <option>Nepali</option>
+                          <option>Norwegian</option>
+                          <option>Pashto</option>
+                          <option>Pidgin</option>
+                          <option>Polish</option>
+                          <option>Portuguese</option>
+                          <option>Romanian</option>
+                          <option>Russian</option>
+                          <option>Serbian</option>
+                          <option>Slovak</option>
+                          <option>Slovene</option>
+                          <option>Somali</option>
+                          <option>Spanish</option>
+                          <option>Swahili</option>
+                          <option>Swedish</option>
+                          <option>Tagalog</option>
+                          <option>Turkish</option>
+                          <option>Ukrainian</option>
+                          <option>Urdu</option>
+                          <option>Uzbek</option>
+                          <option>Vietnamese</option>
+                          <option>Welsh</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Post Removal Message:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="language-filter-post-message">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Use Warning Timeout:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="language-filter-warning">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Warning Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="1" id="language-filter-warning-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Full Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="600" id="language-filter-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Immunity Level:</p>
+                      </div>
+                      <div class="col s6">
+                        <select id="language-filter-level">
+                          <option>Moderators and Above (500)</option>
+                          <option>Regulars and Above (600)</option>
+                          {% if partner %}
+                          <option>Subscribers and Above (700)</option>
+                          {% endif %}
+                          <option>Turbo and Above (750)</option>
+                          <option>All Users (800)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+                    <a href="#!" class="modal-action modal-close btn-flat">Save and Close</a>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                <strong>Repetition Filter</strong><br />
+                This filter will stop users repeating the same message constantly. It is useful for preventing one-user chat spam.
+              </td>
+              <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                <div class="switch" style="display: inline-block; margin-right: 5px;">
+                  <label>
+                    Off
+                    {% if editor %}
+                    <input type="checkbox">
+                    {% else %}
+                    <input disabled type="checkbox">
+                    {% endif %}
+                    <span class="lever"></span>
+                    On
+                  </label>
+                </div>
+                <a href="#modal-repetition-filter" class="btn purple darken-4 modal-trigger"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                <div id="modal-repetition-filter" class="modal">
+                  <div class="modal-content">
+                    <h4>Repetition Filter</h4>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Post Removal Message:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="repetition-filter-post-message">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Custom Removal Message:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="text" placeholder="Please stop repeating messages!" id="repetition-filter-message" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Use Warning Timeout:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             <input type="checkbox" id="repetition-filter-warning">
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Warning Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="1" id="repetition-filter-warning-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Full Timeout Length:</p>
+                      </div>
+                      <div class="col s6">
+                        <input type="number" placeholder="600" id="repetition-filter-length" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Immunity Level:</p>
+                      </div>
+                      <div class="col s6">
+                        <select id="repetition-filter-level">
+                          <option>Moderators and Above (500)</option>
+                          <option>Regulars and Above (600)</option>
+                          {% if partner %}
+                          <option>Subscribers and Above (700)</option>
+                          {% endif %}
+                          <option>Turbo and Above (750)</option>
+                          <option>All Users (800)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+                    <a href="#!" class="modal-action modal-close btn-flat">Save and Close</a>
+                  </div>
+                </div>
               </td>
             </tr>
           </tbody>

@@ -15,6 +15,7 @@ var config = require("./config"),
     toggleSwitch = require("toggle-switch"),
     _ = require("underscore"),
     CronJob = require("cron").CronJob,
+    languageDetector = new (require('languagedetect'));
     bot = new discord.Client();
 
 // Setup Stuff
@@ -28,6 +29,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.listen(config.app.port, function() {
+  var arr = [];
+  for (var i in languageDetector.getLanguages()) {
+    arr.push("<option>" + languageDetector.getLanguages()[i] + "</option>")
+  }
+  console.log(arr);
   console.log('[DASHBOARD] Listing on port: ' + config.app.port);
 });
 
