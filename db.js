@@ -7,6 +7,7 @@ var	config = require('./config'),
   DiscordLogModel = thinky.createModel('discord_logs', schema.discordlogs, schema.primarykey.discordlogs),
   DiscordSettingsModel = thinky.createModel('discord_settings', schema.twitchsettings, schema.primarykey.twitchsettings),
   TwitchLogModel = thinky.createModel('twitch_logs', schema.twitchlogs, schema.primarykey.twitchlogs),
+  TwitchActionModel = thinky.createModel('twitch_actions', schema.twitchlogs, schema.primarykey.twitchlogs),
   TwitchSettingsModel = thinky.createModel('twitch_settings', schema.twitchsettings, schema.primarykey.twitchsettings),
   CommandsModel = thinky.createModel('commands', schema.commands, schema.primarykey.commands),
   StatsModel = thinky.createModel('stats', schema.stats, schema.primarykey.stats);
@@ -91,6 +92,30 @@ var twitch_logs = {
   bot: () => {
     return new Promise((resolve, reject) => {
       TwitchLogModel.filter({display_name: "Heepsbot"}).then((db) => {
+        resolve(db);
+      });
+    });
+  }
+};
+
+var twitch_actions = {
+  addEntry: (object) => {
+    return new Promise((resolve, reject) => {
+      TwitchActionModel.insert(object).then((db) => {
+        resolve(db);
+      });
+    });
+  },
+  getChannel: (id) => {
+    return new Promise((resolve, reject) => {
+      TwitchActionModel.filter({channel: id}).then((db) => {
+        resolve(db);
+      });
+    });
+  },
+  getAll: () => {
+    return new Promise((resolve, reject) => {
+      TwitchActionModel.then((db) => {
         resolve(db);
       });
     });
@@ -195,6 +220,7 @@ module.exports = {
   discord_logs: discord_logs,
   twitch_settings: twitch_settings,
   twitch_logs: twitch_logs,
+  twitch_actions: twitch_actions,
   commands: commands,
   stats: stats
 }

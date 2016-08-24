@@ -29,11 +29,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.listen(config.app.port, function() {
-  var arr = [];
-  for (var i in languageDetector.getLanguages()) {
-    arr.push("<option>" + languageDetector.getLanguages()[i] + "</option>")
-  }
-  console.log(arr);
   console.log('[DASHBOARD] Listing on port: ' + config.app.port);
 });
 
@@ -209,39 +204,45 @@ db.twitch_settings.getAll().then(function(data) {
             regulars = channel[0].regulars,
             exists = true,
             points = _.sortBy(channel[0].settings.points.totals, "total").reverse();
-            raffle = channel[0].settings.raffle;
+            raffle = channel[0].settings.raffle,
+            links_protection = channel[0].settings.spam.links;
+            links_protection.whitelist = links_protection.whitelist.toString().replace(",", "\n");
       }
       db.twitch_logs.getChannel("#" + req.params.user).then(function(twitch_chat_logs) {
-        twitch_chat_logs = _.sortBy(twitch_chat_logs, "date").reverse();
-        db.commands.getAll("#" + req.params.user).then(function(commands) {
-          helpers.getChannel(req.params.user).then(function(twitch) {
-            if (twitch !== "suspended") {
-              if (twitch.display_name.substr(twitch.display_name.length - 1) == "s") {
-                var ends = true;
+        db.twitch_actions.getChannel("#" + req.params.user).then(function(twitch_action_logs) {
+          twitch_chat_logs = _.sortBy(twitch_chat_logs, "date").reverse();
+          twitch_action_logs = _.sortBy(twitch_action_logs, "date").reverse();
+          db.commands.getAll("#" + req.params.user).then(function(commands) {
+            helpers.getChannel(req.params.user).then(function(twitch) {
+              if (twitch !== "suspended") {
+                if (twitch.display_name.substr(twitch.display_name.length - 1) == "s") {
+                  var ends = true;
+                }
+                var partner = twitch.partner,
+                    status = twitch.status,
+                    game = twitch.game;
               }
-              var partner = twitch.partner,
-                  status = twitch.status,
-                  game = twitch.game;
-            }
-            if (channel.length > 0) {
-              channel[0].name = twitch.display_name;
-              channel[0].logo = twitch.logo;
-              db.twitch_settings.update(channel[0].id, channel[0]);
-            }
-            helpers.getHosts(twitch._id).then(function(hosts) {
-              helpers.isTwitchEditor(app.locals.username, req.params.user, req.session.auth).then(function(twitchEditor) {
-                db.stats.get().then(function(main_stats) {
-                  Promise.all([db.twitch_logs.getAll(), db.discord_logs.getAll(), db.discord_logs.bot(), db.twitch_logs.bot(), helpers.getModChannels()]).then(function(misc_stats) {
-                    var stats = {};
-                    stats.twitch_total = main_stats[0].twitch,
-                    stats.discord_total = main_stats[0].discord,
-                    stats.twitch_messages_logged = misc_stats[0].length,
-                    stats.discord_messages_logged = misc_stats[1].length,
-                    stats.discord_messages_sent = misc_stats[2].length,
-                    stats.twitch_messages_sent = misc_stats[3].length,
-                    stats.twitch_mod_total = misc_stats[4];
-                    res.render("twitch", {title: "Twitch Dashboard", theme: "Twitch", owner: req.params.user, twitch_chat_logs: twitch_chat_logs, editors: editors, regulars: regulars, editor: editor, admin: admin, commands: commands, twitch: twitch, exists: exists, ends: ends, points: points, partner: partner, status: status, game: game, hosts: hosts, twitchEditor: twitchEditor, stats: stats, raffle: raffle });
-                  })
+              if (channel.length > 0) {
+                channel[0].name = twitch.display_name;
+                channel[0].logo = twitch.logo;
+                db.twitch_settings.update(channel[0].id, channel[0]);
+              }
+              helpers.getHosts(twitch._id).then(function(hosts) {
+                helpers.isTwitchEditor(app.locals.username, req.params.user, req.session.auth).then(function(twitchEditor) {
+                  db.stats.get().then(function(main_stats) {
+                    Promise.all([db.twitch_logs.getAll(), db.discord_logs.getAll(), db.discord_logs.bot(), db.twitch_logs.bot(), helpers.getModChannels()]).then(function(misc_stats) {
+                      var stats = {};
+                      stats.twitch_total = main_stats[0].twitch,
+                      stats.discord_total = main_stats[0].discord,
+                      stats.twitch_messages_logged = misc_stats[0].length,
+                      stats.discord_messages_logged = misc_stats[1].length,
+                      stats.discord_messages_sent = misc_stats[2].length,
+                      stats.twitch_actions = twitch_action_logs.length,
+                      stats.twitch_messages_sent = misc_stats[3].length,
+                      stats.twitch_mod_total = misc_stats[4];
+                      res.render("twitch", {title: "Twitch Dashboard", theme: "Twitch", owner: req.params.user, twitch_chat_logs: twitch_chat_logs, twitch_action_logs: twitch_action_logs, editors: editors, regulars: regulars, editor: editor, admin: admin, commands: commands, twitch: twitch, exists: exists, ends: ends, points: points, partner: partner, status: status, game: game, hosts: hosts, twitchEditor: twitchEditor, stats: stats, raffle: raffle, links_protection: links_protection });
+                    })
+                  });
                 });
               });
             });
@@ -360,7 +361,6 @@ db.twitch_settings.getAll().then(function(data) {
 
   app.post('/twitch/raffle/open', function(req,res) {
     db.twitch_settings.get("#" + req.body.channel).then(function(data) {
-      data[0].settings.raffle.open = false; // REMOVE THIS WHEN COMPLETED TESTING
       if (data[0].settings.raffle.open !== true) {
         if (!data[0].settings.raffle.key) {
           data[0].settings.raffle.open = true;
@@ -511,7 +511,39 @@ db.twitch_settings.getAll().then(function(data) {
         res.send({ action: "error", message: "Error removing entries: could not find user!" })
       }
     });
-  })
+  });
+
+  app.post('/twitch/protection/links/toggle/', function(req, res) {
+    db.twitch_settings.get("#" + req.body.channel).then(function(data) {
+      data[0].settings.spam.links.enabled = (req.body.enabled == "true");
+      db.twitch_settings.update(data[0].id, data[0]);
+    });
+  });
+
+  app.post('/twitch/protection/links/update/', function(req, res) {
+    db.twitch_settings.get("#" + req.body.channel).then(function(data) {
+      data[0].settings.spam.links.ips = (req.body.ips == "true");
+      data[0].settings.spam.links.prevent_evasion = (req.body.prevent_evasion == "true");
+      data[0].settings.spam.links.global_links = (req.body.global_links == "true");
+      data[0].settings.spam.links.post_message = (req.body.post_message == "true");
+      data[0].settings.spam.links.warning = (req.body.warning == "true");
+      data[0].settings.spam.links.level = parseInt(req.body.level);
+      if (isNaN(data[0].settings.spam.links.level)) {
+        data[0].settings.spam.links.level = null;
+      }
+      data[0].settings.spam.links.warning_length = parseInt(req.body.warning_length);
+      if (isNaN(data[0].settings.spam.links.warning_length)) {
+        data[0].settings.spam.links.warning_length = null;
+      }
+      data[0].settings.spam.links.length = parseInt(req.body.length);
+      if (isNaN(data[0].settings.spam.links.length)) {
+        data[0].settings.spam.links.length = null;
+      }
+      data[0].settings.spam.links.message = req.body.message;
+      data[0].settings.spam.links.whitelist = req.body.whitelist;
+      db.twitch_settings.update(data[0].id, data[0]);
+    });
+  });
 
   var twitchStats = new CronJob("* */5 * * * *", function() {
     db.stats.get().then(function(stats) {
@@ -522,6 +554,9 @@ db.twitch_settings.getAll().then(function(data) {
       console.log("[STATS] CronJob Stopped.")
     },
     true);
+
+  var permitted = {},
+      purged = {};
 
   client.on("chat", function (channel, user, message, self) {
     var display_name = user["display-name"],
@@ -574,31 +609,97 @@ db.twitch_settings.getAll().then(function(data) {
               discord_logs: true
             },
             spam: {
-              links: 1000,
-              caps: 1000,
-              symbols: 1000,
-              blacklist: 1000,
-              paragraph: 1000,
-              actions: 1000,
-              settings: {
-                links_whitelist: [],
-                caps_percent: 60,
-                caps_minimum: 6,
-                symbols_percent: 60,
-                symbols_minimum: 6,
-                paragraph_limit: 350,
-                banned_words: [],
-                banned_regex: [],
-                permit: true,
-                permit_time: 120
+              links: {
+                enabled: false,
+                ips: false,
+                prevent_evasion: false,
+                post_message: true,
+                message: null,
+                warning: true,
+                warning_length: 1,
+                length: 600,
+                level: 600,
+                whitelist: [],
+                global_links: true
               },
-              messages: {
-                links: "Links require approval by a moderator!",
-                caps: "Please do not SHOUT in chat.",
-                symbols: "Cut the symbol spam please.",
-                blacklist: "That word/phrase isn't allowed here!",
-                paragraph: "Please make messages shorter.",
-                actions: "Do not use coloured text."
+              caps: {
+                enabled: false,
+                minimum_length: 8,
+                percentage: 80,
+                post_message: true,
+                message: null,
+                warning: true,
+                warning_length: 1,
+                length: 600,
+                level: 600
+              },
+              actions: {
+                enabled: false,
+                post_message: true,
+                message: null,
+                warning: true,
+                warning_length: 1,
+                length: 600,
+                level: 600
+              },
+              banned_words: {
+                enabled: false,
+                post_message: true,
+                message: null,
+                warning: true,
+                warning_length: 1,
+                length: 600,
+                level: 600,
+                blacklist: []
+              },
+              paragraph: {
+                enabled: false,
+                post_message: true,
+                message: null,
+                warning: true,
+                warning_length: 1,
+                length: 600,
+                level: 600,
+                limit: 350
+              },
+              symbols: {
+                enabled: false,
+                minimum_length: 8,
+                percentage: 60,
+                post_message: true,
+                message: null,
+                warning: true,
+                warning_length: 1,
+                length: 600,
+                level: 600
+              },
+              emotes: {
+                enabled: false,
+                post_message: true,
+                message: null,
+                warning: true,
+                warning_length: 1,
+                length: 600,
+                level: 600,
+                limit: 5
+              },
+              language: {
+                enabled: false,
+                post_message: true,
+                warning: true,
+                warning_length: 1,
+                length: 600,
+                level: 600,
+                language: "english"
+              },
+              repitition: {
+                enabled: false,
+                post_message: true,
+                message: null,
+                warning: true,
+                warning_length: 1,
+                length: 600,
+                level: 600
               }
             },
             commands: {
@@ -713,6 +814,107 @@ db.twitch_settings.getAll().then(function(data) {
     }
     db.twitch_settings.get(channel).then(function(data) {
       var data = data[0];
+
+      // Link Protection
+      for (var i in params) {
+        var linkRegex = new RegExp(/^(?:(?:https?|ftp):\/\/)?(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$/)
+        if (linkRegex.test(params[i])) {
+          if (helpers.userLevel(user, data) > data.settings.spam.links.level) {
+            var message;
+            if (data.settings.spam.links.message) {
+              message = data.settings.spam.links.message;
+            }
+            else {
+              message = "Please request permission from a moderator before posting a link!";
+            }
+            var name = user.username;
+            if (permitted[channel] && permitted[channel][name]) {
+              var timeDiff = Date.now() / 1000 - permitted[channel][name];
+              if (timeDiff >= 120) {
+                if (!purged[channel]) {
+                    purged[channel] = {};
+                }
+                var purgeTimeDiff = null;
+                if (purged[channel][name]) {
+                  purgeTimeDiff = Date.now() / 1000 - purged[channel][name];
+                }
+                if (purgeTimeDiff !== null && purgeTimeDiff >= 28800) {
+                  client.say(channel, message + " [" + display_name + "] [Timeout]");
+                  client.timeout(channel, user.username, data.settings.spam.links.length, "Timed out by Heepsbot link filter for the following: " + params[i]);
+                  purged[channel][name] = null;
+                  db.twitch_actions.addEntry({
+                    channel: channel,
+                    user: display_name,
+                    type: "Timeout",
+                    reason: "Link Filter",
+                    date: date
+                  });
+                }
+                else {
+                  client.say(channel, message + " [" + display_name + "] [Warning]");
+                  client.timeout(channel, user.username, data.settings.spam.links.warning_length, "Purged by Heepsbot link filter for the following: " + params[i]);
+                  purged[channel][name] = Date.now() / 1000;
+                  db.twitch_actions.addEntry({
+                    channel: channel,
+                    user: display_name,
+                    type: "Warning",
+                    reason: "Link Filter",
+                    date: date
+                  });
+                }
+              }
+              else {
+                permitted[channel][name] = null;
+              }
+            }
+            else {
+              if (!purged[channel]) {
+                  purged[channel] = {};
+              }
+              var purgeTimeDiff = null;
+              if (purged[channel][name]) {
+                purgeTimeDiff = Date.now() / 1000 - purged[channel][name];
+              }
+              if (purgeTimeDiff !== null && purgeTimeDiff <= 28800) {
+                client.say(channel, message + " [" + display_name + "] [Timeout]");
+                client.timeout(channel, user.username, data.settings.spam.links.length, "Timed out by Heepsbot link filter for the following: " + params[i]);
+                purged[channel][name] = null;
+                db.twitch_actions.addEntry({
+                  channel: channel,
+                  user: display_name,
+                  type: "Timeout",
+                  reason: "Link Filter",
+                  date: date
+                });
+              }
+              else {
+                client.say(channel, message + " [" + display_name + "] [Warning]");
+                client.timeout(channel, user.username, data.settings.spam.links.warning_length, "Purged by Heepsbot link filter for the following: " + params[i]);
+                purged[channel][name] = Date.now() / 1000;
+                db.twitch_actions.addEntry({
+                  channel: channel,
+                  user: display_name,
+                  type: "Warning",
+                  reason: "Link Filter",
+                  date: date
+                });
+              }
+            }
+          }
+        }
+      }
+
+      // Permit Command
+      if (params[0] == ";permit") {
+        if (helpers.userLevel(user, data) <= 500) {
+          var userToPermit = params[1].toLowerCase();
+          if (!permitted[channel]) {
+              permitted[channel] = {};
+          }
+          permitted[channel][userToPermit] = Date.now() / 1000;
+          client.say(channel, display_name + " -> " + params[1] + " has 120 seconds to post a link.");
+        }
+      }
 
       // 8Ball
       if (params[0] == ";8ball") {

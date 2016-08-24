@@ -153,9 +153,17 @@
                   <label>
                     Off
                     {% if editor %}
-                    <input type="checkbox">
+                      {% if links_protection.enabled %}
+                      <input checked type="checkbox" data-channel="{{owner}}" id="link-protection-toggle">
+                      {% else %}
+                      <input type="checkbox" data-channel="{{owner}}" id="link-protection-toggle">
+                      {% endif %}
                     {% else %}
-                    <input disabled type="checkbox">
+                      {% if links_protection.enabled %}
+                      <input disabled checked type="checkbox">
+                      {% else %}
+                      <input disabled type="checkbox">
+                      {% endif %}
                     {% endif %}
                     <span class="lever"></span>
                     On
@@ -173,7 +181,46 @@
                         <div class="switch" style="margin: 16px 0;">
                            <label>
                              Off
-                             <input type="checkbox" id="link-protection-ips">
+                             {% if editor %}
+                              {% if links_protection.ips %}
+                              <input checked type="checkbox" id="link-protection-ips">
+                              {% else %}
+                              <input type="checkbox" id="link-protection-ips">
+                              {% endif %}
+                             {% else %}
+                               {% if links_protection.ips %}
+                               <input disabled checked type="checkbox" id="link-protection-ips">
+                               {% else %}
+                               <input disabled type="checkbox" id="link-protection-ips">
+                               {% endif %}
+                             {% endif %}
+                             <span class="lever"></span>
+                             On
+                           </label>
+                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s6">
+                        <p>Use Global Blacklist:</p>
+                      </div>
+                      <div class="col s6">
+                        <div class="switch" style="margin: 16px 0;">
+                           <label>
+                             Off
+                             {% if editor %}
+                              {% if links_protection.global_links %}
+                              <input checked type="checkbox" id="link-protection-blacklist">
+                              {% else %}
+                              <input type="checkbox" id="link-protection-blacklist">
+                              {% endif %}
+                             {% else %}
+                               {% if links_protection.global_links %}
+                               <input disabled checked type="checkbox" id="link-protection-blacklist">
+                               {% else %}
+                               <input disabled type="checkbox" id="link-protection-blacklist">
+                               {% endif %}
+                             {% endif %}
                              <span class="lever"></span>
                              On
                            </label>
@@ -188,7 +235,19 @@
                         <div class="switch" style="margin: 16px 0;">
                            <label>
                              Off
-                             <input type="checkbox" id="link-protection-evasion">
+                             {% if editor %}
+                              {% if links_protection.prevent_evasion %}
+                              <input checked type="checkbox" id="link-protection-evasion">
+                              {% else %}
+                              <input type="checkbox" id="link-protection-evasion">
+                              {% endif %}
+                             {% else %}
+                               {% if links_protection.prevent_evasion %}
+                               <input disabled checked type="checkbox" id="link-protection-evasion">
+                               {% else %}
+                               <input disabled type="checkbox" id="link-protection-evasion">
+                               {% endif %}
+                             {% endif %}
                              <span class="lever"></span>
                              On
                            </label>
@@ -203,7 +262,19 @@
                         <div class="switch" style="margin: 16px 0;">
                            <label>
                              Off
-                             <input type="checkbox" id="link-protection-post-message">
+                             {% if editor %}
+                              {% if links_protection.post_message %}
+                              <input checked type="checkbox" id="link-protection-post-message">
+                              {% else %}
+                              <input type="checkbox" id="link-protection-post-message">
+                              {% endif %}
+                             {% else %}
+                               {% if links_protection.post_message %}
+                               <input disabled checked type="checkbox" id="link-protection-post-message">
+                               {% else %}
+                               <input disabled type="checkbox" id="link-protection-post-message">
+                               {% endif %}
+                             {% endif %}
                              <span class="lever"></span>
                              On
                            </label>
@@ -215,7 +286,11 @@
                         <p>Custom Removal Message:</p>
                       </div>
                       <div class="col s6">
-                        <input type="text" placeholder="Links require prior permission from a moderator!" id="link-protection-message" />
+                        {% if editor %}
+                        <input type="text" placeholder="Links require prior permission from a moderator!" value="{{links_protection.message}}" id="link-protection-message" />
+                        {% else %}
+                        <input type="text" disabled placeholder="Links require prior permission from a moderator!" value="{{links_protection.message}}" id="link-protection-message" />
+                        {% endif %}
                       </div>
                     </div>
                     <div class="row">
@@ -226,7 +301,19 @@
                         <div class="switch" style="margin: 16px 0;">
                            <label>
                              Off
-                             <input type="checkbox" id="link-protection-warning">
+                             {% if editor %}
+                              {% if links_protection.post_message %}
+                              <input checked type="checkbox" id="link-protection-warning">
+                              {% else %}
+                              <input type="checkbox" id="link-protection-warning">
+                              {% endif %}
+                             {% else %}
+                              {% if links_protection.post_message %}
+                              <input disabled checked type="checkbox" id="link-protection-warning">
+                              {% else %}
+                              <input disabled type="checkbox" id="link-protection-warning">
+                              {% endif %}
+                             {% endif %}
                              <span class="lever"></span>
                              On
                            </label>
@@ -238,7 +325,11 @@
                         <p>Warning Timeout Length:</p>
                       </div>
                       <div class="col s6">
-                        <input type="number" placeholder="1" id="link-protection-warning-length" />
+                        {% if editor %}
+                        <input type="number" value="{{links_protection.warning_length}}" placeholder="1" id="link-protection-warning-length" />
+                        {% else %}
+                        <input type="number" value="{{links_protection.warning_length}}" disabled placeholder="1" id="link-protection-warning-length" />
+                        {% endif %}
                       </div>
                     </div>
                     <div class="row">
@@ -246,7 +337,11 @@
                         <p>Full Timeout Length:</p>
                       </div>
                       <div class="col s6">
-                        <input type="number" placeholder="600" id="link-protection-length" />
+                        {% if editor %}
+                        <input type="number" value="{{links_protection.length}}" placeholder="600" id="link-protection-length" />
+                        {% else %}
+                        <input type="number" value="{{links_protection.length}}" disabled placeholder="600" id="link-protection-length" />
+                        {% endif %}
                       </div>
                     </div>
                     <div class="row">
@@ -254,15 +349,67 @@
                         <p>Immunity Level:</p>
                       </div>
                       <div class="col s6">
+                        {% if editor %}
                         <select id="link-protection-level">
+                          {% if links_protection.level == 500 %}
+                          <option selected>Moderators and Above (500)</option>
+                          {% else %}
                           <option>Moderators and Above (500)</option>
+                          {% endif %}
+                          {% if links_protection.level == 600 %}
+                          <option selected>Regulars and Above (600)</option>
+                          {% else %}
                           <option>Regulars and Above (600)</option>
+                          {% endif %}
                           {% if partner %}
+                          {% if links_protection.level == 700 %}
+                          <option selected>Subscribers and Above (700)</option>
+                          {% else %}
                           <option>Subscribers and Above (700)</option>
                           {% endif %}
+                          {% endif %}
+                          {% if links_protection.level == 750 %}
+                          <option selected>Turbo and Above (750)</option>
+                          {% else %}
                           <option>Turbo and Above (750)</option>
+                          {% endif %}
+                          {% if links_protection.level == 800 %}
+                          <option selected>All Users (800)</option>
+                          {% else %}
                           <option>All Users (800)</option>
+                          {% endif %}
                         </select>
+                        {% else %}
+                        <select disabled id="link-protection-level">
+                          {% if links_protection.level == 500 %}
+                          <option selected>Moderators and Above (500)</option>
+                          {% else %}
+                          <option>Moderators and Above (500)</option>
+                          {% endif %}
+                          {% if links_protection.level == 600 %}
+                          <option selected>Regulars and Above (600)</option>
+                          {% else %}
+                          <option>Regulars and Above (600)</option>
+                          {% endif %}
+                          {% if partner %}
+                          {% if links_protection.level == 700 %}
+                          <option selected>Subscribers and Above (700)</option>
+                          {% else %}
+                          <option>Subscribers and Above (700)</option>
+                          {% endif %}
+                          {% endif %}
+                          {% if links_protection.level == 750 %}
+                          <option selected>Turbo and Above (750)</option>
+                          {% else %}
+                          <option>Turbo and Above (750)</option>
+                          {% endif %}
+                          {% if links_protection.level == 800 %}
+                          <option selected>All Users (800)</option>
+                          {% else %}
+                          <option>All Users (800)</option>
+                          {% endif %}
+                        </select>
+                        {% endif %}
                       </div>
                     </div>
                     <div class="row">
@@ -270,13 +417,19 @@
                         <p>Whitelist:</p>
                       </div>
                       <div class="col s6 input-field">
-                        <textarea id="link-protection-whitelist" class="materialize-textarea"></textarea>
+                        {% if editor %}
+                        <textarea id="link-protection-whitelist" class="materialize-textarea">{{links_protection.whitelist}}</textarea>
+                        {% else %}
+                        <textarea disabled id="link-protection-whitelist" class="materialize-textarea">{{links_protection.whitelist}}</textarea>
+                        {% endif %}
                       </div>
                     </div>
                   </div>
                   <div class="modal-footer">
                     <a href="#!" class="modal-action modal-close btn-flat">Close</a>
-                    <a href="#!" class="modal-action modal-close btn-flat">Save and Close</a>
+                    {% if editor %}
+                    <a href="#!" class="modal-action modal-close btn-flat" id="link-protection-save" data-channel="{{owner}}">Save and Close</a>
+                    {% endif %}
                   </div>
                 </div>
               </td>
@@ -856,15 +1009,7 @@
                         <p>Emotes Limit:</p>
                       </div>
                       <div class="col s6">
-                        <input type="number" placeholder="40" id="emotes-protection-percentage" />
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col s6">
-                        <p>Minimum Message Length:</p>
-                      </div>
-                      <div class="col s6">
-                        <input type="number" placeholder="8" id="emotes-protection-length" />
+                        <input type="number" placeholder="5" id="emotes-protection-limit" />
                       </div>
                     </div>
                     <div class="row">
@@ -1414,6 +1559,27 @@
               <th class="col s2">Options</th>
             </thead>
             <tbody>
+              <tr class="row">
+                <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
+                  <strong>Permit</strong><br />
+                  Allows users to bypass spam filters for a limited amount of time.
+                </td>
+                <td class="col s2" style="margin-top:15px; padding-bottom: 15px;">
+                  <div class="switch" style="display: inline-block; margin-right: 5px;">
+                    <label>
+                      Off
+                      {% if editor %}
+                      <input type="checkbox">
+                      {% else %}
+                      <input disabled type="checkbox">
+                      {% endif %}
+                      <span class="lever"></span>
+                      On
+                    </label>
+                  </div>
+                  <a href="#modal-command-permit" class="btn purple darken-4"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                </td>
+              </tr>
               <tr class="row">
                 <td class="col s10" style="margin-top:15px; padding-bottom: 15px;">
                   <strong>Uptime</strong><br />
@@ -1967,7 +2133,7 @@
               <hr />
               <table class="bordered striped">
                 <thead class="row">
-                  <th class="col s3">Date</th>
+                  <th class="col s3">Date (UTC)</th>
                   <th class="col s3">Username</th>
                   <th class="col s6">Message</th>
                 </thead>
@@ -2017,8 +2183,60 @@
               </div>
             </div>
             <div class="col l6 s12">
-              <h5 class="center" style="display: inline-block;">Event Logs (Last 50)</h5><a style="float: right; display: inline" href="#modal-event-logs" class="btn purple darken-4 white-text modal-trigger">More</a>
+              <h5 class="center" style="display: inline-block;">Action Logs (Last 50)</h5><a style="float: right; display: inline" href="#modal-action-logs" class="btn purple darken-4 white-text modal-trigger">More</a>
               <hr />
+              <table class="bordered striped">
+                <thead class="row">
+                  <th class="col s3">Date (UTC)</th>
+                  <th class="col s3">Username</th>
+                  <th class="col s3">Type</th>
+                  <th class="col s3">Reason</th>
+                </thead>
+                <tbody>
+                  {% for log in twitch_action_logs %}
+                  {% if loop.index < 51 %}
+                  <tr class="row" data-user="{{log.display_name|lower}}" style="margin-top: 5px;">
+                    <td class="col s3">{{log.date|date("j/n\/y H\:i")}}</td>
+                    <td class="col s3">{{log.user}}</td>
+                    <td class="col s3">{{log.type}}</td>
+                    <td class="col s3">{{log.reason}}</td>
+                  </tr>
+                  {% endif %}
+                  {% endfor %}
+                </tbody>
+              </table>
+              {%if !twitch_action_logs[0]%}
+              <p class="center"><i>No Logs Found</i></p>
+              {%endif%}
+              <div id="modal-action-logs" class="modal">
+                <div class="modal-content">
+                  <h4>Chat Logs</h4>
+                  <table class="bordered striped">
+                    <thead class="row">
+                      <th class="col s3">Date (UTC)</th>
+                      <th class="col s3">Username</th>
+                      <th class="col s3">Type</th>
+                      <th class="col s3">Reason</th>
+                    </thead>
+                    <tbody>
+                      {% for log in twitch_action_logs %}
+                      <tr class="row" data-user="{{log.display_name|lower}}" style="margin-top: 5px;">
+                        <td class="col s3">{{log.date|date("j/n\/y H\:i")}}</td>
+                        <td class="col s3">{{log.display_name}}</td>
+                        <td class="col s3">{{log.type}}</td>
+                        <td class="col s3">{{log.reason}}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  {%if !twitch_chat_logs[0]%}
+                  <p class="center"><i>No Logs Found</i></p>
+                  {%endif%}
+                </div>
+                <div class="modal-footer">
+                  <a href="#!" class="modal-close btn-flat">Close</a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2109,7 +2327,8 @@
   <script src="/js/twitch_commands.js"></script>
   <script src="/js/users.js"></script>
   <script src="/js/twitch_points.js"></script>
-    <script src="/js/twitch_raffle.js"></script>
+  <script src="/js/twitch_raffle.js"></script>
+  <script src="/js/twitch_link_protection.js"></script>
   {% endif %}
   <script src="/js/twitch_dashboard.js"></script>
   {% include "./footer.html" %}

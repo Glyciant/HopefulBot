@@ -57,7 +57,7 @@ var userLevel = function(object, data) {
 
 var getChannel = function(username) {
   return new Promise(function(resolve, reject) {
-    needle.get("https://api.twitch.tv/kraken/channels/" + username, { client_id: config.auth.cid }, (err, data) => {
+    needle.get("https://api.twitch.tv/kraken/channels/" + username, { headers: { "Client-ID": config.auth.cid} }, (err, data) => {
       if (data.body.status == "422") {
         resolve("suspended");
       }
@@ -73,7 +73,7 @@ var getChannel = function(username) {
 
 var getHosts = function(id) {
   return new Promise(function(resolve, reject) {
-    needle.get("https://tmi.twitch.tv/hosts?include_logins=1&target=" + id, { client_id: config.auth.cid }, (err, data) => {
+    needle.get("https://tmi.twitch.tv/hosts?include_logins=1&target=" + id, { headers: { "Client-ID": config.auth.cid} }, (err, data) => {
       resolve(data.body.hosts);
     });
   });
