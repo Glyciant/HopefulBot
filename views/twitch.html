@@ -40,6 +40,8 @@
           <a href="#!" class="modal-action modal-close btn-flat">Cancel</a>
         </div>
       </div>
+      <br />
+      <a href="https://discordapp.com/oauth2/authorize?&client_id=176399298655682571&scope=bot&permissions=257054" class="btn purple darken-4 white-text modal-trigger" style="margin-top: 5px;">Get Discord Bot</a>
       {% else %}
       <a href="javascript:;" id="channel-setup" data-channel="{{owner}}" class="btn purple darken-4 white-text" style="margin-top: 5px;">Run Setup</a>
       {% endif %}
@@ -202,33 +204,6 @@
                     </div>
                     <div class="row">
                       <div class="col s6">
-                        <p>Use Global Blacklist:</p>
-                      </div>
-                      <div class="col s6">
-                        <div class="switch" style="margin: 16px 0;">
-                           <label>
-                             Off
-                             {% if editor %}
-                              {% if links_protection.global_links %}
-                              <input checked type="checkbox" id="link-protection-blacklist">
-                              {% else %}
-                              <input type="checkbox" id="link-protection-blacklist">
-                              {% endif %}
-                             {% else %}
-                               {% if links_protection.global_links %}
-                               <input disabled checked type="checkbox" id="link-protection-blacklist">
-                               {% else %}
-                               <input disabled type="checkbox" id="link-protection-blacklist">
-                               {% endif %}
-                             {% endif %}
-                             <span class="lever"></span>
-                             On
-                           </label>
-                         </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col s6">
                         <p>Prevent Evasion Attempts:</p>
                       </div>
                       <div class="col s6">
@@ -326,9 +301,9 @@
                       </div>
                       <div class="col s6">
                         {% if editor %}
-                        <input type="number" value="{{links_protection.warning_length}}" placeholder="1" id="link-protection-warning-length" />
+                        <input type="number" value="{{links_protection.warning_length}}" placeholder="1" id="link-protection-warning-length" min=1 max=1209600 />
                         {% else %}
-                        <input type="number" value="{{links_protection.warning_length}}" disabled placeholder="1" id="link-protection-warning-length" />
+                        <input type="number" value="{{links_protection.warning_length}}" disabled placeholder="1" id="link-protection-warning-length" min=1 max=1209600 />
                         {% endif %}
                       </div>
                     </div>
@@ -338,9 +313,9 @@
                       </div>
                       <div class="col s6">
                         {% if editor %}
-                        <input type="number" value="{{links_protection.length}}" placeholder="600" id="link-protection-length" />
+                        <input type="number" value="{{links_protection.length}}" placeholder="600" id="link-protection-length" min=1 max=1209600 />
                         {% else %}
-                        <input type="number" value="{{links_protection.length}}" disabled placeholder="600" id="link-protection-length" />
+                        <input type="number" value="{{links_protection.length}}" disabled placeholder="600" id="link-protection-length" min=1 max=1209600 />
                         {% endif %}
                       </div>
                     </div>
@@ -418,9 +393,9 @@
                       </div>
                       <div class="col s6 input-field">
                         {% if editor %}
-                        <textarea id="link-protection-whitelist" class="materialize-textarea">{{links_protection.whitelist}}</textarea>
+                        <textarea id="link-protection-whitelist" class="materialize-textarea">{% for link in links_protection.whitelist %}{{link}}{% if loop.index < links_protection.whitelist.length %}&#13;&#10;{% endif %}{% endfor %}</textarea>
                         {% else %}
-                        <textarea disabled id="link-protection-whitelist" class="materialize-textarea">{{links_protection.whitelist}}</textarea>
+                        <textarea disabled id="link-protection-whitelist" class="materialize-textarea">{% for link in links_protection.whitelist %}{{link}}{% if loop.index < links_protection.whitelist.length %}&#13;&#10;{% endif %}{% endfor %}</textarea>
                         {% endif %}
                       </div>
                     </div>

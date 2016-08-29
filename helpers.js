@@ -137,6 +137,10 @@ var isFollowing = function(user, channel) {
   });
 }
 
+function matchRule(str, rule) {
+  return new RegExp("^" + rule.split("*").join(".*") + "$").test(str);
+}
+
 module.exports = {
   isAdmin: isAdmin,
   userLevel: userLevel,
@@ -146,5 +150,6 @@ module.exports = {
   updateTwitch: updateTwitch,
   isTwitchEditor: isTwitchEditor,
   getModChannels: getModChannels,
-  isFollowing: isFollowing
+  isFollowing: isFollowing,
+  matchRule: matchRule
 };

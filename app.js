@@ -206,7 +206,6 @@ db.twitch_settings.getAll().then(function(data) {
             points = _.sortBy(channel[0].settings.points.totals, "total").reverse();
             raffle = channel[0].settings.raffle,
             links_protection = channel[0].settings.spam.links;
-            links_protection.whitelist = links_protection.whitelist.toString().replace(",", "\n");
       }
       db.twitch_logs.getChannel("#" + req.params.user).then(function(twitch_chat_logs) {
         db.twitch_actions.getChannel("#" + req.params.user).then(function(twitch_action_logs) {
@@ -619,8 +618,7 @@ db.twitch_settings.getAll().then(function(data) {
                 warning_length: 1,
                 length: 600,
                 level: 600,
-                whitelist: [],
-                global_links: true
+                whitelist: []
               },
               caps: {
                 enabled: false,
@@ -817,15 +815,25 @@ db.twitch_settings.getAll().then(function(data) {
 
       // Link Protection
       for (var i in params) {
-        var linkRegex = new RegExp(/^(?:(?:https?|ftp):\/\/)?(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$/)
-        if (linkRegex.test(params[i])) {
-          if (helpers.userLevel(user, data) > data.settings.spam.links.level) {
+        var linkRegex = new RegExp(/^(?:(?:https?|ftp):\/\/)?(?:\S+(?::\S*)?@)?(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?(?::\d{2,5})?(?:[/?#]\S*)?$/);
+        var evasionRegex = new RegExp(/^(?:(?:https?|ftp):\/\/)?(?:\S+(?::\S*)?@)?(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:(\.|\[dot\]|\(dot\)|\[.\]|\(\.\)|\s\.\s)(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:(\.|\[dot\]|\(dot\)|\[.\]|\(\.\)|\s\.\s)(?:[a-z\u00a1-\uffff]{2,}))(\.|\[dot\]|\(dot\)|\[.\]|\(\.\)|\s\.\s)?(?::\d{2,5})?(?:[/?#]\S*)?$/);
+        var ipRegex = new RegExp(/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/);
+        if (linkRegex.test(params[i]) || (ipRegex.test(params[i]) && data.settings.spam.links.ips === true) || (evasionRegex.test(params[i]) && data.settings.spam.links.prevent_evasion === true)) {
+          var whitelist = data.settings.spam.links.whitelist;
+          for (var j in whitelist) {
+            if (typeof(whitelist[j]) !== "function") {
+              if (j !== whitelist.length && helpers.matchRule(params[i],whitelist[j]) === true && whitelist[j] !== "") {
+                return;
+              }
+            }
+          }
+          if (helpers.userLevel(user, data) > data.settings.spam.links.level && data.settings.spam.links.enabled === true) {
             var message;
             if (data.settings.spam.links.message) {
               message = data.settings.spam.links.message;
             }
             else {
-              message = "Please request permission from a moderator before posting a link!";
+              message = "Links require prior permission from a moderator!";
             }
             var name = user.username;
             if (permitted[channel] && permitted[channel][name]) {
@@ -838,8 +846,10 @@ db.twitch_settings.getAll().then(function(data) {
                 if (purged[channel][name]) {
                   purgeTimeDiff = Date.now() / 1000 - purged[channel][name];
                 }
-                if (purgeTimeDiff !== null && purgeTimeDiff >= 28800) {
-                  client.say(channel, message + " [" + display_name + "] [Timeout]");
+                if ((purgeTimeDiff !== null && purgeTimeDiff <= 28800) || data.settings.spam.links.warning === false) {
+                  if (data.settings.spam.links.post_message === true) {
+                    client.say(channel, message + " [" + display_name + "] [Timeout]");
+                  }
                   client.timeout(channel, user.username, data.settings.spam.links.length, "Timed out by Heepsbot link filter for the following: " + params[i]);
                   purged[channel][name] = null;
                   db.twitch_actions.addEntry({
@@ -851,7 +861,9 @@ db.twitch_settings.getAll().then(function(data) {
                   });
                 }
                 else {
-                  client.say(channel, message + " [" + display_name + "] [Warning]");
+                  if (data.settings.spam.links.post_message === true) {
+                    client.say(channel, message + " [" + display_name + "] [Warning]");
+                  }
                   client.timeout(channel, user.username, data.settings.spam.links.warning_length, "Purged by Heepsbot link filter for the following: " + params[i]);
                   purged[channel][name] = Date.now() / 1000;
                   db.twitch_actions.addEntry({
@@ -875,8 +887,10 @@ db.twitch_settings.getAll().then(function(data) {
               if (purged[channel][name]) {
                 purgeTimeDiff = Date.now() / 1000 - purged[channel][name];
               }
-              if (purgeTimeDiff !== null && purgeTimeDiff <= 28800) {
-                client.say(channel, message + " [" + display_name + "] [Timeout]");
+              if ((purgeTimeDiff !== null && purgeTimeDiff <= 28800) || data.settings.spam.links.warning === false) {
+                if (data.settings.spam.links.post_message === true) {
+                  client.say(channel, message + " [" + display_name + "] [Timeout]");
+                }
                 client.timeout(channel, user.username, data.settings.spam.links.length, "Timed out by Heepsbot link filter for the following: " + params[i]);
                 purged[channel][name] = null;
                 db.twitch_actions.addEntry({
@@ -888,7 +902,9 @@ db.twitch_settings.getAll().then(function(data) {
                 });
               }
               else {
-                client.say(channel, message + " [" + display_name + "] [Warning]");
+                if (data.settings.spam.links.post_message === true) {
+                  client.say(channel, message + " [" + display_name + "] [Warning]");
+                }
                 client.timeout(channel, user.username, data.settings.spam.links.warning_length, "Purged by Heepsbot link filter for the following: " + params[i]);
                 purged[channel][name] = Date.now() / 1000;
                 db.twitch_actions.addEntry({
@@ -1171,7 +1187,7 @@ db.twitch_settings.getAll().then(function(data) {
                     message: message.replace(params[0], "").trim(),
                     subscriber: user.subscriber
                   }
-                  data.settings.raffle.users.push(obj)
+                  data.settings.raffle.users.push(obj);
                   j++;
                 }
               }
