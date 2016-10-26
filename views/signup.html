@@ -1,0 +1,23 @@
+{% include "./header.html" %}
+<div class="row">
+  <div class="col s10 offset-s1 grey lighten-2 center" style="border-radius:20px; margin-top:15px; padding: 15px;">
+    <p>Thank you for using Heepsbot! To sign up or login, please use an existing Twitch/Hitbox/Beam/Discord account by clicking the relevant link below.</p>
+  </div>
+</div>
+<div class="row">
+  <div class="col s4 offset-s1 deep-purple darken-4 center" style="border-radius:20px;">
+    <h3><a class="white-text" href='{{twitch_authurl}}' style="padding: 5px;" data-activates='dashboard-twitch'>Twitch</a></h3>
+  </div>
+  <div class="col s4 offset-s2 blue darken-4 center" style="border-radius:20px;">
+    <h3><a class="white-text" href='{{discord_authurl}}' style="padding: 5px;" data-activates='dashboard-twitch'>Discord</a></h3>
+  </div>
+</div>
+<div class="row">
+  <div class="col s4 offset-s1 teal darken-4 center" style="border-radius:20px;">
+    <h3><a class="white-text" href='{{hitbox_authurl}}' style="padding: 5px;" data-activates='dashboard-twitch'>Hitbox</a></h3>
+  </div>
+  <div class="col s4 offset-s2 indigo darken-4 center" style="border-radius:20px;">
+    <h3><a class="white-text" href='{{beam_authurl}}' style="padding: 5px;" data-activates='dashboard-twitch'>Beam</a></h3>
+  </div>
+</div>
+{% include "./footer.html" %}
