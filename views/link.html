@@ -1,24 +1,24 @@
 {% include "./header.html" %}
 <div class="row">
   <div class="col s10 offset-s1 grey lighten-2 center" style="border-radius:20px; margin-top:15px; padding: 15px;">
-    <p>To login to another account, please use an existing Twitch/Hitbox/Beam/Discord account by clicking the relevant link below.</p>
+    <p>To login to another account, please use an existing Twitch/Discord/Beam account by clicking the relevant link below.</p>
   </div>
 </div>
 <div class="row">
   <div class="col s4 offset-s1 deep-purple darken-4 center" style="border-radius:20px; padding: 5px;">
     {% if twitch %}
     <h3 id="discord" class="white-text">Twitch: {{twitch}}</h3>
-    {% if hitbox || beam || discord %}
+    {% if discord || beam %}
     <a href="javascript:;" id="unlink-twitch" class="white-text" data-id="{{loggedin}}">(Unlink)</a>
     {% endif %}
     {% else %}
-    <h3><a id="discord" class="white-text" href='{{twitch_authurl}}' data-activates='dashboard-twitch'>Twitch</a></h3>
+    <h3><a id="twitch" class="white-text" href='{{twitch_authurl}}' data-activates='dashboard-twitch'>Twitch</a></h3>
     {% endif %}
   </div>
   <div class="col s4 offset-s2 blue darken-4 center" style="border-radius:20px; padding: 5px;">
     {% if discord %}
     <h3 id="discord" class="white-text">Discord: {{discord}}</h3>
-    {% if twitch || hitbox || beam %}
+    {% if twitch || beam %}
     <a href="javascript:;" id="unlink-discord" class="white-text" data-id="{{loggedin}}">(Unlink)</a>
     {% endif %}
     {% else %}
@@ -27,24 +27,14 @@
   </div>
 </div>
 <div class="row">
-  <div class="col s4 offset-s1 teal darken-4 center" style="border-radius:20px; padding: 5px;">
-    {% if hitbox %}
-    <h3 id="discord" class="white-text">Hitbox: {{hitbox}}</h3>
-    {% if twitch || beam || discord %}
-    <a href="javascript:;" id="unlink-hitbox" class="white-text" data-id="{{loggedin}}">(Unlink)</a>
-    {% endif %}
-    {% else %}
-    <h3><a id="discord" class="white-text" href='{{hitbox_authurl}}' data-activates='dashboard-twitch'>Hitbox</a></h3>
-    {% endif %}
-  </div>
-  <div class="col s4 offset-s2 indigo darken-4 center" style="border-radius:20px; padding: 5px;">
+  <div class="col s4 offset-s4 indigo darken-4 center" style="border-radius:20px; padding: 5px;">
     {% if beam %}
     <h3 id="discord" class="white-text">Beam: {{beam}}</h3>
-    {% if twitch || hitbox || discord %}
+    {% if twitch || discord %}
     <a href="javascript:;" id="unlink-beam" class="white-text" data-id="{{loggedin}}">(Unlink)</a>
     {% endif %}
     {% else %}
-    <h3><a id="discord" class="white-text" href='{{beam_authurl}}' data-activates='dashboard-twitch'>Beam</a></h3>
+    <h3><a id="beam" class="white-text" href='{{beam_authurl}}' data-activates='dashboard-twitch'>Beam</a></h3>
     {% endif %}
   </div>
 </div>

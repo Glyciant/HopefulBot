@@ -27,7 +27,7 @@ twitchBot.on("connected", function (address, port) {
 function joinAllChannels() {
   db.twitch_settings.getAll().then(function(result) {
     for (var i in result) {
-      twitchBot.join(result[i]);
+      twitchBot.join(result[i].username);
     }
   });
 }

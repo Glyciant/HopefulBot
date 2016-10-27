@@ -11,7 +11,6 @@ var express = require('express'),
     Base64 = require('base-64'),
     twitchCommands = require('./commands_twitch'),
     discordCommands = require('./commands_discord'),
-    hitboxCommands = require('./commands_hitbox'),
     beamCommands = require('./commands_beam');
 
 // Set up views, routes, etc.
@@ -39,14 +38,12 @@ app.use(function(req, res, next) {
   res.locals.username = req.session.name;
   res.locals.isAdmin = helpers.general.isAdmin(res.locals.username);
   res.locals.twitch_authurl = config.twitch.auth.authurl;
-    res.locals.discord_authurl = config.discord.auth.authurl;
-  res.locals.hitbox_authurl = config.hitbox.auth.authurl;
+  res.locals.discord_authurl = config.discord.auth.authurl;
   res.locals.beam_authurl = config.beam.auth.authurl;
   if (res.locals.loggedin) {
     db.users.get(res.locals.loggedin).then(function(result) {
       res.locals.twitch = result.twitch;
       res.locals.discord = result.discord_id;
-      res.locals.hitbox = result.hitbox;
       res.locals.beam = result.beam;
       next();
     });
@@ -81,11 +78,6 @@ app.get('/docs/web/discord/', function(req, res) {
   res.render('docs_web_discord', { title: "Discord Web Panel Documentation", theme: "Discord"});
 });
 
-// Get Hitbox web docs
-app.get('/docs/web/hitbox/', function(req, res) {
-  res.render('docs_web_hitbox', { title: "Hitbox Web Panel Documentation", theme: "Hitbox"});
-});
-
 // Get Beam web docs
 app.get('/docs/web/beam/', function(req, res) {
   res.render('docs_web_beam', { title: "Beam Web Panel Documentation", theme: "Beam"});
@@ -104,11 +96,6 @@ app.get('/docs/chat/twitch/', function(req, res) {
 // Get Discord chat docs
 app.get('/docs/chat/discord/', function(req, res) {
   res.render('docs_chat_discord', { title: "Discord Chat Commands Documentation", theme: "Discord"});
-});
-
-// Get Hitbox chat docs
-app.get('/docs/chat/hitbox/', function(req, res) {
-  res.render('docs_chat_hitbox', { title: "Hitbox Chat Commands Documentation", theme: "Hitbox"});
 });
 
 // Get Beam chat docs
@@ -151,11 +138,6 @@ app.get('/settings/:id/discord/', function(req, res) {
   res.render('settings_discord', { title: "Discord Settings", theme: "Discord"});
 });
 
-// Get Hitbox settings page
-app.get('/settings/:id/hitbox/', function(req, res) {
-  res.render('settings_hitbox', { title: "Hitbox Settings", theme: "Hitbox"});
-});
-
 // Get Beam settings page
 app.get('/settings/:id/beam/', function(req, res) {
   res.render('settings_beam', { title: "Beam Settings", theme: "Beam"});
@@ -181,14 +163,11 @@ app.get('/logs/:id/:platform/', function(req, res) {
   if (req.params.platform == "twitch") {
     res.render('logs', { title: "Twitch Chat Logs", theme: "Twitch"});
   }
-  else if (req.params.platform == "hitbox") {
-    res.render('logs', { title: "Hitbox Chat Logs", theme: "Hitbox"});
+  else if (req.params.platform == "discord") {
+    res.render('logs', { title: "Discord Chat Logs", theme: "Discord"});
   }
   else if (req.params.platform == "beam") {
     res.render('logs', { title: "Beam Chat Logs", theme: "Beam"});
-  }
-  else if (req.params.platform == "discord") {
-    res.render('logs', { title: "Discord Chat Logs", theme: "Discord"});
   }
   else {
     res.redirect('/logs/' + req.params.id);
@@ -200,14 +179,11 @@ app.get('/logs/:id/:platform/actions/', function(req, res) {
   if (req.params.platform == "twitch") {
     res.render('logs', { title: "Twitch Action Logs", theme: "Twitch"});
   }
-  else if (req.params.platform == "hitbox") {
-    res.render('logs', { title: "Hitbox Action Logs", theme: "Hitbox"});
+  else if (req.params.platform == "discord") {
+    res.render('logs', { title: "Discord Action Logs", theme: "Discord"});
   }
   else if (req.params.platform == "beam") {
     res.render('logs', { title: "Beam Action Logs", theme: "Beam"});
-  }
-  else if (req.params.platform == "discord") {
-    res.render('logs', { title: "Discord Action Logs", theme: "Discord"});
   }
   else {
     res.redirect('/logs/' + req.params.id);
@@ -266,10 +242,9 @@ app.get('/auth/login/twitch/', function(req, res) {
     if(!err) {
       needle.get('https://api.twitch.tv/kraken/user?oauth_token=' + body.access_token + "&client_id=" + config.twitch.auth.cid, function(error, data) {
         if(!error) {
-          // Link Twitch account to existing data
           if (req.session.user_id) {
             db.users.updateTwitch(req.session.user_id, data.body.name).then(function(result) {
-              db.twitch_settings.defaultSettings(req.session.user_id, data.body.display_name, data.body.logo).then(function(result) {
+              db.twitch_settings.defaultSettings(req.session.user_id, data.body.name, data.body.display_name, data.body.logo).then(function(result) {
                 res.redirect('/settings/');
               });
             });
@@ -281,10 +256,10 @@ app.get('/auth/login/twitch/', function(req, res) {
             req.session.display_name = data.body.display_name;
             db.users.getIdByTwitch(req.session.name).then(function(result) {
               if (!result) {
-                db.users.generateUser(req.session.name, null, null, null).then(function(result) {
+                db.users.generateUser(req.session.name, null, null).then(function(result) {
                   db.users.getIdByTwitch(req.session.name).then(function(result) {
                     req.session.user_id = result;
-                    db.twitch_settings.defaultSettings(req.session.user_id, data.body.display_name, data.body.logo).then(function(result) {
+                    db.twitch_settings.defaultSettings(req.session.user_id, data.body.name, data.body.display_name, data.body.logo).then(function(result) {
                       res.redirect('/settings/');
                     });
                   });
@@ -368,7 +343,7 @@ app.get('/auth/login/discord/', function(req, res) {
               req.session.display_name = data.body.username;
               db.users.getIdByDiscord(req.session.name).then(function(result) {
                 if (!result) {
-                  db.users.generateUser(null, null, null, req.session.name).then(function(result) {
+                  db.users.generateUser(null, req.session.name, null).then(function(result) {
                     db.users.getIdByDiscord(req.session.name).then(function(result) {
                       req.session.user_id = result;
                       Promise.all([discordCommands.botServers(), db.discord_settings.getAll()]).then(servers => {
@@ -421,61 +396,6 @@ app.get('/auth/login/discord/', function(req, res) {
   });
 });
 
-// Hitbox Auth
-app.get('/auth/login/hitbox/', function(req, res) {
-  hash = Base64.encode(config.hitbox.auth.cid + config.hitbox.auth.secret);
-  needle.post('https://api.hitbox.tv/oauth/exchange/', {
-    request_token: req.query.request_token,
-    app_token: config.hitbox.auth.cid,
-    hash: hash
-  }, function(err, resp, body) {
-    if(!err) {
-      needle.get('https://api.hitbox.tv/userfromtoken/' + JSON.parse(body).access_token, function(error, data) {
-        needle.get('https://api.hitbox.tv/user/' + JSON.parse(data.body).user_name, function(error, user_data) {
-          if(!error) {
-            if (req.session.user_id) {
-              db.users.updateHitbox(req.session.user_id, JSON.parse(data.body).user_name.toLowerCase()).then(function(result) {
-                db.hitbox_settings.defaultSettings(req.session.user_id, JSON.parse(data.body).user_name, JSON.parse(user_data.body).user_logo).then(function(result) {
-                  res.redirect('/settings/');
-                });
-              });
-            }
-            else {
-              req.session.auth = JSON.parse(body).access_token;
-              req.session.name = JSON.parse(data.body).user_name.toLowerCase();
-              req.session.display_name = JSON.parse(data.body).user_name;
-              db.users.getIdByHitbox(req.session.name).then(function(result) {
-                if (!result) {
-                  db.users.generateUser(null, req.session.name, null, null).then(function(result) {
-                    db.users.getIdByHitbox(req.session.name).then(function(result) {
-                      req.session.user_id = result;
-                      db.hitbox_settings.defaultSettings(req.session.user_id, JSON.parse(data.body).user_name, JSON.parse(user_data.body).user_logo).then(function(result) {
-                        res.redirect('/settings/');
-                      });
-                    });
-                  });
-                }
-                else {
-                  db.users.getIdByHitbox(req.session.name).then(function(result) {
-                    req.session.user_id = result;
-                    res.redirect('/settings/');
-                  });
-                }
-              });
-            }
-          }
-          else{
-            res.render("error", {title: "Error", theme: "Neutral", code: "404", description: "Could not authenticate via the Hitbox API."});
-          }
-        });
-      });
-    }
-    else{
-      res.render("error", {title: "Error", theme: "Neutral", code: "404", description: "Hitbox API appears to be having issues."});
-    }
-  });
-});
-
 // Beam Auth
 app.get('/auth/login/beam/', function(req, res) {
   needle.post('https://beam.pro/api/v1/oauth/token', {
@@ -494,7 +414,7 @@ app.get('/auth/login/beam/', function(req, res) {
         if(!error) {
           if (req.session.user_id) {
             db.users.updateBeam(req.session.user_id, data.body.username.toLowerCase()).then(function(result) {
-              db.beam_settings.defaultSettings(req.session.user_id, data.body.username, data.body.avatar).then(function(result) {
+              db.beam_settings.defaultSettings(req.session.user_id, data.body.channel.id, data.body.username, data.body.avatar).then(function(result) {
                 res.redirect('/settings/');
               });
             });
@@ -505,10 +425,10 @@ app.get('/auth/login/beam/', function(req, res) {
             req.session.display_name = data.body.username;
             db.users.getIdByBeam(req.session.name).then(function(result) {
               if (!result) {
-                db.users.generateUser(null, null, req.session.name, null).then(function(result) {
+                db.users.generateUser(null, null, req.session.name).then(function(result) {
                   db.users.getIdByBeam(req.session.name).then(function(result) {
                     req.session.user_id = result;
-                    db.beam_settings.defaultSettings(req.session.user_id, data.body.username, data.body.avatar).then(function(result) {
+                    db.beam_settings.defaultSettings(req.session.user_id, data.body.channel.id, data.body.username, data.body.avatar).then(function(result) {
                       res.redirect('/settings/');
                     });
                   });
@@ -546,13 +466,6 @@ app.post('/unlink/discord/', function(req, res) {
   db.users.updateDiscordId(req.body.id, null);
   db.users.updateDiscordServer(req.body.id, null);
   db.discord_settings.delete(req.body.id);
-  return;
-});
-
-// Unlink Hitbox Account
-app.post('/unlink/hitbox/', function(req, res) {
-  db.users.updateHitbox(req.body.id, null);
-  db.hitbox_settings.delete(req.body.id);
   return;
 });
 

@@ -6,8 +6,8 @@ $(document).delegate("#unlink-twitch", "click", function() {
   });
 });
 
-$(document).delegate("#unlink-hitbox", "click", function() {
-  $.post("/unlink/hitbox/", {
+$(document).delegate("#unlink-discord", "click", function() {
+  $.post("/unlink/discord/", {
     id: $(this).data("id")
   }, function() {
     window.location = "/link/";
@@ -16,14 +16,6 @@ $(document).delegate("#unlink-hitbox", "click", function() {
 
 $(document).delegate("#unlink-beam", "click", function() {
   $.post("/unlink/beam/", {
-    id: $(this).data("id")
-  }, function() {
-    window.location = "/link/";
-  });
-});
-
-$(document).delegate("#unlink-discord", "click", function() {
-  $.post("/unlink/discord/", {
     id: $(this).data("id")
   }, function() {
     window.location = "/link/";

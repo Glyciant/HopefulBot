@@ -4,7 +4,6 @@ var config = {};
 config.app = {};
 config.twitch = {};
 config.discord = {};
-config.hitbox = {};
 config.beam = {};
 
 // Define App Details
@@ -15,14 +14,12 @@ config.app.baseurl = "http://localhost:" + config.app.port;
 // Setup Auth Objects
 config.twitch.auth = {};
 config.discord.auth = {};
-config.hitbox.auth = {};
 config.beam.auth = {};
 
 // Define Bot Chat Logins
 config.twitch.bot = "";
 config.discord.bot = "";
 config.discord.bot_id = "";
-config.hitbox.bot = "";
 config.beam.bot = "";
 
 // Define Twitch Auth
@@ -36,12 +33,6 @@ config.discord.auth.cid = "";
 config.discord.auth.secret = "";
 config.discord.auth.redirect = config.app.baseurl + "/auth/login/discord/";
 config.discord.auth.authurl = "https://discordapp.com/api/oauth2/authorize?client_id=" + config.discord.auth.cid + "&scope=identify+bot+guilds&response_type=code&permissions=0";
-
-// Define Hitbox Auth
-config.hitbox.auth.cid = "";
-config.hitbox.auth.secret = "";
-config.hitbox.auth.redirect = config.app.baseurl + "/auth/login/hitbox/";
-config.hitbox.auth.authurl = "https://api.hitbox.tv/oauth/login?force_auth=true&app_token=" + config.hitbox.auth.cid;
 
 // Define Beam Auth
 config.beam.auth.cid = "";

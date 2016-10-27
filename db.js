@@ -5,16 +5,15 @@ var mongodb = require('mongodb').MongoClient,
     url = "mongodb://localhost:27017/heepsbot";
 
 var users = {
-  generateUser: (twitch, hitbox, beam, discord) => {
+  generateUser: (twitch, discord, beam) => {
     return new Promise((resolve, reject) => {
       mongodb.connect(url, function(err, db) {
         assert.equal(null, err);
         db.collection("users").insertOne({
           twitch: twitch,
-          hitbox: hitbox,
-          beam: beam,
           discord_id: discord,
           discord_server: null,
+          beam: beam,
           commands: [],
           aliases: []
         }, function(err, result) {
@@ -63,12 +62,12 @@ var users = {
       });
     });
   },
-  getIdByHitbox: (hitbox) => {
+  getIdByDiscord: (discord) => {
     return new Promise((resolve, reject) => {
       mongodb.connect(url, function(err, db) {
         assert.equal(null, err);
         db.collection("users").findOne({
-          hitbox: hitbox
+          discord_id: discord
         }, function(err, result) {
           assert.equal(null, err);
           db.close();
@@ -88,25 +87,6 @@ var users = {
         assert.equal(null, err);
         db.collection("users").findOne({
           beam: beam
-        }, function(err, result) {
-          assert.equal(null, err);
-          db.close();
-          if (result) {
-            resolve(result._id);
-          }
-          else {
-            resolve(null);
-          }
-        });
-      });
-    });
-  },
-  getIdByDiscord: (discord) => {
-    return new Promise((resolve, reject) => {
-      mongodb.connect(url, function(err, db) {
-        assert.equal(null, err);
-        db.collection("users").findOne({
-          discord_id: discord
         }, function(err, result) {
           assert.equal(null, err);
           db.close();
@@ -183,27 +163,6 @@ var users = {
       });
     });
   },
-  updateHitbox: (id, hitbox) => {
-    return new Promise((resolve, reject) => {
-      mongodb.connect(url, function(err, db) {
-        assert.equal(null, err);
-        db.collection("users").updateOne({
-          _id: ObjectID(id)
-        }, {
-          $set: { hitbox: hitbox }
-        }, function(err, result) {
-          assert.equal(null, err);
-          db.close();
-          if (result) {
-            resolve(result);
-          }
-          else {
-            resolve(null);
-          }
-        });
-      });
-    });
-  },
   updateBeam: (id, beam) => {
     return new Promise((resolve, reject) => {
       mongodb.connect(url, function(err, db) {
@@ -228,11 +187,11 @@ var users = {
 };
 
 var twitch_settings = {
-  defaultSettings: (id, name, icon) => {
+  defaultSettings: (id, username, display_name, icon) => {
     return new Promise((resolve, reject) => {
       mongodb.connect(url, function(err, db) {
         assert.equal(null, err);
-        db.collection("twitch_settings").insertOne(helpers.twitch_settings.defaultSettings(id, name, icon), function(err, result) {
+        db.collection("twitch_settings").insertOne(helpers.twitch_settings.defaultSettings(id, username, display_name, icon), function(err, result) {
           assert.equal(null, err);
           db.close();
           if (result) {
@@ -340,49 +299,12 @@ var discord_settings = {
   }
 };
 
-var hitbox_settings = {
-  defaultSettings: (id, name, icon) => {
-    return new Promise((resolve, reject) => {
-      mongodb.connect(url, function(err, db) {
-        assert.equal(null, err);
-        db.collection("hitbox_settings").insertOne(helpers.hitbox_settings.defaultSettings(id, name, icon), function(err, result) {
-          assert.equal(null, err);
-          db.close();
-          if (result) {
-            resolve(result);
-          }
-          else {
-            resolve(null);
-          }
-        });
-      });
-    });
-  },
-  delete: (id) => {
-    return new Promise((resolve, reject) => {
-      mongodb.connect(url, function(err, db) {
-        assert.equal(null, err);
-        db.collection("hitbox_settings").deleteOne({ user_id: id }, function(err, result) {
-          assert.equal(null, err);
-          db.close();
-          if (result) {
-            resolve(result);
-          }
-          else {
-            resolve(null);
-          }
-        });
-      });
-    });
-  }
-};
-
 var beam_settings = {
-  defaultSettings: (id, name, icon) => {
+  defaultSettings: (user_id, chat_id, name, icon) => {
     return new Promise((resolve, reject) => {
       mongodb.connect(url, function(err, db) {
         assert.equal(null, err);
-        db.collection("beam_settings").insertOne(helpers.beam_settings.defaultSettings(id, name, icon), function(err, result) {
+        db.collection("beam_settings").insertOne(helpers.beam_settings.defaultSettings(user_id, chat_id, name, icon), function(err, result) {
           assert.equal(null, err);
           db.close();
           if (result) {
@@ -411,6 +333,25 @@ var beam_settings = {
         });
       });
     });
+  },
+  getAll: () => {
+    return new Promise((resolve, reject) => {
+      mongodb.connect(url, function(err, db) {
+        assert.equal(null, err);
+        db.collection("beam_settings").find({}, function(err, result) {
+          result.toArray().then(function(arrayResult) {
+            assert.equal(null, err);
+            db.close();
+            if (arrayResult) {
+              resolve(arrayResult);
+            }
+            else {
+              resolve(null);
+            }
+          });
+        });
+      });
+    });
   }
 };
 
@@ -418,6 +359,5 @@ module.exports = {
   users: users,
   twitch_settings: twitch_settings,
   discord_settings: discord_settings,
-  hitbox_settings: hitbox_settings,
   beam_settings: beam_settings
 };
