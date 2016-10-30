@@ -195,7 +195,7 @@ var twitch_settings = {
           assert.equal(null, err);
           db.close();
           if (result) {
-            resolve(result);
+              resolve(result);
           }
           else {
             resolve(null);
@@ -239,9 +239,70 @@ var twitch_settings = {
         });
       });
     });
+  },
+  getById: (id) => {
+    return new Promise((resolve, reject) => {
+      mongodb.connect(url, function(err, db) {
+        assert.equal(null, err);
+        db.collection("twitch_settings").find({
+          user_id: ObjectID(id)
+        }, function(err, result) {
+          result.toArray().then(function(arrayResult) {
+            assert.equal(null, err);
+            db.close();
+            if (arrayResult) {
+              resolve(arrayResult);
+            }
+            else {
+              resolve(null);
+            }
+          });
+        });
+      });
+    });
+  },
+  getByUsername: (username) => {
+    return new Promise((resolve, reject) => {
+      mongodb.connect(url, function(err, db) {
+        assert.equal(null, err);
+        db.collection("twitch_settings").find({
+          username: username
+        }, function(err, result) {
+          result.toArray().then(function(arrayResult) {
+            assert.equal(null, err);
+            db.close();
+            if (arrayResult) {
+              resolve(arrayResult);
+            }
+            else {
+              resolve(null);
+            }
+          });
+        });
+      });
+    });
+  },
+  update: (id, object) => {
+    return new Promise((resolve, reject) => {
+      mongodb.connect(url, function(err, db) {
+        assert.equal(null, err);
+        db.collection("twitch_settings").update({
+          user_id: ObjectID(id),
+        }, object,
+        function(err, result) {
+          assert.equal(null, err);
+          db.close();
+          if (result) {
+            resolve(result);
+          }
+          else {
+            resolve(null);
+          }
+        });
+      });
+    });
   }
 };
-
 
 var discord_settings = {
   defaultSettings: (user_id, server_id, name, icon) => {

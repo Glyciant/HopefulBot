@@ -1,6 +1,7 @@
 var tmi = require("tmi.js"),
     config = require("./config"),
-    db = require("./db")
+    helpers = require("./helpers"),
+    db = require("./db"),
     tmiOptions = {
       options: {
           debug: true
@@ -17,21 +18,150 @@ var tmi = require("tmi.js"),
     },
     twitchBot = new tmi.client(tmiOptions);
 
+// Connect to Twitch
 twitchBot.connect();
 
+// Begin Join Channels Function
 twitchBot.on("connected", function (address, port) {
-  console.log("[TWITCH] Login Successful!")
+  console.log("[TWITCH] Login Successful!");
   joinAllChannels();
 });
 
+// Join Channels Function
 function joinAllChannels() {
   db.twitch_settings.getAll().then(function(result) {
     for (var i in result) {
-      twitchBot.join(result[i].username);
+      if (result[i].enabled === true) {
+        twitchBot.join(result[i].username);
+      }
     }
   });
 }
 
-module.exports = {
+var joinChannel = function(channel) {
+  db.twitch_settings.getByUsername(channel).then(function(data) {
+    data[0].enabled = true;
+    twitchBot.join(channel);
+    db.twitch_settings.update(data[0].user_id, data[0])
+  });
+};
 
+var partChannel = function(channel) {
+  db.twitch_settings.getByUsername(channel).then(function(data) {
+    data[0].enabled = false;
+    twitchBot.part(channel);
+    db.twitch_settings.update(data[0].user_id, data[0])
+  });
+};
+
+var rejoinChannel = function(channel) {
+  db.twitch_settings.getByUsername(channel).then(function(data) {
+    twitchBot.part(channel);
+    twitchBot.join(channel);
+  });
+};
+
+var resetBot = function(channel) {
+  db.users.getIdByTwitch(channel).then(function(data) {
+    db.twitch_settings.getByUsername(channel).then(function(result) {
+      db.twitch_settings.delete(data).then(function() {
+        db.twitch_settings.defaultSettings(data, result[0].username, result[0].display_name, result[0].icon);
+      });
+    });
+  });
+};
+
+// Define Spam Protection Variables
+var purged = {},
+    permitted = {};
+
+// Action Protection
+twitchBot.on("action", function (channel, userstate, message, self) {
+  db.twitch_settings.getByUsername(channel.replace("#","")).then(function(data) {
+    if (data[0].spam.actions.enabled === true) {
+      if (data[0].spam.actions.level < helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+        if (!purged[channel]) {
+          purged[channel] = {};
+        }
+        var purgeTimeDiff = null;
+        if (purged[channel][userstate.username]) {
+          purgeTimeDiff = Date.now() / 1000 - purged[channel][userstate.username];
+        }
+        if ((purgeTimeDiff !== null && purgeTimeDiff <= 28800) || data[0].spam.actions.warning === false) {
+          twitchBot.timeout(channel, userstate.username, data[0].spam.actions.length, "Heepsbot Spam Protection: Action Filter [Timeout]");
+          purged[channel][userstate.username] = null;
+          var result = "Timeout";
+        }
+        else {
+          twitchBot.timeout(channel, userstate.username, data[0].spam.actions.warning_length, "Heepsbot Spam Protection: Action Filter [Warning]");
+          purged[channel][userstate.username] = Date.now() / 1000;
+          var result = "Purge";
+        }
+        if (data[0].spam.actions.post_message === true) {
+          if (data[0].spam.actions.whisper_message === true) {
+            twitchBot.whisper(userstate.username, data[0].spam.actions.message.replace("$(user)", userstate["display-name"]).replace("$(result)", result));
+          }
+          else {
+            twitchBot.say(channel, data[0].spam.actions.message.replace("$(user)", userstate["display-name"]).replace("$(result)", result));
+          }
+        }
+      }
+    }
+  });
+});
+
+// Blacklist Protection
+twitchBot.on("message", function (channel, userstate, message, self) {
+  db.twitch_settings.getByUsername(channel.replace("#","")).then(function(data) {
+    if (data[0].spam.blacklist.enabled === true) {
+      for (var j in data[0].spam.blacklist.blacklist) {
+        var pattern = data[0].spam.blacklist.blacklist[j];
+        if (pattern.substring(0, 1) == "/" && pattern.substring(pattern.length - 1, pattern.length) == "/") {
+          pattern = new RegExp(data[0].spam.blacklist.blacklist[j].slice(1, -1));
+        }
+        else {
+          pattern = new RegExp(data[0].spam.blacklist.blacklist[j]);
+        }
+        if (pattern.test(message) === true) {
+          var detected = true;
+        }
+      }
+      if (detected) {
+        if (data[0].spam.blacklist.level < helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+          if (!purged[channel]) {
+            purged[channel] = {};
+          }
+          var purgeTimeDiff = null;
+          if (purged[channel][userstate.username]) {
+            purgeTimeDiff = Date.now() / 1000 - purged[channel][userstate.username];
+          }
+          if ((purgeTimeDiff !== null && purgeTimeDiff <= 28800) || data[0].spam.blacklist.warning === false) {
+            twitchBot.timeout(channel, userstate.username, data[0].spam.blacklist.length, "Heepsbot Spam Protection: Blacklist Filter [Timeout]");
+            purged[channel][userstate.username] = null;
+            var result = "Timeout";
+          }
+          else {
+            twitchBot.timeout(channel, userstate.username, data[0].spam.blacklist.warning_length, "Heepsbot Spam Protection: Blacklist Filter [Warning]");
+            purged[channel][userstate.username] = Date.now() / 1000;
+            var result = "Purge";
+          }
+          if (data[0].spam.blacklist.post_message === true) {
+            if (data[0].spam.blacklist.whisper_message === true) {
+              twitchBot.whisper(userstate.username, data[0].spam.blacklist.message.replace("$(user)", userstate["display-name"]).replace("$(result)", result));
+            }
+            else {
+              twitchBot.say(channel, data[0].spam.blacklist.message.replace("$(user)", userstate["display-name"]).replace("$(result)", result));
+            }
+          }
+        }
+      }
+    }
+  });
+});
+
+module.exports = {
+  joinChannel: joinChannel,
+  partChannel: partChannel,
+  rejoinChannel: rejoinChannel,
+  resetBot: resetBot
 };

@@ -10,13 +10,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js"></script>
   </head>
   {% if theme == "Twitch" %}
-  <body class="deep-purple lighten-4">
+  <body class="deep-purple lighten-4 twitch-body-theme">
   {% elseif theme == "Discord" %}
-  <body class="blue lighten-4">
+  <body class="blue lighten-4 discord-body-theme">
   {% elseif theme == "Beam" %}
-  <body class="indigo lighten-4">
+  <body class="indigo lighten-4 beam-body-theme">
   {% else %}
-  <body class="grey lighten-4">
+  <body class="grey lighten-4 neutral-body-theme">
   {% endif %}
     <div class="nav">
       {% if loggedin %}

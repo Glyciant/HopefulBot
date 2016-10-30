@@ -36,7 +36,7 @@ app.use(function(req, res, next) {
   res.locals.loggedin = req.session.user_id;
   res.locals.display_name = req.session.display_name;
   res.locals.username = req.session.name;
-  res.locals.isAdmin = helpers.general.isAdmin(res.locals.username);
+  res.locals.isAdmin = helpers.general.isAdmin(res.locals.loggedin);
   res.locals.twitch_authurl = config.twitch.auth.authurl;
   res.locals.discord_authurl = config.discord.auth.authurl;
   res.locals.beam_authurl = config.beam.auth.authurl;
@@ -125,12 +125,42 @@ app.get('/settings/', function(req, res) {
 
 // Get settings first page
 app.get('/settings/:id/', function(req, res) {
-  res.render('settings', { title: "Settings", theme: "Neutral"});
+  db.users.get(req.params.id).then(function(user) {
+    user._id = user._id.toString();
+    res.render('settings', {
+      title: "Settings",
+      theme: "Neutral",
+      user: user
+    });
+  });
 });
 
 // Get Twitch settings page
 app.get('/settings/:id/twitch/', function(req, res) {
-  res.render('settings_twitch', { title: "Twitch Settings", theme: "Twitch"});
+  db.users.get(req.params.id).then(function(user) {
+    if (user && user.twitch !== null) {
+      db.users.get(req.params.id).then(function(user) {
+        helpers.twitch_settings.getChannel(user.twitch).then(function(api) {
+          db.twitch_settings.getById(req.params.id).then(function(data) {
+            if (res.locals.loggedin == req.params.id) {
+              var isOwner = true;
+            }
+            res.render('settings_twitch', {
+              title: "Twitch Settings",
+              theme: "Twitch",
+              data: data[0],
+              api: api,
+              user: user,
+              isOwner: isOwner
+            });
+          });
+        });
+      });
+    }
+    else {
+      res.render("error", {title: "Error", theme: "Neutral", code: "403", description: "You cannot access that page because the user ID provided does not have a linked Twitch account."});
+    }
+  });
 });
 
 // Get Discord settings page
@@ -474,6 +504,89 @@ app.post('/unlink/beam/', function(req, res) {
   db.users.updateBeam(req.body.id, null);
   db.beam_settings.delete(req.body.id);
   return;
+});
+
+// Join Bot to Twitch Channel
+app.post('/twitch/channel/join/', function(req, res) {
+  twitchCommands.joinChannel(req.body.channel);
+});
+
+// Part Bot to Twitch Channel
+app.post('/twitch/channel/part/', function(req, res) {
+  twitchCommands.partChannel(req.body.channel);
+});
+
+// Rejoin Bot to Twitch Channel
+app.post('/twitch/channel/rejoin/', function(req, res) {
+  twitchCommands.rejoinChannel(req.body.channel);
+});
+
+// Reset Twitch Settings
+app.post('/twitch/channel/reset/', function(req, res) {
+  twitchCommands.resetBot(req.body.channel);
+});
+
+// Toggle Twitch Actions Protection
+app.post('/twitch/protection/actions/toggle/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.actions.enabled = (req.body.enabled === "true");
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Update Twitch Actions Protection Settings
+app.post('/twitch/protection/actions/update/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.actions.warning = (req.body.warning === "true");
+    data[0].spam.actions.post_message = (req.body.post_message === "true");
+    data[0].spam.actions.whisper_message = (req.body.whisper_message === "true");
+    data[0].spam.actions.warning_length = parseInt(req.body.warning_length);
+    data[0].spam.actions.length = parseInt(req.body.length);
+    data[0].spam.actions.message = req.body.message;
+    data[0].spam.actions.level = parseInt(req.body.level);
+    if (isNaN(data[0].spam.actions.warning_length)) {
+      data[0].spam.actions.warning_length = 1;
+    }
+    if (isNaN(data[0].spam.actions.length)) {
+      data[0].spam.actions.length = 600;
+    }
+    if (isNaN(data[0].spam.actions.level)) {
+      data[0].spam.actions.level = 600;
+    }
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Toggle Twitch Blacklist Protection
+app.post('/twitch/protection/blacklist/toggle/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.blacklist.enabled = (req.body.enabled === "true");
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Update Twitch Blacklist Protection Settings
+app.post('/twitch/protection/blacklist/update/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.blacklist.blacklist = req.body.blacklist;
+    data[0].spam.blacklist.warning = (req.body.warning === "true");
+    data[0].spam.blacklist.post_message = (req.body.post_message === "true");
+    data[0].spam.blacklist.whisper_message = (req.body.whisper_message === "true");
+    data[0].spam.blacklist.warning_length = parseInt(req.body.warning_length);
+    data[0].spam.blacklist.length = parseInt(req.body.length);
+    data[0].spam.blacklist.message = req.body.message;
+    data[0].spam.blacklist.level = parseInt(req.body.level);
+    if (isNaN(data[0].spam.blacklist.warning_length)) {
+      data[0].spam.blacklist.warning_length = 1;
+    }
+    if (isNaN(data[0].spam.blacklist.length)) {
+      data[0].spam.blacklist.length = 600;
+    }
+    if (isNaN(data[0].spam.blacklist.level)) {
+      data[0].spam.blacklist.level = 600;
+    }
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
 });
 
 // Sign out

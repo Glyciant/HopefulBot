@@ -1,42 +1,93 @@
 {% include "./header.html" %}
-<div class="row">
-  <div class="col s10 offset-s1 grey lighten-2 center" style="border-radius:20px; margin-top:15px; padding: 15px;">
-    <p>To login to another account, please use an existing Twitch/Discord/Beam account by clicking the relevant link below.</p>
+
+<div class="container">
+  <div class="row">
+    <div class="col s12 m6 l4">
+      <ul class="collection with-header">
+        <li class="collection-header center"><h4>Twitch</h4></li>
+        <li class="collection-item">Spam Protection</li>
+        <li class="collection-item">Custom Commands</li>
+        <li class="collection-item">Timed Messages</li>
+        <li class="collection-item">General Use Commands</li>
+        <li class="collection-item">API Commands</li>
+        <li class="collection-item">Game Commands</li>
+        <li class="collection-item">Poll</li>
+        <li class="collection-item">Raffle</li>
+        <li class="collection-item">Moderation Commands</li>
+        <li class="collection-item">Chat Announcements</li>
+        <li class="collection-item">Highlight Tracking</li>
+        <li class="collection-item">Quotes System</li>
+        <li class="collection-item">Points</li>
+        <li class="collection-item">Song Requests</li>
+        <li class="collection-item">Edit Twitch Title/Game</li>
+      </ul>
+    </div>
+    <div class="col s12 m6 l4">
+      <ul class="collection with-header">
+        <li class="collection-header center"><h4>Discord</h4></li>
+        <li class="collection-item">Spam Protection</li>
+        <li class="collection-item">Custom Commands</li>
+        <li class="collection-item">Timed Messages</li>
+        <li class="collection-item">General Use Commands</li>
+        <li class="collection-item">Server Commands</li>
+        <li class="collection-item">Game Commands</li>
+        <li class="collection-item">Poll</li>
+        <li class="collection-item">Raffle</li>
+        <li class="collection-item">Moderation Commands</li>
+        <li class="collection-item">Quotes System</li>
+        <li class="collection-item">Points</li>
+      </ul>
+    </div>
+    <div class="col s12 m6 offset-m3 l4">
+      <ul class="collection with-header">
+        <li class="collection-header center"><h4>Beam</h4></li>
+        <li class="collection-item">Spam Protection</li>
+        <li class="collection-item">Custom Commands</li>
+        <li class="collection-item">Timed Messages</li>
+        <li class="collection-item">General Use Commands</li>
+        <li class="collection-item">API Commands</li>
+        <li class="collection-item">Game Commands</li>
+        <li class="collection-item">Raffle</li>
+        <li class="collection-item">Moderation Commands</li>
+        <li class="collection-item">Highlight Tracking</li>
+        <li class="collection-item">Quotes System</li>
+        <li class="collection-item">Points</li>
+      </ul>
+    </div>
   </div>
-</div>
-<div class="row">
-  <div class="col s4 offset-s1 deep-purple darken-4 center" style="border-radius:20px; padding: 5px;">
-    {% if twitch %}
-    <h3 id="discord" class="white-text">Twitch: {{twitch}}</h3>
-    {% if discord || beam %}
-    <a href="javascript:;" id="unlink-twitch" class="white-text" data-id="{{loggedin}}">(Unlink)</a>
-    {% endif %}
-    {% else %}
-    <h3><a id="twitch" class="white-text" href='{{twitch_authurl}}' data-activates='dashboard-twitch'>Twitch</a></h3>
-    {% endif %}
-  </div>
-  <div class="col s4 offset-s2 blue darken-4 center" style="border-radius:20px; padding: 5px;">
-    {% if discord %}
-    <h3 id="discord" class="white-text">Discord: {{discord}}</h3>
-    {% if twitch || beam %}
-    <a href="javascript:;" id="unlink-discord" class="white-text" data-id="{{loggedin}}">(Unlink)</a>
-    {% endif %}
-    {% else %}
-    <h3><a id="discord" class="white-text" href='{{discord_authurl}}' data-activates='dashboard-twitch'>Discord</a></h3>
-    {% endif %}
-  </div>
-</div>
-<div class="row">
-  <div class="col s4 offset-s4 indigo darken-4 center" style="border-radius:20px; padding: 5px;">
-    {% if beam %}
-    <h3 id="discord" class="white-text">Beam: {{beam}}</h3>
-    {% if twitch || discord %}
-    <a href="javascript:;" id="unlink-beam" class="white-text" data-id="{{loggedin}}">(Unlink)</a>
-    {% endif %}
-    {% else %}
-    <h3><a id="beam" class="white-text" href='{{beam_authurl}}' data-activates='dashboard-twitch'>Beam</a></h3>
-    {% endif %}
+  <div class="row center">
+    <div class="col s12 m6 l4">
+      {% if twitch %}
+      <a class="btn-large purple darken-4 white-text" style="width: 100%; cursor: default;">Twitch: {{twitch}}</a>
+      {% if discord || beam %}
+      <a href="javascript:;" id="unlink-twitch" class="btn purple darken-4 white-text" style="margin-top: 2px;" data-id="{{loggedin}}">Unlink</a>
+      {% endif %}
+      {% else %}
+      <a href="{{twitch_authurl}}" class="btn-large purple darken-4 white-text" style="width: 100%;">Link Twitch</a>
+      {% endif %}
+    </div>
+    <div class="col s12 m6 l4">
+      {% if discord %}
+      <a class="btn-large blue darken-4 white-text" style="width: 100%; cursor: default;">Discord: {{discord}}</a>
+      {% if twitch || beam %}
+      <a href="javascript:;" id="unlink-discord" class="btn blue darken-4 white-text" style="margin-top: 2px;" data-id="{{loggedin}}">Unlink</a>
+      {% endif %}
+      {% else %}
+      <a href="{{discord_authurl}}" class="btn-large blue darken-4 white-text" style="width: 100%;">Link Discord</a>
+      {% endif %}
+    </div>
+    <div class="col s12 m6 offset-m3 l4">
+      {% if beam %}
+      <a class="btn-large indigo darken-4 white-text" style="width: 100%; cursor: default;">Beam: {{beam}}</a>
+      {% if twitch || discord %}
+      <a href="javascript:;" id="unlink-beam" class="btn indigo darken-4 white-text" style="margin-top: 2px;" data-id="{{loggedin}}">Unlink</a>
+      {% endif %}
+      {% else %}
+      <a href="{{beam_authurl}}" class="btn-large indigo darken-4 white-text" style="width: 100%;">Link Beam</a>
+      {% endif %}
+    </div>
   </div>
 </div>
 <script src="/js/link.js"></script>
+
 {% include "./footer.html" %}

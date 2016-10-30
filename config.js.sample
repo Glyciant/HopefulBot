@@ -7,9 +7,14 @@ config.discord = {};
 config.beam = {};
 
 // Define App Details
-config.app.admins = [];
 config.app.port = 8000;
 config.app.baseurl = "http://localhost:" + config.app.port;
+
+// Define Admins
+config.app.admins = [""];
+config.twitch.admins = [""];
+config.discord.admins = [""];
+config.beam.admins = [""];
 
 // Setup Auth Objects
 config.twitch.auth = {};

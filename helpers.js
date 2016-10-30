@@ -1,4 +1,5 @@
-var config = require('./config');
+var config = require('./config'),
+    needle = require('needle');
 
 var general = {
   isAdmin: function(user) {
@@ -17,9 +18,11 @@ var twitch_settings = {
       user_id: id,
       username: username,
       display_name: display_name,
+      enabled: true,
       command_prefix: "!",
       editors: [],
       regulars: [],
+      restricted: [],
       icon: icon,
       autopoints: {
         chat: 0,
@@ -179,7 +182,7 @@ var twitch_settings = {
           warning: true,
           warning_length: 10
         },
-        banned_words: {
+        blacklist: {
           blacklist: [],
           enabled: false,
           length: 600,
@@ -297,6 +300,84 @@ var twitch_settings = {
       },
       timers: []
     };
+  },
+  getChannel: function(user) {
+    return new Promise(function(resolve, reject) {
+      needle.get("https://api.twitch.tv/kraken/channels/" + user + "?client_id=" + config.twitch.auth.cid, (error, data) => {
+        if (!error) {
+          if (data.body.status == "422") {
+            resolve("suspended");
+          }
+          else if (data.body.status == "404") {
+            resolve("missing");
+          }
+          else {
+            resolve(data.body);
+          }
+        }
+        else {
+          reject(error);
+        }
+      });
+    });
+  },
+  updateApiStatus: function(title, game, user, oauth) {
+    return new Promise(function(resolve, reject) {
+      needle.put("https://api.twitch.tv/kraken/channels/" + user + "?oauth_token=" + oauth, {
+        channel: {
+          status: title,
+          game: game
+        }
+       }, (error, data) => {
+        if (!error) {
+          resolve(data.body);
+        }
+        else {
+          reject(error);
+        }
+      });
+    });
+  },
+  getUserLevel: function(data, user) {
+    if (user.username == "heep123") {
+      return 1;
+    }
+    else if (config.twitch.admins.indexOf(user.username) > -1) {
+      return 50;
+    }
+    else if (user["user-type"] == "staff") {
+      return 100;
+    }
+    else if (user["user-type"] == "admin") {
+      return 200;
+    }
+    else if (user["user-type"] == "global_mod") {
+      return 250;
+    }
+    else if (data.username == user.username) {
+      return 300;
+    }
+    else if (data.regulars.indexOf(user.username) > -1) {
+      return 400;
+    }
+    else if (user.mod === true) {
+      return 500;
+    }
+    else if (data.editors.indexOf(user.username) > -1) {
+      return 600;
+    }
+    else if (user.subscriber === true) {
+      return 700;
+    }
+    else if (user.turbo === true) {
+      return 750;
+    }
+    else if (data.restricted.indexOf(user.username) > -1) {
+      return 900;
+    }
+    else {
+      return 800;
+    }
   }
 };
 
@@ -309,6 +390,7 @@ var discord_settings = {
       command_prefix: "!",
       editors: [],
       regulars: [],
+      restricted: [],
       icon: icon,
       autopoints: {
         chat: 0,
@@ -430,7 +512,7 @@ var discord_settings = {
         enabled: true
       },
       spam: {
-        banned_words: {
+        blacklist: {
           blacklist: [],
           enabled: false,
           length: 600,
@@ -520,6 +602,7 @@ var beam_settings = {
       command_prefix: "!",
       editors: [],
       regulars: [],
+      restricted: [],
       icon: icon,
       autopoints: {
         chat: 0,
@@ -642,7 +725,7 @@ var beam_settings = {
         enabled: false
       },
       spam: {
-        banned_words: {
+        blacklist: {
           blacklist: [],
           enabled: false,
           length: 600,

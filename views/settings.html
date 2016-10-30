@@ -1,3 +1,33 @@
 {% include "./header.html" %}
-
+<div class="row">
+  <div class="col m3 l2 white" style="height: calc(100% - 64px); overflow: auto;">
+    <div class="collection with-header">
+      <h5 class="center">Navigation</h5>
+      <a href="./twitch" class="collection-item black-text" style="border-top: 1px solid #e0e0e0;">Twitch Settings</a>
+      <a href="./discord" class="collection-item black-text">Discord Settings</a>
+      <a href="./beam" class="collection-item black-text">Beam Settings</a>
+    </div>
+  </div>
+  <div class="col m9 l10" style="overflow: auto;">
+    <div class="white black-text center row" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #fafafa;">
+      <h4>Dashboard</h4>
+      <p>User ID: <code>{{user._id}}</code></p>
+      {% if user.twitch %}
+      <p>Twitch: {{user.twitch}}</p>
+      {% else %}
+      <p>Twitch: Not Connected</p>
+      {% endif %}
+      {% if user.discord_id %}
+      <p>Discord: {{user.discord_id}}</p>
+      {% else %}
+      <p>Discord: Not Connected</p>
+      {% endif %}
+      {% if user.beam %}
+      <p>Beam: {{user.beam}}</p>
+      {% else %}
+      <p>Beam: Not Connected</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
 {% include "./footer.html" %}
