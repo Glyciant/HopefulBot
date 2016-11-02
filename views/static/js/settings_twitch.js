@@ -102,3 +102,37 @@ $(document).delegate("#blacklist-protection-update", "click", function() {
     level: level
   });
 });
+
+$(document).delegate("#caps-protection-toggle", "change", function() {
+  var channel = $(this).data("channel"),
+      enabled = $("#caps-protection-toggle").prop("checked");
+  $.post('/twitch/protection/caps/toggle/', {
+    channel: channel,
+    enabled: enabled
+  });
+});
+
+$(document).delegate("#caps-protection-update", "click", function() {
+  var channel = $(this).data("channel"),
+      warning = $("#caps-protection-warning-toggle").prop("checked"),
+      post_message = $("#caps-protection-message-toggle").prop("checked"),
+      whisper_message = $("#caps-protection-whisper-toggle").prop("checked"),
+      warning_length = $("#caps-protection-warning-length").val(),
+      length = $("#caps-protection-length").val(),
+      message = $("#caps-protection-message").val(),
+      level = $("#caps-protection-level option:selected").data("level"),
+      minimum_length = $("#caps-protection-minimum-length").val(),
+      percentage = $("#caps-protection-percentage").val();
+  $.post('/twitch/protection/caps/update/', {
+    channel: channel,
+    warning: warning,
+    post_message: post_message,
+    whisper_message: whisper_message,
+    warning_length: warning_length,
+    length: length,
+    message: message,
+    level: level,
+    minimum_length: minimum_length,
+    percentage: percentage
+  });
+});

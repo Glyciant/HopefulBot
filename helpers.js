@@ -194,12 +194,12 @@ var twitch_settings = {
           warning_length: 10
         },
         caps: {
-          miniumum_length: 8,
+          minimum_length: 8,
           percentage: 70,
           enabled: false,
           length: 600,
           level: 600,
-          message: "$(user) -> Please do SHOUT in chat. [$(result)]",
+          message: "$(user) -> Please do not SHOUT in chat. [$(result)]",
           post_message: true,
           whisper_message: false,
           warning: true,
@@ -264,7 +264,7 @@ var twitch_settings = {
           warning_length: 10
         },
         symbols: {
-          miniumum_length: 8,
+          minimum_length: 8,
           percentage: 70,
           enabled: false,
           length: 600,
@@ -523,7 +523,7 @@ var discord_settings = {
           warning_length: 10
         },
         caps: {
-          miniumum_length: 8,
+          minimum_length: 8,
           percentage: 70,
           enabled: false,
           length: 600,
@@ -577,7 +577,7 @@ var discord_settings = {
           warning_length: 10
         },
         symbols: {
-          miniumum_length: 8,
+          minimum_length: 8,
           percentage: 70,
           enabled: false,
           length: 600,
@@ -737,12 +737,12 @@ var beam_settings = {
           warning_length: 10
         },
         caps: {
-          miniumum_length: 8,
+          minimum_length: 8,
           percentage: 70,
           enabled: false,
           length: 600,
           level: 600,
-          message: "$(user) -> Please do SHOUT in chat. [$(result)]",
+          message: "$(user) -> Please do not SHOUT in chat. [$(result)]",
           post_message: true,
           whisper_message: false,
           warning: true,
@@ -807,7 +807,7 @@ var beam_settings = {
           warning_length: 10
         },
         symbols: {
-          miniumum_length: 8,
+          minimum_length: 8,
           percentage: 70,
           enabled: false,
           length: 600,

@@ -159,6 +159,57 @@ twitchBot.on("message", function (channel, userstate, message, self) {
   });
 });
 
+// Caps Protection
+twitchBot.on("message", function (channel, userstate, message, self) {
+  db.twitch_settings.getByUsername(channel.replace("#","")).then(function(data) {
+    if (data[0].spam.caps.enabled === true) {
+      if (message.length >= data[0].spam.caps.minimum_length) {
+        var capsCount = 0,
+            spaceCount = 0;
+        for (var i in message) {
+          if (/[A-Z]/.test(message[i]) === true) {
+            capsCount++;
+          }
+          else if (/\s/.test(message[i]) === true) {
+            spaceCount++;
+          }
+        }
+        var percentage = (capsCount / (message.length - spaceCount)) * 100;
+        if (percentage >= data[0].spam.caps.percentage) {
+          if (data[0].spam.caps.level < helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+            if (!purged[channel]) {
+              purged[channel] = {};
+            }
+            var purgeTimeDiff = null;
+            if (purged[channel][userstate.username]) {
+              purgeTimeDiff = Date.now() / 1000 - purged[channel][userstate.username];
+            }
+            if ((purgeTimeDiff !== null && purgeTimeDiff <= 28800) || data[0].spam.caps.warning === false) {
+              twitchBot.timeout(channel, userstate.username, data[0].spam.caps.length, "Heepsbot Spam Protection: Caps Filter [Timeout]");
+              purged[channel][userstate.username] = null;
+              var result = "Timeout";
+            }
+            else {
+              twitchBot.timeout(channel, userstate.username, data[0].spam.caps.warning_length, "Heepsbot Spam Protection: Caps Filter [Warning]");
+              purged[channel][userstate.username] = Date.now() / 1000;
+              var result = "Purge";
+            }
+            if (data[0].spam.caps.post_message === true) {
+              if (data[0].spam.caps.whisper_message === true) {
+                twitchBot.whisper(userstate.username, data[0].spam.caps.message.replace("$(user)", userstate["display-name"]).replace("$(result)", result));
+              }
+              else {
+                twitchBot.say(channel, data[0].spam.caps.message.replace("$(user)", userstate["display-name"]).replace("$(result)", result));
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+});
+
+
 module.exports = {
   joinChannel: joinChannel,
   partChannel: partChannel,

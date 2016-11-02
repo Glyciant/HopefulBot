@@ -589,6 +589,45 @@ app.post('/twitch/protection/blacklist/update/', function(req, res) {
   });
 });
 
+// Toggle Twitch Caps Protection
+app.post('/twitch/protection/caps/toggle/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.caps.enabled = (req.body.enabled === "true");
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Update Twitch Caps Protection Settings
+app.post('/twitch/protection/caps/update/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.caps.minimum_length = parseInt(req.body.minimum_length);
+    data[0].spam.caps.percentage = parseInt(req.body.percentage);
+    data[0].spam.caps.warning = (req.body.warning === "true");
+    data[0].spam.caps.post_message = (req.body.post_message === "true");
+    data[0].spam.caps.whisper_message = (req.body.whisper_message === "true");
+    data[0].spam.caps.warning_length = parseInt(req.body.warning_length);
+    data[0].spam.caps.length = parseInt(req.body.length);
+    data[0].spam.caps.message = req.body.message;
+    data[0].spam.caps.level = parseInt(req.body.level);
+    if (isNaN(data[0].spam.caps.warning_length)) {
+      data[0].spam.caps.warning_length = 1;
+    }
+    if (isNaN(data[0].spam.caps.length)) {
+      data[0].spam.caps.length = 600;
+    }
+    if (isNaN(data[0].spam.caps.level)) {
+      data[0].spam.caps.level = 600;
+    }
+    if (isNaN(data[0].spam.caps.minimum_length)) {
+      data[0].spam.caps.minimum_length = 8;
+    }
+    if (isNaN(data[0].spam.caps.percentage)) {
+      data[0].spam.caps.percentage = 70;
+    }
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
 // Sign out
 app.get('/auth/logout/', function(req, res) {
   req.session.destroy(function() {
