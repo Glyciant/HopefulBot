@@ -628,6 +628,41 @@ app.post('/twitch/protection/caps/update/', function(req, res) {
   });
 });
 
+// Toggle Twitch Excess Emotes Protection
+app.post('/twitch/protection/emotes/toggle/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.emotes.enabled = (req.body.enabled === "true");
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Update Twitch Excess Emotes Protection Settings
+app.post('/twitch/protection/emotes/update/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.emotes.limit = parseInt(req.body.limit);
+    data[0].spam.emotes.warning = (req.body.warning === "true");
+    data[0].spam.emotes.post_message = (req.body.post_message === "true");
+    data[0].spam.emotes.whisper_message = (req.body.whisper_message === "true");
+    data[0].spam.emotes.warning_length = parseInt(req.body.warning_length);
+    data[0].spam.emotes.length = parseInt(req.body.length);
+    data[0].spam.emotes.message = req.body.message;
+    data[0].spam.emotes.level = parseInt(req.body.level);
+    if (isNaN(data[0].spam.emotes.warning_length)) {
+      data[0].spam.emotes.warning_length = 1;
+    }
+    if (isNaN(data[0].spam.emotes.length)) {
+      data[0].spam.emotes.length = 600;
+    }
+    if (isNaN(data[0].spam.emotes.level)) {
+      data[0].spam.emotes.level = 600;
+    }
+    if (isNaN(data[0].spam.emotes.limit)) {
+      data[0].spam.emotes.limit = 5;
+    }
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
 // Sign out
 app.get('/auth/logout/', function(req, res) {
   req.session.destroy(function() {

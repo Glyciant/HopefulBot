@@ -209,6 +209,51 @@ twitchBot.on("message", function (channel, userstate, message, self) {
   });
 });
 
+// Excess Emotes Protection
+twitchBot.on("message", function (channel, userstate, message, self) {
+  db.twitch_settings.getByUsername(channel.replace("#","")).then(function(data) {
+    if (data[0].spam.emotes.enabled === true) {
+      var count = 0;
+      if (userstate.emotes !== null) {
+        for (var i in Object.keys(userstate.emotes)) {
+          for (var j in userstate.emotes[Object.keys(userstate.emotes)[i]]) {
+            count++;
+          }
+        }
+      }
+      if (count >= data[0].spam.emotes.limit) {
+        if (data[0].spam.emotes.level < helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+          if (!purged[channel]) {
+            purged[channel] = {};
+          }
+          var purgeTimeDiff = null;
+          if (purged[channel][userstate.username]) {
+            purgeTimeDiff = Date.now() / 1000 - purged[channel][userstate.username];
+          }
+          if ((purgeTimeDiff !== null && purgeTimeDiff <= 28800) || data[0].spam.emotes.warning === false) {
+            twitchBot.timeout(channel, userstate.username, data[0].spam.emotes.length, "Heepsbot Spam Protection: Excess Emotes Filter [Timeout]");
+            purged[channel][userstate.username] = null;
+            var result = "Timeout";
+          }
+          else {
+            twitchBot.timeout(channel, userstate.username, data[0].spam.emotes.warning_length, "Heepsbot Spam Protection: Excess Emotes Filter [Warning]");
+            purged[channel][userstate.username] = Date.now() / 1000;
+            var result = "Purge";
+          }
+          if (data[0].spam.emotes.post_message === true) {
+            if (data[0].spam.emotes.whisper_message === true) {
+              twitchBot.whisper(userstate.username, data[0].spam.emotes.message.replace("$(user)", userstate["display-name"]).replace("$(result)", result));
+            }
+            else {
+              twitchBot.say(channel, data[0].spam.emotes.message.replace("$(user)", userstate["display-name"]).replace("$(result)", result));
+            }
+          }
+        }
+      }
+    }
+  });
+});
+
 
 module.exports = {
   joinChannel: joinChannel,
