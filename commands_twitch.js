@@ -450,6 +450,43 @@ twitchBot.on("message", function (channel, userstate, message, self) {
   });
 });
 
+// Paragraph Protection
+twitchBot.on("message", function (channel, userstate, message, self) {
+  db.twitch_settings.getByUsername(channel.replace("#","")).then(function(data) {
+    if (data[0].spam.paragraph.enabled === true) {
+      if (message.length > data[0].spam.paragraph.limit) {
+        if (data[0].spam.paragraph.level < helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+          if (!purged[channel]) {
+            purged[channel] = {};
+          }
+          var purgeTimeDiff = null;
+          if (purged[channel][userstate.username]) {
+            purgeTimeDiff = Date.now() / 1000 - purged[channel][userstate.username];
+          }
+          if ((purgeTimeDiff !== null && purgeTimeDiff <= 28800) || data[0].spam.paragraph.warning === false) {
+            twitchBot.timeout(channel, userstate.username, data[0].spam.paragraph.length, "Heepsbot Spam Protection: Lone Emotes Filter [Timeout]");
+            purged[channel][userstate.username] = null;
+            var result = "Timeout";
+          }
+          else {
+            twitchBot.timeout(channel, userstate.username, data[0].spam.paragraph.warning_length, "Heepsbot Spam Protection: Lone Emotes Filter [Warning]");
+            purged[channel][userstate.username] = Date.now() / 1000;
+            var result = "Purge";
+          }
+          if (data[0].spam.paragraph.post_message === true) {
+            if (data[0].spam.paragraph.whisper_message === true) {
+              twitchBot.whisper(userstate.username, data[0].spam.paragraph.message.replace("$(user)", userstate["display-name"]).replace("$(result)", result));
+            }
+            else {
+              twitchBot.say(channel, data[0].spam.paragraph.message.replace("$(user)", userstate["display-name"]).replace("$(result)", result));
+            }
+          }
+        }
+      }
+    }
+  });
+});
+
 module.exports = {
   joinChannel: joinChannel,
   partChannel: partChannel,

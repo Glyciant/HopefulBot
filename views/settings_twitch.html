@@ -17,11 +17,12 @@
       <a href="#modal-raffle" class="collection-item black-text modal-trigger">Raffle<i class="material-icons secondary-content black-text">present_to_all</i></a>
       <a href="#modal-poll" class="collection-item black-text modal-trigger">Poll<i class="material-icons secondary-content black-text">present_to_all</i></a>
       <a href="#modal-points" class="collection-item black-text modal-trigger">Points<i class="material-icons secondary-content black-text">present_to_all</i></a>
+      <a href="#modal-nicknames" class="collection-item black-text modal-trigger">Nicknames<i class="material-icons secondary-content black-text">present_to_all</i></a>
       <a href="#modal-song-requests" class="collection-item black-text modal-trigger">Song Requests<i class="material-icons secondary-content black-text">present_to_all</i></a>
     </div>
+    {% if user.discord_id && user.beam %}
     <div class="collection with-header">
       <h5 class="center">Navigation</h5>
-      <a href="." class="collection-item black-text" style="border-top: 1px solid #e0e0e0;">User Page</a>
       {% if user.discord_id %}
       <a href="./discord" class="collection-item black-text">Discord Dashboard<img class="secondary-content" src="/img/discord.png" style="height: 24px; width: 23px;" /></a>
       {% endif %}
@@ -29,6 +30,7 @@
       <a href="./beam" class="collection-item black-text">Beam Dashboard<img class="secondary-content" src="/img/beam.png" style="height: 24px; width: 24px;" /></a>
       {% endif %}
     </div>
+    {% endif %}
   </div>
   <div class="col m9 l10" style="overflow: auto;">
     <div class="col s7">
@@ -286,7 +288,7 @@
         <div class="switch" style="margin-top: 25px;">
           <label>
             Off
-            <input type="checkbox">
+            <input type="checkbox" {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %} {% if data.spam.paragraph.enabled %} checked {% endif %} id="paragraph-protection-toggle" data-channel="{{api.name}}">
             <span class="lever"></span>
             On
           </label>
@@ -1184,6 +1186,119 @@
   </div>
   <div class="modal-footer">
     <a href="#modal-spam-protection" id="lone-emotes-protection-update" data-channel="{{api.name}}" class="modal-action modal-trigger modal-close btn-flat">Save</a>
+  </div>
+</div>
+
+<!-- Paragraph Filter Modal -->
+<div id="modal-paragraph-filter" class="modal modal-fixed-footer">
+  <div class="modal-content">
+    <h4>Paragraph Filter</h4>
+    <hr />
+    <div class="row">
+      <div class="col s8">
+        <p><strong>Character Limit:</strong> Messages with this number of characters or more will be removed by the filter.</p>
+      </div>
+      <div class="col s4 center">
+        <input id="paragraph-protection-limit" placeholder="350" {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %} {% if data.spam.paragraph.limit %} value="{{data.spam.paragraph.limit}}" {% endif %} type="number" />
+      </div>
+    </div>
+    <hr />
+    <div class="row">
+      <div class="col s8">
+        <p><strong>Immunity Level:</strong> Users with this user level or greater will not be affected by the filter.</p>
+      </div>
+      <div class="col s4 center">
+        <select id="paragraph-protection-level" {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %}>
+          <option data-level="500" {% if data.spam.paragraph.level === 500 %} selected {% endif %}>Moderators (500)</option>
+          <option data-level="600" {% if data.spam.paragraph.level === 600 %} selected {% endif %}>Regulars (600)</option>
+          {% if api.partner %}
+          <option data-level="700" {% if data.spam.paragraph.level === 700 %} selected {% endif %}>Subscribers (700)</option>
+          {% endif %}
+          <option data-level="750" {% if data.spam.paragraph.level === 750 %} selected {% endif %}>Turbo/Prime Users (750)</option>
+            <option data-level="800" {% if data.spam.paragraph.level === 800 %} selected {% endif %}>All Users (800)</option>
+          <option data-level="900" {% if data.spam.paragraph.level === 900 %} selected {% endif %}>Restricted Users (900)</option>
+        </select>
+      </div>
+    </div>
+    <hr />
+    <div class="row">
+      <div class="col s8">
+        <p><strong>Warning Timeout:</strong> If enabled, users are given a shorter timeout for their first offense.</p>
+      </div>
+      <div class="col s4 center">
+        <div class="switch" style="margin-top: 15px;">
+          <label>
+            Off
+            <input id="paragraph-protection-warning-toggle" {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %} {% if data.spam.paragraph.warning %} checked {% endif %} type="checkbox">
+            <span class="lever"></span>
+            On
+          </label>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <div class="row">
+      <div class="col s8">
+        <p><strong>Post Message:</strong> If enabled, a message is posted that tells the user why their message was deleted.</p>
+      </div>
+      <div class="col s4 center">
+        <div class="switch" style="margin-top: 25px;">
+          <label>
+            Off
+            <input id="paragraph-protection-message-toggle" {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %} {% if data.spam.paragraph.post_message %} checked {% endif %} type="checkbox">
+            <span class="lever"></span>
+            On
+          </label>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <div class="row">
+      <div class="col s8">
+        <p><strong>Whisper Message:</strong> If enabled, messages that are posted will be whispered to the user.</p>
+      </div>
+      <div class="col s4 center">
+        <div class="switch" style="margin-top: 15px;">
+          <label>
+            Off
+            <input id="paragraph-protection-whisper-toggle" {% if !data.spam.paragraph.post_message %} disabled {% endif %} {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %} {% if data.spam.paragraph.whisper_message && !data.spam.paragraph.post_message %} checked {% endif %} type="checkbox">
+            <span class="lever"></span>
+            On
+          </label>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <div class="row">
+      <div class="col s8">
+        <p><strong>Warning Timeout Length:</strong> The length of the warning timeout, in seconds.</p>
+      </div>
+      <div class="col s4 center">
+        <input id="paragraph-protection-warning-length" placeholder="10" {% if !data.spam.paragraph.warning %} disabled {% endif %} {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %} {% if data.spam.paragraph.warning_length %} value="{{data.spam.paragraph.warning_length}}" {% endif %} type="number" />
+      </div>
+    </div>
+    <hr />
+    <div class="row">
+      <div class="col s8">
+        <p><strong>Timeout Length:</strong> The length of the main timeout, in seconds.</p>
+      </div>
+      <div class="col s4 center">
+        <input id="paragraph-protection-length" placeholder="600" {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %} {% if data.spam.paragraph.length %} value="{{data.spam.paragraph.length}}" {% endif %} type="number" />
+      </div>
+    </div>
+    <hr />
+    <div class="row">
+      <div class="col s8">
+        <p><strong>Message:</strong> The message posted when a user has their message deleted.</p>
+      </div>
+      <div class="col s4 center">
+        <input id="paragraph-protection-message" placeholder="$(user) -> Please keep messages short. [$(result)]" {% if !data.spam.paragraph.post_message %} disabled {% endif %} {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %} {% if data.spam.paragraph.message %} value="{{data.spam.paragraph.message}}" {% endif %} type="text" />
+      </div>
+    </div>
+    <hr />
+  </div>
+  <div class="modal-footer">
+    <a href="#modal-spam-protection" id="paragraph-protection-update" data-channel="{{api.name}}" class="modal-action modal-trigger modal-close btn-flat">Save</a>
   </div>
 </div>
 

@@ -429,3 +429,56 @@ $(document).delegate("#lone-emotes-protection-warning-toggle", "change", functio
     $("#lone-emotes-protection-warning-length").prop("disabled", false);
   }
 });
+
+$(document).delegate("#paragraph-protection-toggle", "change", function() {
+  var channel = $(this).data("channel"),
+      enabled = $("#paragraph-protection-toggle").prop("checked");
+  $.post('/twitch/protection/paragraph/toggle/', {
+    channel: channel,
+    enabled: enabled
+  });
+});
+
+$(document).delegate("#paragraph-protection-update", "click", function() {
+  var channel = $(this).data("channel"),
+      warning = $("#paragraph-protection-warning-toggle").prop("checked"),
+      post_message = $("#paragraph-protection-message-toggle").prop("checked"),
+      whisper_message = $("#paragraph-protection-whisper-toggle").prop("checked"),
+      warning_length = $("#paragraph-protection-warning-length").val(),
+      length = $("#paragraph-protection-length").val(),
+      message = $("#paragraph-protection-message").val(),
+      level = $("#paragraph-protection-level option:selected").data("level"),
+      limit = $("#paragraph-protection-limit").val();
+  $.post('/twitch/protection/paragraph/update/', {
+    channel: channel,
+    warning: warning,
+    post_message: post_message,
+    whisper_message: whisper_message,
+    warning_length: warning_length,
+    length: length,
+    message: message,
+    level: level,
+    limit: limit
+  });
+});
+
+$(document).delegate("#paragraph-protection-message-toggle", "change", function() {
+  if ($("#paragraph-protection-message-toggle").prop("checked") === false) {
+    $("#paragraph-protection-whisper-toggle").prop("checked", false);
+    $("#paragraph-protection-whisper-toggle").prop("disabled", true);
+    $("#paragraph-protection-message").prop("disabled", true);
+  }
+  else {
+    $("#paragraph-protection-whisper-toggle").prop("disabled", false);
+    $("#paragraph-protection-message").prop("disabled", false);
+  }
+});
+
+$(document).delegate("#paragraph-protection-warning-toggle", "change", function() {
+  if ($("#paragraph-protection-warning-toggle").prop("checked") === false) {
+    $("#paragraph-protection-warning-length").prop("disabled", true);
+  }
+  else {
+    $("#paragraph-protection-warning-length").prop("disabled", false);
+  }
+});

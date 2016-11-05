@@ -128,7 +128,6 @@ app.get('/settings/:id/', function(req, res) {
   db.users.get(req.params.id).then(function(user) {
     user._id = user._id.toString();
     Promise.all([helpers.twitch_settings.getChannel(user.twitch), helpers.beam_settings.getChannel(user.beam)]).then(function(data) {
-      console.log(data[1])
       res.render('settings', {
         title: "Settings",
         theme: "Neutral",
@@ -739,6 +738,9 @@ app.post('/twitch/protection/links/update/', function(req, res) {
     if (isNaN(data[0].spam.links.level)) {
       data[0].spam.links.level = 600;
     }
+    if (isNaN(data[0].spam.emotes.limit)) {
+      data[0].spam.emotes.limit = 350;
+    }
     db.twitch_settings.update(data[0].user_id, data[0]);
   });
 });
@@ -769,6 +771,38 @@ app.post('/twitch/protection/lones/update/', function(req, res) {
     }
     if (isNaN(data[0].spam.lones.level)) {
       data[0].spam.lones.level = 600;
+    }
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Toggle Twitch Paragraph Protection
+app.post('/twitch/protection/paragraph/toggle/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.paragraph.enabled = (req.body.enabled === "true");
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Update Twitch Paragraph Protection Settings
+app.post('/twitch/protection/paragraph/update/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.paragraph.limit = parseInt(req.body.limit);
+    data[0].spam.paragraph.warning = (req.body.warning === "true");
+    data[0].spam.paragraph.post_message = (req.body.post_message === "true");
+    data[0].spam.paragraph.whisper_message = (req.body.whisper_message === "true");
+    data[0].spam.paragraph.warning_length = parseInt(req.body.warning_length);
+    data[0].spam.paragraph.length = parseInt(req.body.length);
+    data[0].spam.paragraph.message = req.body.message;
+    data[0].spam.paragraph.level = parseInt(req.body.level);
+    if (isNaN(data[0].spam.paragraph.warning_length)) {
+      data[0].spam.paragraph.warning_length = 1;
+    }
+    if (isNaN(data[0].spam.paragraph.length)) {
+      data[0].spam.paragraph.length = 600;
+    }
+    if (isNaN(data[0].spam.paragraph.level)) {
+      data[0].spam.paragraph.level = 600;
     }
     db.twitch_settings.update(data[0].user_id, data[0]);
   });
