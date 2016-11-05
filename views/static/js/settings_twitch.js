@@ -30,6 +30,18 @@ $(document).delegate("#bot-default-settings", "click", function() {
   Materialize.toast("All default settings have been restored.", 4000);
 });
 
+$(document).delegate("#permit-user", "click", function() {
+  var channel = $(this).data("channel"),
+      loggedin = $(this).data("user"),
+      user = $("#permit-user-name").val();
+  $.post('/twitch/protection/permit/', {
+    channel: channel,
+    loggedin: loggedin,
+    user: user
+  });
+  Materialize.toast(user + " has been given a permit on the channel.", 4000);
+});
+
 $(document).delegate("#update-api-status", "click", function() {
   var channel = $(this).data("channel"),
       title = $("#api-status-title").val(),
@@ -144,6 +156,7 @@ $(document).delegate("#blacklist-protection-warning-toggle", "change", function(
     $("#blacklist-protection-warning-length").prop("disabled", false);
   }
 });
+
 $(document).delegate("#caps-protection-toggle", "change", function() {
   var channel = $(this).data("channel"),
       enabled = $("#caps-protection-toggle").prop("checked");
@@ -198,6 +211,7 @@ $(document).delegate("#caps-protection-warning-toggle", "change", function() {
     $("#caps-protection-warning-length").prop("disabled", false);
   }
 });
+
 $(document).delegate("#excess-emotes-protection-toggle", "change", function() {
   var channel = $(this).data("channel"),
       enabled = $("#excess-emotes-protection-toggle").prop("checked");
@@ -248,5 +262,170 @@ $(document).delegate("#excess-emotes-protection-warning-toggle", "change", funct
   }
   else {
     $("#excess-emotes-protection-warning-length").prop("disabled", false);
+  }
+});
+
+$(document).delegate("#ips-protection-toggle", "change", function() {
+  var channel = $(this).data("channel"),
+      enabled = $("#ips-protection-toggle").prop("checked");
+  $.post('/twitch/protection/ips/toggle/', {
+    channel: channel,
+    enabled: enabled
+  });
+});
+
+$(document).delegate("#ips-protection-update", "click", function() {
+  var channel = $(this).data("channel"),
+      warning = $("#ips-protection-warning-toggle").prop("checked"),
+      post_message = $("#ips-protection-message-toggle").prop("checked"),
+      whisper_message = $("#ips-protection-whisper-toggle").prop("checked"),
+      warning_length = $("#ips-protection-warning-length").val(),
+      length = $("#ips-protection-length").val(),
+      message = $("#ips-protection-message").val(),
+      level = $("#ips-protection-level option:selected").data("level"),
+      prevent_evasion = $("#ips-protection-evasion-toggle").prop("checked"),
+      permit = $("#ips-protection-permit-toggle").prop("checked"),
+      whitelist = $("#ips-protection-whitelist").val().split(/\n/);
+  $.post('/twitch/protection/ips/update/', {
+    channel: channel,
+    warning: warning,
+    post_message: post_message,
+    whisper_message: whisper_message,
+    warning_length: warning_length,
+    length: length,
+    message: message,
+    level: level,
+    prevent_evasion: prevent_evasion,
+    permit: permit,
+    whitelist: whitelist
+  });
+});
+
+$(document).delegate("#ips-protection-message-toggle", "change", function() {
+  if ($("#ips-protection-message-toggle").prop("checked") === false) {
+    $("#ips-protection-whisper-toggle").prop("checked", false);
+    $("#ips-protection-whisper-toggle").prop("disabled", true);
+    $("#ips-protection-message").prop("disabled", true);
+  }
+  else {
+    $("#ips-protection-whisper-toggle").prop("disabled", false);
+    $("#ips-protection-message").prop("disabled", false);
+  }
+});
+
+$(document).delegate("#ips-protection-warning-toggle", "change", function() {
+  if ($("#ips-protection-warning-toggle").prop("checked") === false) {
+    $("#ips-protection-warning-length").prop("disabled", true);
+  }
+  else {
+    $("#ips-protection-warning-length").prop("disabled", false);
+  }
+});
+
+$(document).delegate("#links-protection-toggle", "change", function() {
+  var channel = $(this).data("channel"),
+      enabled = $("#links-protection-toggle").prop("checked");
+  $.post('/twitch/protection/links/toggle/', {
+    channel: channel,
+    enabled: enabled
+  });
+});
+
+$(document).delegate("#links-protection-update", "click", function() {
+  var channel = $(this).data("channel"),
+      warning = $("#links-protection-warning-toggle").prop("checked"),
+      post_message = $("#links-protection-message-toggle").prop("checked"),
+      whisper_message = $("#links-protection-whisper-toggle").prop("checked"),
+      warning_length = $("#links-protection-warning-length").val(),
+      length = $("#links-protection-length").val(),
+      message = $("#links-protection-message").val(),
+      level = $("#links-protection-level option:selected").data("level"),
+      prevent_evasion = $("#links-protection-evasion-toggle").prop("checked"),
+      permit = $("#links-protection-permit-toggle").prop("checked"),
+      whitelist = $("#links-protection-whitelist").val().split(/\n/);
+  $.post('/twitch/protection/links/update/', {
+    channel: channel,
+    warning: warning,
+    post_message: post_message,
+    whisper_message: whisper_message,
+    warning_length: warning_length,
+    length: length,
+    message: message,
+    level: level,
+    prevent_evasion: prevent_evasion,
+    permit: permit,
+    whitelist: whitelist
+  });
+});
+
+$(document).delegate("#links-protection-message-toggle", "change", function() {
+  if ($("#links-protection-message-toggle").prop("checked") === false) {
+    $("#links-protection-whisper-toggle").prop("checked", false);
+    $("#links-protection-whisper-toggle").prop("disabled", true);
+    $("#links-protection-message").prop("disabled", true);
+  }
+  else {
+    $("#links-protection-whisper-toggle").prop("disabled", false);
+    $("#links-protection-message").prop("disabled", false);
+  }
+});
+
+$(document).delegate("#links-protection-warning-toggle", "change", function() {
+  if ($("#links-protection-warning-toggle").prop("checked") === false) {
+    $("#links-protection-warning-length").prop("disabled", true);
+  }
+  else {
+    $("#links-protection-warning-length").prop("disabled", false);
+  }
+});
+
+$(document).delegate("#lone-emotes-protection-toggle", "change", function() {
+  var channel = $(this).data("channel"),
+      enabled = $("#lone-emotes-protection-toggle").prop("checked");
+  $.post('/twitch/protection/lones/toggle/', {
+    channel: channel,
+    enabled: enabled
+  });
+});
+
+$(document).delegate("#lone-emotes-protection-update", "click", function() {
+  var channel = $(this).data("channel"),
+      warning = $("#lone-emotes-protection-warning-toggle").prop("checked"),
+      post_message = $("#lone-emotes-protection-message-toggle").prop("checked"),
+      whisper_message = $("#lone-emotes-protection-whisper-toggle").prop("checked"),
+      warning_length = $("#lone-emotes-protection-warning-length").val(),
+      length = $("#lone-emotes-protection-length").val(),
+      message = $("#lone-emotes-protection-message").val(),
+      level = $("#lone-emotes-protection-level option:selected").data("level");
+  $.post('/twitch/protection/lones/update/', {
+    channel: channel,
+    warning: warning,
+    post_message: post_message,
+    whisper_message: whisper_message,
+    warning_length: warning_length,
+    length: length,
+    message: message,
+    level: level
+  });
+});
+
+$(document).delegate("#lone-emotes-protection-message-toggle", "change", function() {
+  if ($("#lone-emotes-protection-message-toggle").prop("checked") === false) {
+    $("#lone-emotes-protection-whisper-toggle").prop("checked", false);
+    $("#lone-emotes-protection-whisper-toggle").prop("disabled", true);
+    $("#lone-emotes-protection-message").prop("disabled", true);
+  }
+  else {
+    $("#lone-emotes-protection-whisper-toggle").prop("disabled", false);
+    $("#lone-emotes-protection-message").prop("disabled", false);
+  }
+});
+
+$(document).delegate("#lone-emotes-protection-warning-toggle", "change", function() {
+  if ($("#lone-emotes-protection-warning-toggle").prop("checked") === false) {
+    $("#lone-emotes-protection-warning-length").prop("disabled", true);
+  }
+  else {
+    $("#lone-emotes-protection-warning-length").prop("disabled", false);
   }
 });

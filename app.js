@@ -127,10 +127,15 @@ app.get('/settings/', function(req, res) {
 app.get('/settings/:id/', function(req, res) {
   db.users.get(req.params.id).then(function(user) {
     user._id = user._id.toString();
-    res.render('settings', {
-      title: "Settings",
-      theme: "Neutral",
-      user: user
+    Promise.all([helpers.twitch_settings.getChannel(user.twitch), helpers.beam_settings.getChannel(user.beam)]).then(function(data) {
+      console.log(data[1])
+      res.render('settings', {
+        title: "Settings",
+        theme: "Neutral",
+        user: user,
+        twitch: data[0],
+        beam: data[1]
+      });
     });
   });
 });
@@ -183,7 +188,7 @@ app.get('/logs/', function(req, res) {
   }
 });
 
-// Get settings first page
+// Get logs first page
 app.get('/logs/:id/', function(req, res) {
   res.render('logs_redirect', { title: "Logs", theme: "Neutral"});
 });
@@ -526,6 +531,13 @@ app.post('/twitch/channel/reset/', function(req, res) {
   twitchCommands.resetBot(req.body.channel);
 });
 
+// Permit User
+app.post('/twitch/protection/permit/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    twitchCommands.permitUser("#" + req.body.channel, { "display-name": req.body.loggedin }, [data[0].command_prefix + "permit", req.body.user], data[0]);
+  });
+});
+
 // Toggle Twitch Actions Protection
 app.post('/twitch/protection/actions/toggle/', function(req, res) {
   db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
@@ -658,6 +670,105 @@ app.post('/twitch/protection/emotes/update/', function(req, res) {
     }
     if (isNaN(data[0].spam.emotes.limit)) {
       data[0].spam.emotes.limit = 5;
+    }
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Toggle Twitch IP Protection
+app.post('/twitch/protection/ips/toggle/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.ips.enabled = (req.body.enabled === "true");
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Update Twitch IP Protection Settings
+app.post('/twitch/protection/ips/update/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.ips.prevent_evasion = (req.body.prevent_evasion === "true");
+    data[0].spam.ips.permit = (req.body.permit === "true");
+    data[0].spam.ips.whitelist = req.body.whitelist;
+    data[0].spam.ips.warning = (req.body.warning === "true");
+    data[0].spam.ips.post_message = (req.body.post_message === "true");
+    data[0].spam.ips.whisper_message = (req.body.whisper_message === "true");
+    data[0].spam.ips.warning_length = parseInt(req.body.warning_length);
+    data[0].spam.ips.length = parseInt(req.body.length);
+    data[0].spam.ips.message = req.body.message;
+    data[0].spam.ips.level = parseInt(req.body.level);
+    if (isNaN(data[0].spam.ips.warning_length)) {
+      data[0].spam.ips.warning_length = 1;
+    }
+    if (isNaN(data[0].spam.ips.length)) {
+      data[0].spam.ips.length = 600;
+    }
+    if (isNaN(data[0].spam.ips.level)) {
+      data[0].spam.ips.level = 600;
+    }
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Toggle Twitch Link Protection
+app.post('/twitch/protection/links/toggle/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.links.enabled = (req.body.enabled === "true");
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Update Twitch Link Protection Settings
+app.post('/twitch/protection/links/update/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.links.prevent_evasion = (req.body.prevent_evasion === "true");
+    data[0].spam.links.permit = (req.body.permit === "true");
+    data[0].spam.links.whitelist = req.body.whitelist;
+    data[0].spam.links.warning = (req.body.warning === "true");
+    data[0].spam.links.post_message = (req.body.post_message === "true");
+    data[0].spam.links.whisper_message = (req.body.whisper_message === "true");
+    data[0].spam.links.warning_length = parseInt(req.body.warning_length);
+    data[0].spam.links.length = parseInt(req.body.length);
+    data[0].spam.links.message = req.body.message;
+    data[0].spam.links.level = parseInt(req.body.level);
+    if (isNaN(data[0].spam.links.warning_length)) {
+      data[0].spam.links.warning_length = 1;
+    }
+    if (isNaN(data[0].spam.links.length)) {
+      data[0].spam.links.length = 600;
+    }
+    if (isNaN(data[0].spam.links.level)) {
+      data[0].spam.links.level = 600;
+    }
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Toggle Twitch Lone Emotes Protection
+app.post('/twitch/protection/lones/toggle/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.lones.enabled = (req.body.enabled === "true");
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Update Twitch Lone Emotes Protection Settings
+app.post('/twitch/protection/lones/update/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.lones.warning = (req.body.warning === "true");
+    data[0].spam.lones.post_message = (req.body.post_message === "true");
+    data[0].spam.lones.whisper_message = (req.body.whisper_message === "true");
+    data[0].spam.lones.warning_length = parseInt(req.body.warning_length);
+    data[0].spam.lones.length = parseInt(req.body.length);
+    data[0].spam.lones.message = req.body.message;
+    data[0].spam.lones.level = parseInt(req.body.level);
+    if (isNaN(data[0].spam.lones.warning_length)) {
+      data[0].spam.lones.warning_length = 1;
+    }
+    if (isNaN(data[0].spam.lones.length)) {
+      data[0].spam.lones.length = 600;
+    }
+    if (isNaN(data[0].spam.lones.level)) {
+      data[0].spam.lones.level = 600;
     }
     db.twitch_settings.update(data[0].user_id, data[0]);
   });

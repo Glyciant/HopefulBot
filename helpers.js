@@ -9,6 +9,9 @@ var general = {
     else {
       return false;
     }
+  },
+  matchRule: function(str, rule) {
+    return new RegExp("^" + rule.split("*").join(".*") + "$").test(str);
   }
 };
 
@@ -216,12 +219,14 @@ var twitch_settings = {
           warning: true,
           warning_length: 10
         },
-        language: {
-          language: "en",
-          enabled: false,
+        ips: {
+          whitelist: [],
+          permit: false,
+          prevent_evasion: true,
+          enabled: true,
           length: 600,
           level: 600,
-          message: "$(user) -> Please use English only in this chat. [$(result)]",
+          message: "$(user) -> Please do not post IPs without a moderator's permission. [$(result)]",
           post_message: true,
           whisper_message: false,
           warning: true,
@@ -229,14 +234,22 @@ var twitch_settings = {
         },
         links: {
           whitelist: [],
-          global_links: true,
-          ips: true,
           permit: true,
           prevent_evasion: true,
           enabled: true,
           length: 600,
           level: 600,
           message: "$(user) -> Please do not post links without a moderator's permission. [$(result)]",
+          post_message: true,
+          whisper_message: false,
+          warning: true,
+          warning_length: 10
+        },
+        lones: {
+          enabled: false,
+          length: 600,
+          level: 600,
+          message: "$(user) -> Please do not use lone emotes. [$(result)]",
           post_message: true,
           whisper_message: false,
           warning: true,
@@ -533,20 +546,21 @@ var discord_settings = {
           warning: true,
           warning_length: 10
         },
-        language: {
-          language: "en",
-          enabled: false,
+        ips: {
+          whitelist: [],
+          permit: false,
+          prevent_evasion: true,
+          enabled: true,
           length: 600,
           level: 600,
-          message: "$(user) -> Please use English only in this chat.",
+          message: "$(user) -> Please do not post IPs without a moderator's permission. [$(result)]",
           post_message: true,
+          whisper_message: false,
           warning: true,
           warning_length: 10
         },
         links: {
           whitelist: [],
-          global_links: true,
-          ips: true,
           permit: true,
           prevent_evasion: true,
           enabled: true,
@@ -590,6 +604,18 @@ var discord_settings = {
       },
       timers: []
     };
+  },
+  getUserById: function(id) {
+    return new Promise(function(resolve, reject) {
+      needle.get("https://discordapp.com/api/users/" + id, (error, data) => {
+        if (!error) {
+          resolve(data.body);
+        }
+        else {
+          reject(error);
+        }
+      });
+    });
   }
 };
 
@@ -759,12 +785,14 @@ var beam_settings = {
           warning: true,
           warning_length: 10
         },
-        language: {
-          language: "en",
-          enabled: false,
+        ips: {
+          whitelist: [],
+          permit: false,
+          prevent_evasion: true,
+          enabled: true,
           length: 600,
           level: 600,
-          message: "$(user) -> Please use English only in this chat. [$(result)]",
+          message: "$(user) -> Please do not post IPs without a moderator's permission. [$(result)]",
           post_message: true,
           whisper_message: false,
           warning: true,
@@ -772,8 +800,6 @@ var beam_settings = {
         },
         links: {
           whitelist: [],
-          global_links: true,
-          ips: true,
           permit: true,
           prevent_evasion: true,
           enabled: true,
@@ -821,6 +847,18 @@ var beam_settings = {
       },
       timers: []
     };
+  },
+  getChannel: function(user) {
+    return new Promise(function(resolve, reject) {
+      needle.get("https://beam.pro/api/v1/channels/" + user, (error, data) => {
+        if (!error) {
+          resolve(data.body);
+        }
+        else {
+          reject(error);
+        }
+      });
+    });
   }
 };
 
