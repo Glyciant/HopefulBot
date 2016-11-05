@@ -416,9 +416,73 @@ var beam_settings = {
   }
 };
 
+var twitch_logs = {
+  add: (channel, username, message, date) => {
+    return new Promise((resolve, reject) => {
+      mongodb.connect(url, function(err, db) {
+        assert.equal(null, err);
+        db.collection("twitch_logs").insertOne({
+          channel: channel,
+          username: username,
+          message: message,
+          date: date
+        }, function(err, result) {
+          assert.equal(null, err);
+          db.close();
+          resolve(result);
+        });
+      });
+    });
+  },
+  getChannel: (channel) => {
+    return new Promise((resolve, reject) => {
+      mongodb.connect(url, function(err, db) {
+        assert.equal(null, err);
+        db.collection("twitch_logs").find({
+          channel: channel
+        }, function(err, result) {
+          result.sort({date: -1}).toArray().then(function(arrayResult) {
+            assert.equal(null, err);
+            db.close();
+            if (arrayResult) {
+              resolve(arrayResult);
+            }
+            else {
+              resolve(null);
+            }
+          });
+        });
+      });
+    });
+  },
+  getUserInChannel: (channel, user) => {
+    return new Promise((resolve, reject) => {
+      mongodb.connect(url, function(err, db) {
+        assert.equal(null, err);
+        db.collection("twitch_logs").find({
+          channel: channel,
+          username: user
+        }, function(err, result) {
+          result.sort({date: -1}).toArray().then(function(arrayResult) {
+            assert.equal(null, err);
+            db.close();
+            if (arrayResult) {
+              resolve(arrayResult);
+            }
+            else {
+              resolve(null);
+            }
+          });
+        });
+      });
+    });
+  }
+};
+
 module.exports = {
   users: users,
   twitch_settings: twitch_settings,
   discord_settings: discord_settings,
-  beam_settings: beam_settings
+  beam_settings: beam_settings,
+  twitch_logs: twitch_logs
 };

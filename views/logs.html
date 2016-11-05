@@ -1,3 +1,32 @@
 {% include "./header.html" %}
 
+<div class="white black-text center row" style="border-radius:20px; margin:15px; padding: 15px; border: 3px solid #ede7f6;">
+  <table class="bordered highlight">
+    <thead>
+      <th>Date</th>
+      <th>Username</th>
+      {% if type == "chat" %}
+      <th>Message</th>
+      {% else %}
+      <th>Action</th>
+      <th>Reason</th>
+      {% endif %}
+    </thead>
+    <tbody>
+      {% for log in logs %}
+      <tr>
+        <td>{{log.date}}</td>
+        <td>{{log.username}}</td>
+        {% if type == "chat" %}
+        <td>{{log.message}}</td>
+        {% else %}
+        <td>{{log.action}}</td>
+        <td>{{log.reason}}</td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
 {% include "./footer.html" %}

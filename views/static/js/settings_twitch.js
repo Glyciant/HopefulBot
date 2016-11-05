@@ -482,3 +482,118 @@ $(document).delegate("#paragraph-protection-warning-toggle", "change", function(
     $("#paragraph-protection-warning-length").prop("disabled", false);
   }
 });
+
+$(document).delegate("#repitition-protection-toggle", "change", function() {
+  var channel = $(this).data("channel"),
+      enabled = $("#repitition-protection-toggle").prop("checked");
+  $.post('/twitch/protection/repitition/toggle/', {
+    channel: channel,
+    enabled: enabled
+  });
+});
+
+$(document).delegate("#repitition-protection-update", "click", function() {
+  var channel = $(this).data("channel"),
+      warning = $("#repitition-protection-warning-toggle").prop("checked"),
+      post_message = $("#repitition-protection-message-toggle").prop("checked"),
+      whisper_message = $("#repitition-protection-whisper-toggle").prop("checked"),
+      warning_length = $("#repitition-protection-warning-length").val(),
+      length = $("#repitition-protection-length").val(),
+      message = $("#repitition-protection-message").val(),
+      level = $("#repitition-protection-level option:selected").data("level");
+  $.post('/twitch/protection/repitition/update/', {
+    channel: channel,
+    warning: warning,
+    post_message: post_message,
+    whisper_message: whisper_message,
+    warning_length: warning_length,
+    length: length,
+    message: message,
+    level: level
+  });
+});
+
+$(document).delegate("#repitition-protection-message-toggle", "change", function() {
+  if ($("#repitition-protection-message-toggle").prop("checked") === false) {
+    $("#repitition-protection-whisper-toggle").prop("checked", false);
+    $("#repitition-protection-whisper-toggle").prop("disabled", true);
+    $("#repitition-protection-message").prop("disabled", true);
+  }
+  else {
+    $("#repitition-protection-whisper-toggle").prop("disabled", false);
+    $("#repitition-protection-message").prop("disabled", false);
+  }
+});
+
+$(document).delegate("#repitition-protection-warning-toggle", "change", function() {
+  if ($("#repitition-protection-warning-toggle").prop("checked") === false) {
+    $("#repitition-protection-warning-length").prop("disabled", true);
+  }
+  else {
+    $("#repitition-protection-warning-length").prop("disabled", false);
+  }
+});
+
+$(document).delegate("#symbols-protection-toggle", "change", function() {
+  var channel = $(this).data("channel"),
+      enabled = $("#symbols-protection-toggle").prop("checked");
+  $.post('/twitch/protection/symbols/toggle/', {
+    channel: channel,
+    enabled: enabled
+  });
+});
+
+$(document).delegate("#symbols-protection-update", "click", function() {
+  var channel = $(this).data("channel"),
+      warning = $("#symbols-protection-warning-toggle").prop("checked"),
+      post_message = $("#symbols-protection-message-toggle").prop("checked"),
+      whisper_message = $("#symbols-protection-whisper-toggle").prop("checked"),
+      warning_length = $("#symbols-protection-warning-length").val(),
+      length = $("#symbols-protection-length").val(),
+      message = $("#symbols-protection-message").val(),
+      level = $("#symbols-protection-level option:selected").data("level"),
+      minimum_length = $("#symbols-protection-minimum-length").val(),
+      percentage = $("#symbols-protection-percentage").val();
+  $.post('/twitch/protection/symbols/update/', {
+    channel: channel,
+    warning: warning,
+    post_message: post_message,
+    whisper_message: whisper_message,
+    warning_length: warning_length,
+    length: length,
+    message: message,
+    level: level,
+    minimum_length: minimum_length,
+    percentage: percentage
+  });
+});
+
+$(document).delegate("#symbols-protection-message-toggle", "change", function() {
+  if ($("#symbols-protection-message-toggle").prop("checked") === false) {
+    $("#symbols-protection-whisper-toggle").prop("checked", false);
+    $("#symbols-protection-whisper-toggle").prop("disabled", true);
+    $("#symbols-protection-message").prop("disabled", true);
+  }
+  else {
+    $("#symbols-protection-whisper-toggle").prop("disabled", false);
+    $("#symbols-protection-message").prop("disabled", false);
+  }
+});
+
+$(document).delegate("#symbols-protection-warning-toggle", "change", function() {
+  if ($("#symbols-protection-warning-toggle").prop("checked") === false) {
+    $("#symbols-protection-warning-length").prop("disabled", true);
+  }
+  else {
+    $("#symbols-protection-warning-length").prop("disabled", false);
+  }
+});
+
+$(document).delegate("#excess-emotes-protection-toggle", "change", function() {
+  var channel = $(this).data("channel"),
+      enabled = $("#excess-emotes-protection-toggle").prop("checked");
+  $.post('/twitch/protection/emotes/toggle/', {
+    channel: channel,
+    enabled: enabled
+  });
+});

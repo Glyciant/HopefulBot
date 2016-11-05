@@ -194,18 +194,22 @@ app.get('/logs/:id/', function(req, res) {
 
 // Get chat logs
 app.get('/logs/:id/:platform/', function(req, res) {
-  if (req.params.platform == "twitch") {
-    res.render('logs', { title: "Twitch Chat Logs", theme: "Twitch"});
-  }
-  else if (req.params.platform == "discord") {
-    res.render('logs', { title: "Discord Chat Logs", theme: "Discord"});
-  }
-  else if (req.params.platform == "beam") {
-    res.render('logs', { title: "Beam Chat Logs", theme: "Beam"});
-  }
-  else {
-    res.redirect('/logs/' + req.params.id);
-  }
+  db.users.get(req.params.id).then(function(user) {
+    if (req.params.platform == "twitch") {
+      db.twitch_logs.getChannel("#" + user.twitch).then(function(data) {
+        res.render('logs', { title: "Twitch Chat Logs", theme: "Twitch", type:"chat", logs: data });
+      });
+    }
+    else if (req.params.platform == "discord") {
+      res.render('logs', { title: "Discord Chat Logs", theme: "Discord"});
+    }
+    else if (req.params.platform == "beam") {
+      res.render('logs', { title: "Beam Chat Logs", theme: "Beam"});
+    }
+    else {
+      res.redirect('/logs/' + req.params.id);
+    }
+  });
 });
 
 // Get action logs
@@ -803,6 +807,79 @@ app.post('/twitch/protection/paragraph/update/', function(req, res) {
     }
     if (isNaN(data[0].spam.paragraph.level)) {
       data[0].spam.paragraph.level = 600;
+    }
+    if (isNaN(data[0].spam.paragraph.limit)) {
+      data[0].spam.paragraph.level = 350;
+    }
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Toggle Twitch Repitition Protection
+app.post('/twitch/protection/repitition/toggle/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.repitition.enabled = (req.body.enabled === "true");
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Update Twitch Repitition Protection Settings
+app.post('/twitch/protection/repitition/update/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.repitition.warning = (req.body.warning === "true");
+    data[0].spam.repitition.post_message = (req.body.post_message === "true");
+    data[0].spam.repitition.whisper_message = (req.body.whisper_message === "true");
+    data[0].spam.repitition.warning_length = parseInt(req.body.warning_length);
+    data[0].spam.repitition.length = parseInt(req.body.length);
+    data[0].spam.repitition.message = req.body.message;
+    data[0].spam.repitition.level = parseInt(req.body.level);
+    if (isNaN(data[0].spam.repitition.warning_length)) {
+      data[0].spam.repitition.warning_length = 1;
+    }
+    if (isNaN(data[0].spam.repitition.length)) {
+      data[0].spam.repitition.length = 600;
+    }
+    if (isNaN(data[0].spam.repitition.level)) {
+      data[0].spam.repitition.level = 600;
+    }
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Toggle Twitch Symbol Protection
+app.post('/twitch/protection/symbols/toggle/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.symbols.enabled = (req.body.enabled === "true");
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Update Twitch Symbol Protection Settings
+app.post('/twitch/protection/symbols/update/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].spam.symbols.minimum_length = parseInt(req.body.minimum_length);
+    data[0].spam.symbols.percentage = parseInt(req.body.percentage);
+    data[0].spam.symbols.warning = (req.body.warning === "true");
+    data[0].spam.symbols.post_message = (req.body.post_message === "true");
+    data[0].spam.symbols.whisper_message = (req.body.whisper_message === "true");
+    data[0].spam.symbols.warning_length = parseInt(req.body.warning_length);
+    data[0].spam.symbols.length = parseInt(req.body.length);
+    data[0].spam.symbols.message = req.body.message;
+    data[0].spam.symbols.level = parseInt(req.body.level);
+    if (isNaN(data[0].spam.symbols.warning_length)) {
+      data[0].spam.symbols.warning_length = 1;
+    }
+    if (isNaN(data[0].spam.symbols.length)) {
+      data[0].spam.symbols.length = 600;
+    }
+    if (isNaN(data[0].spam.symbols.level)) {
+      data[0].spam.symbols.level = 600;
+    }
+    if (isNaN(data[0].spam.symbols.minimum_length)) {
+      data[0].spam.symbols.minimum_length = 8;
+    }
+    if (isNaN(data[0].spam.symbols.percentage)) {
+      data[0].spam.symbols.percentage = 70;
     }
     db.twitch_settings.update(data[0].user_id, data[0]);
   });

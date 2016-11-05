@@ -71,12 +71,19 @@ var resetBot = function(channel) {
   });
 };
 
+// Message Logging
+twitchBot.on("message", function (channel, userstate, message, self) {
+  var d = new Date(),
+      date = d.getDate() + "/" + d.getMonth() + "/" + d.getFullYear() + " " + d.getHours() + ":" + (d.getMinutes()<10?'0':'') + d.getMinutes() + ":" + (d.getSeconds()<10?'0':'') + d.getSeconds();
+  db.twitch_logs.add(channel, userstate["display-name"], message, date);
+});
+
 // Define Spam Protection Variables
 var purged = {},
     permitted = {};
 
 // Action Protection
-twitchBot.on("action", function (channel, userstate, message, self) {
+twitchBot.on("action", function(channel, userstate, message, self) {
   db.twitch_settings.getByUsername(channel.replace("#","")).then(function(data) {
     if (data[0].spam.actions.enabled === true) {
       if (data[0].spam.actions.level < helpers.twitch_settings.getUserLevel(data[0], userstate)) {
@@ -110,9 +117,10 @@ twitchBot.on("action", function (channel, userstate, message, self) {
   });
 });
 
-// Blacklist Protection
-twitchBot.on("message", function (channel, userstate, message, self) {
+twitchBot.on("message", function(channel, userstate, message, self) {
   db.twitch_settings.getByUsername(channel.replace("#","")).then(function(data) {
+
+    // Blacklist Protection
     if (data[0].spam.blacklist.enabled === true) {
       for (var j in data[0].spam.blacklist.blacklist) {
         var pattern = data[0].spam.blacklist.blacklist[j];
@@ -156,12 +164,7 @@ twitchBot.on("message", function (channel, userstate, message, self) {
         }
       }
     }
-  });
-});
-
-// Caps Protection
-twitchBot.on("message", function (channel, userstate, message, self) {
-  db.twitch_settings.getByUsername(channel.replace("#","")).then(function(data) {
+    // Caps Protection
     if (data[0].spam.caps.enabled === true) {
       if (message.length >= data[0].spam.caps.minimum_length) {
         var capsCount = 0,
@@ -206,12 +209,8 @@ twitchBot.on("message", function (channel, userstate, message, self) {
         }
       }
     }
-  });
-});
 
-// Excess Emotes Protection
-twitchBot.on("message", function (channel, userstate, message, self) {
-  db.twitch_settings.getByUsername(channel.replace("#","")).then(function(data) {
+    // Excess Emotes Protection
     if (data[0].spam.emotes.enabled === true) {
       var count = 0;
       if (userstate.emotes !== null) {
@@ -251,45 +250,16 @@ twitchBot.on("message", function (channel, userstate, message, self) {
         }
       }
     }
-  });
-});
 
-// Permit Command
-twitchBot.on("message", function (channel, userstate, message, self) {
-  db.twitch_settings.getByUsername(channel.replace("#","")).then(function(data) {
+    // Permit Command
     var params = message.split(" ");
     if (params[0] == data[0].command_prefix + "permit") {
       if (500 >= helpers.twitch_settings.getUserLevel(data[0], userstate)) {
         permitUser(channel, userstate, params, data[0]);
       }
     }
-  });
-});
 
-function permitUser(channel, userstate, params, data) {
-  if (data.spam.ips.permit === true || data.spam.links.permit === true) {
-    if (data.spam.ips.permit === true && data.spam.links.permit === true) {
-      twitchBot.say(channel, userstate["display-name"] + " ->  " + params[1] + " has 120 seconds to post a link or IP.");
-    }
-    else if (data.spam.ips.permit === true) {
-      twitchBot.say(channel, userstate["display-name"] + " ->  " + params[1] + " has 120 seconds to post an IP.");
-    }
-    else if (data.spam.links.permit === true) {
-      twitchBot.say(channel, userstate["display-name"] + " ->  " + params[1] + " has 120 seconds to post a link.");
-    }
-    if (!permitted[channel]) {
-      permitted[channel] = {};
-    }
-    permitted[channel][params[1].toLowerCase()] = Date.now() / 1000;
-  }
-  else {
-    twitchBot.say(channel, userstate["display-name"] + " -> The permit command is not enabled on this channel.");
-  }
-}
-
-// IP Protection
-twitchBot.on("message", function (channel, userstate, message, self) {
-  db.twitch_settings.getByUsername(channel.replace("#","")).then(function(data) {
+    // IP Protection
     var ipRegex = new RegExp(/(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/),
         evasionRegex = new RegExp(/(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|\[dot\]|\(dot\)|\[.\]|\(\.\)|\s\.\s)(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|\[dot\]|\(dot\)|\[.\]|\(\.\)|\s\.\s)(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|\[dot\]|\(dot\)|\[.\]|\(\.\)|\s\.\s)(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/),
         params = message.split(" "),
@@ -344,12 +314,8 @@ twitchBot.on("message", function (channel, userstate, message, self) {
         }
       }
     }
-  });
-});
 
-// Link Protection
-twitchBot.on("message", function (channel, userstate, message, self) {
-  db.twitch_settings.getByUsername(channel.replace("#","")).then(function(data) {
+    // Link Protection
     var linkRegex = new RegExp(/^(?:(?:https?|ftp):\/\/)?(?:\S+(?::\S*)?@)?(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?(?::\d{2,5})?(?:[/?#]\S*)?$/),
         evasionRegex = new RegExp(/^(?:(?:https?|ftp):\/\/)?(?:\S+(?::\S*)?@)?(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:(\.|\[dot\]|\(dot\)|\[.\]|\(\.\)|\s\.\s)(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:(\.|\[dot\]|\(dot\)|\[.\]|\(\.\)|\s\.\s)(?:[a-z\u00a1-\uffff]{2,}))(\.|\[dot\]|\(dot\)|\[.\]|\(\.\)|\s\.\s)?(?::\d{2,5})?(?:[/?#]\S*)?$/),
         params = message.split(" "),
@@ -404,12 +370,8 @@ twitchBot.on("message", function (channel, userstate, message, self) {
         }
       }
     }
-  });
-});
 
-// Lone Emotes Protection
-twitchBot.on("message", function (channel, userstate, message, self) {
-  db.twitch_settings.getByUsername(channel.replace("#","")).then(function(data) {
+    // Lone Emotes Protection
     if (data[0].spam.lones.enabled === true) {
       if (userstate.emotes !== null) {
         var keys = Object.keys(userstate.emotes),
@@ -447,12 +409,8 @@ twitchBot.on("message", function (channel, userstate, message, self) {
         }
       }
     }
-  });
-});
 
-// Paragraph Protection
-twitchBot.on("message", function (channel, userstate, message, self) {
-  db.twitch_settings.getByUsername(channel.replace("#","")).then(function(data) {
+    // Paragraph Protection
     if (data[0].spam.paragraph.enabled === true) {
       if (message.length > data[0].spam.paragraph.limit) {
         if (data[0].spam.paragraph.level < helpers.twitch_settings.getUserLevel(data[0], userstate)) {
@@ -464,12 +422,12 @@ twitchBot.on("message", function (channel, userstate, message, self) {
             purgeTimeDiff = Date.now() / 1000 - purged[channel][userstate.username];
           }
           if ((purgeTimeDiff !== null && purgeTimeDiff <= 28800) || data[0].spam.paragraph.warning === false) {
-            twitchBot.timeout(channel, userstate.username, data[0].spam.paragraph.length, "Heepsbot Spam Protection: Lone Emotes Filter [Timeout]");
+            twitchBot.timeout(channel, userstate.username, data[0].spam.paragraph.length, "Heepsbot Spam Protection: Paragraph Filter [Timeout]");
             purged[channel][userstate.username] = null;
             var result = "Timeout";
           }
           else {
-            twitchBot.timeout(channel, userstate.username, data[0].spam.paragraph.warning_length, "Heepsbot Spam Protection: Lone Emotes Filter [Warning]");
+            twitchBot.timeout(channel, userstate.username, data[0].spam.paragraph.warning_length, "Heepsbot Spam Protection: Paragraph Filter [Warning]");
             purged[channel][userstate.username] = Date.now() / 1000;
             var result = "Purge";
           }
@@ -484,8 +442,109 @@ twitchBot.on("message", function (channel, userstate, message, self) {
         }
       }
     }
+
+    // Repitition Protection
+    if (data[0].spam.repitition.enabled === true) {
+      db.twitch_logs.getUserInChannel(channel, userstate["display-name"]).then(function(logs) {
+        if (logs[0].message === logs[1].message) {
+          if (data[0].spam.repitition.level < helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+            if (!purged[channel]) {
+              purged[channel] = {};
+            }
+            var purgeTimeDiff = null;
+            if (purged[channel][userstate.username]) {
+              purgeTimeDiff = Date.now() / 1000 - purged[channel][userstate.username];
+            }
+            if ((purgeTimeDiff !== null && purgeTimeDiff <= 28800) || data[0].spam.repitition.warning === false) {
+              twitchBot.timeout(channel, userstate.username, data[0].spam.repitition.length, "Heepsbot Spam Protection: Repitition Filter [Timeout]");
+              purged[channel][userstate.username] = null;
+              var result = "Timeout";
+            }
+            else {
+              twitchBot.timeout(channel, userstate.username, data[0].spam.repitition.warning_length, "Heepsbot Spam Protection: Repitition Filter [Warning]");
+              purged[channel][userstate.username] = Date.now() / 1000;
+              var result = "Purge";
+            }
+            if (data[0].spam.repitition.post_message === true) {
+              if (data[0].spam.repitition.whisper_message === true) {
+                twitchBot.whisper(userstate.username, data[0].spam.repitition.message.replace("$(user)", userstate["display-name"]).replace("$(result)", result));
+              }
+              else {
+                twitchBot.say(channel, data[0].spam.repitition.message.replace("$(user)", userstate["display-name"]).replace("$(result)", result));
+              }
+            }
+          }
+        }
+      });
+    }
+    if (data[0].spam.symbols.enabled === true) {
+      if (message.length >= data[0].spam.symbols.minimum_length) {
+        var symbolsCount = 0,
+            spaceCount = 0;
+        for (var i in message) {
+          if (/[^A-Za-z0-9\s]/.test(message[i]) === true) {
+            symbolsCount++;
+          }
+          else if (/\s/.test(message[i]) === true) {
+            spaceCount++;
+          }
+        }
+        var percentage = (symbolsCount / (message.length - spaceCount)) * 100;
+        if (percentage >= data[0].spam.symbols.percentage) {
+          if (data[0].spam.symbols.level < helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+            if (!purged[channel]) {
+              purged[channel] = {};
+            }
+            var purgeTimeDiff = null;
+            if (purged[channel][userstate.username]) {
+              purgeTimeDiff = Date.now() / 1000 - purged[channel][userstate.username];
+            }
+            if ((purgeTimeDiff !== null && purgeTimeDiff <= 28800) || data[0].spam.symbols.warning === false) {
+              twitchBot.timeout(channel, userstate.username, data[0].spam.symbols.length, "Heepsbot Spam Protection: symbols Filter [Timeout]");
+              purged[channel][userstate.username] = null;
+              var result = "Timeout";
+            }
+            else {
+              twitchBot.timeout(channel, userstate.username, data[0].spam.symbols.warning_length, "Heepsbot Spam Protection: symbols Filter [Warning]");
+              purged[channel][userstate.username] = Date.now() / 1000;
+              var result = "Purge";
+            }
+            if (data[0].spam.symbols.post_message === true) {
+              if (data[0].spam.symbols.whisper_message === true) {
+                twitchBot.whisper(userstate.username, data[0].spam.symbols.message.replace("$(user)", userstate["display-name"]).replace("$(result)", result));
+              }
+              else {
+                twitchBot.say(channel, data[0].spam.symbols.message.replace("$(user)", userstate["display-name"]).replace("$(result)", result));
+              }
+            }
+          }
+        }
+      }
+    }
   });
 });
+
+function permitUser(channel, userstate, params, data) {
+  if (data.spam.ips.permit === true || data.spam.links.permit === true) {
+    if (data.spam.ips.permit === true && data.spam.links.permit === true) {
+      twitchBot.say(channel, userstate["display-name"] + " ->  " + params[1] + " has 120 seconds to post a link or IP.");
+    }
+    else if (data.spam.ips.permit === true) {
+      twitchBot.say(channel, userstate["display-name"] + " ->  " + params[1] + " has 120 seconds to post an IP.");
+    }
+    else if (data.spam.links.permit === true) {
+      twitchBot.say(channel, userstate["display-name"] + " ->  " + params[1] + " has 120 seconds to post a link.");
+    }
+    if (!permitted[channel]) {
+      permitted[channel] = {};
+    }
+    permitted[channel][params[1].toLowerCase()] = Date.now() / 1000;
+  }
+  else {
+    twitchBot.say(channel, userstate["display-name"] + " -> The permit command is not enabled on this channel.");
+  }
+}
+
 
 module.exports = {
   joinChannel: joinChannel,
