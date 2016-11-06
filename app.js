@@ -149,13 +149,19 @@ app.get('/settings/:id/twitch/', function(req, res) {
             if (res.locals.loggedin == req.params.id) {
               var isOwner = true;
             }
+            for (var i in data[0].editors) {
+              if (data[0].editors[i].user.toLowerCase() == res.locals.twitch) {
+                var isEditor = true;
+              }
+            }
             res.render('settings_twitch', {
               title: "Twitch Settings",
               theme: "Twitch",
               data: data[0],
               api: api,
               user: user,
-              isOwner: isOwner
+              isOwner: isOwner,
+              isEditor: isEditor
             });
           });
         });
@@ -538,6 +544,78 @@ app.post('/twitch/channel/reset/', function(req, res) {
 app.post('/twitch/protection/permit/', function(req, res) {
   db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
     twitchCommands.permitUser("#" + req.body.channel, { "display-name": req.body.loggedin }, [data[0].command_prefix + "permit", req.body.user], data[0]);
+  });
+});
+
+// Add Editor
+app.post('/twitch/editors/add/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    if (data[0].editors.map(function(x) { return x.user; }).indexOf(req.body.user) > -1) {
+      res.send({ status: "exists" });
+    }
+    else {
+      helpers.twitch_settings.getChannel(req.body.user).then(function(user) {
+        data[0].editors.push({ user: req.body.user, username: req.body.user.toLowerCase(), icon: user.logo });
+        db.twitch_settings.update(data[0].user_id, data[0]);
+        res.send({ status: "success", icon: user.logo });
+      });
+    }
+  });
+});
+
+// Remove Editor
+app.post('/twitch/editors/remove/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].editors.splice(data[0].editors.map(function(x) { return x.username; }).indexOf(req.body.user.toLowerCase()), 1);
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Add Regular
+app.post('/twitch/regulars/add/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    if (data[0].regulars.map(function(x) { return x.user; }).indexOf(req.body.user) > -1) {
+      res.send({ status: "exists" });
+    }
+    else {
+      helpers.twitch_settings.getChannel(req.body.user).then(function(user) {
+        data[0].regulars.push({ user: req.body.user, username: req.body.user.toLowerCase(), icon: user.logo });
+        db.twitch_settings.update(data[0].user_id, data[0]);
+        res.send({ status: "success", icon: user.logo });
+      });
+    }
+  });
+});
+
+// Remove Regular
+app.post('/twitch/regulars/remove/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].regulars.splice(data[0].regulars.map(function(x) { return x.username; }).indexOf(req.body.user.toLowerCase()), 1);
+    db.twitch_settings.update(data[0].user_id, data[0]);
+  });
+});
+
+// Add Restricted Users
+app.post('/twitch/restricted_users/add/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    if (data[0].restricted.map(function(x) { return x.user; }).indexOf(req.body.user) > -1) {
+      res.send({ status: "exists" });
+    }
+    else {
+      helpers.twitch_settings.getChannel(req.body.user).then(function(user) {
+        data[0].restricted.push({ user: req.body.user, username: req.body.user.toLowerCase(), icon: user.logo });
+        db.twitch_settings.update(data[0].user_id, data[0]);
+        res.send({ status: "success", icon: user.logo });
+      });
+    }
+  });
+});
+
+// Remove Restricted Users
+app.post('/twitch/restricted_users/remove/', function(req, res) {
+  db.twitch_settings.getByUsername(req.body.channel).then(function(data) {
+    data[0].restricted.splice(data[0].restricted.map(function(x) { return x.username; }).indexOf(req.body.user.toLowerCase()), 1);
+    db.twitch_settings.update(data[0].user_id, data[0]);
   });
 });
 

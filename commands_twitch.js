@@ -120,6 +120,8 @@ twitchBot.on("action", function(channel, userstate, message, self) {
 twitchBot.on("message", function(channel, userstate, message, self) {
   db.twitch_settings.getByUsername(channel.replace("#","")).then(function(data) {
 
+    var params = message.split(" ");
+
     // Blacklist Protection
     if (data[0].spam.blacklist.enabled === true) {
       for (var j in data[0].spam.blacklist.blacklist) {
@@ -252,17 +254,15 @@ twitchBot.on("message", function(channel, userstate, message, self) {
     }
 
     // Permit Command
-    var params = message.split(" ");
     if (params[0] == data[0].command_prefix + "permit") {
       if (500 >= helpers.twitch_settings.getUserLevel(data[0], userstate)) {
-        permitUser(channel, userstate, params, data[0]);
+        permitUser(channel, channel, userstate, params, data[0]);
       }
     }
 
     // IP Protection
     var ipRegex = new RegExp(/(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/),
         evasionRegex = new RegExp(/(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|\[dot\]|\(dot\)|\[.\]|\(\.\)|\s\.\s)(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|\[dot\]|\(dot\)|\[.\]|\(\.\)|\s\.\s)(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|\[dot\]|\(dot\)|\[.\]|\(\.\)|\s\.\s)(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/),
-        params = message.split(" "),
         whitelist = data[0].spam.ips.whitelist;
     if (data[0].spam.ips.enabled === true) {
       for (var i in params) {
@@ -318,7 +318,6 @@ twitchBot.on("message", function(channel, userstate, message, self) {
     // Link Protection
     var linkRegex = new RegExp(/^(?:(?:https?|ftp):\/\/)?(?:\S+(?::\S*)?@)?(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?(?::\d{2,5})?(?:[/?#]\S*)?$/),
         evasionRegex = new RegExp(/^(?:(?:https?|ftp):\/\/)?(?:\S+(?::\S*)?@)?(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:(\.|\[dot\]|\(dot\)|\[.\]|\(\.\)|\s\.\s)(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:(\.|\[dot\]|\(dot\)|\[.\]|\(\.\)|\s\.\s)(?:[a-z\u00a1-\uffff]{2,}))(\.|\[dot\]|\(dot\)|\[.\]|\(\.\)|\s\.\s)?(?::\d{2,5})?(?:[/?#]\S*)?$/),
-        params = message.split(" "),
         whitelist = data[0].spam.links.whitelist;
     if (data[0].spam.links.enabled === true) {
       for (var i in params) {
@@ -521,30 +520,271 @@ twitchBot.on("message", function(channel, userstate, message, self) {
         }
       }
     }
+
+    // Imp Command
+    if (params[0] == data[0].command_prefix + "imp") {
+      if (50 >= helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+        db.twitch_settings.getByUsername(params[1]).then(function(actionData) {
+          if (params[3] == "!permit" || params[3] == actionData[0].command_prefix + "permit" || params[3] == data[0].command_prefix + "permit") {
+            permitUser(params[1], params[2], userstate, params, actionData);
+          }
+          else if (params[3] == "!editors" || params[3] == actionData[0].command_prefix + "editors" || params[3] == data[0].command_prefix + "editors") {
+            if (params[4] == "add") {
+              addEditor(params[1], params[2], userstate, actionData, params[5]);
+            }
+            else if (params[4] == "remove" || params[4] == "delete") {
+              removeEditor(params[1], params[2], userstate, actionData, params[5]);
+            }
+            else if (params[4] == "list") {
+              listEditors(params[1], params[2], userstate, actionData);
+            }
+            else {
+              editorUsage(params[1], params[2], userstate, actionData);
+            }
+          }
+          else if (params[3] == "!regulars" || params[3] == actionData[0].command_prefix + "regulars" || params[3] == data[0].command_prefix + "regulars") {
+            if (params[4] == "add") {
+              addRegular(params[1], params[2], userstate, actionData, params[5]);
+            }
+            else if (params[4] == "remove" || params[4] == "delete") {
+              removeRegular(params[1], params[2], userstate, actionData, params[5]);
+            }
+            else if (params[4] == "list") {
+              listRegulars(params[1], params[2], userstate, actionData);
+            }
+            else {
+              regularUsage(params[1], params[2], userstate, actionData);
+            }
+          }
+          else if (params[3] == "!restricted" || params[3] == actionData[0].command_prefix + "restricted" || params[3] == data[0].command_prefix + "restricted") {
+            if (params[4] == "add") {
+              addRestrictedUser(params[1], params[2], userstate, actionData, params[5]);
+            }
+            else if (params[4] == "remove" || params[4] == "delete") {
+              removeRestrictedUser(params[1], params[2], userstate, actionData, params[5]);
+            }
+            else if (params[4] == "list") {
+              listRestrictedUsers(params[1], params[2], userstate, actionData);
+            }
+            else {
+              restrictedUserUsage(params[1], params[2], userstate, actionData);
+            }
+          }
+        });
+      }
+    }
+
+    // Manage Editors
+    if (params[0] == data[0].command_prefix + "editors") {
+      if (params[1] == "add") {
+        if (300 >= helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+          addEditor(channel, channel, userstate, data, params[2]);
+        }
+      }
+      else if (params[1] == "remove" || params[1] == "delete") {
+        if (300 >= helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+          removeEditor(channel, channel, userstate, data, params[2]);
+        }
+      }
+      else if (params[1] == "list") {
+        if (500 >= helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+          listEditors(channel, channel, userstate, data);
+        }
+      }
+      else {
+        if (500 >= helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+          editorUsage(channel, channel, userstate, data);
+        }
+      }
+    }
+
+    // Manage Regulars
+    if (params[0] == data[0].command_prefix + "regulars") {
+      if (params[1] == "add") {
+        if (400 >= helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+          addRegular(channel, channel, userstate, data, params[2]);
+        }
+      }
+      else if (params[1] == "remove" || params[1] == "delete") {
+        if (400 >= helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+          removeRegular(channel, channel, userstate, data, params[2]);
+        }
+      }
+      else if (params[1] == "list") {
+        if (500 >= helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+          listRegulars(channel, channel, userstate, data);
+        }
+      }
+      else {
+        if (500 >= helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+          regularUsage(channel, channel, userstate, data);
+        }
+      }
+    }
+
+    // Manage Restricted Users
+    if (params[0] == data[0].command_prefix + "restricted") {
+      if (params[1] == "add") {
+        if (400 >= helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+          addRestrictedUser(channel, channel, userstate, data, params[2]);
+        }
+      }
+      else if (params[1] == "remove" || params[1] == "delete") {
+        if (400 >= helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+          removeRestrictedUser(channel, channel, userstate, data, params[2]);
+        }
+      }
+      else if (params[1] == "list") {
+        if (500 >= helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+          listRestrictedUsers(channel, channel, userstate, data);
+        }
+      }
+      else {
+        if (500 >= helpers.twitch_settings.getUserLevel(data[0], userstate)) {
+          restrictedUserUsage(channel, channel, userstate, data);
+        }
+      }
+    }
   });
 });
 
-function permitUser(channel, userstate, params, data) {
+function permitUser(channelAction, channelMessage, userstate, params, data) {
   if (data.spam.ips.permit === true || data.spam.links.permit === true) {
     if (data.spam.ips.permit === true && data.spam.links.permit === true) {
-      twitchBot.say(channel, userstate["display-name"] + " ->  " + params[1] + " has 120 seconds to post a link or IP.");
+      twitchBot.say(channelMessage, userstate["display-name"] + " ->  " + params[1] + " has 120 seconds to post a link or IP.");
     }
     else if (data.spam.ips.permit === true) {
-      twitchBot.say(channel, userstate["display-name"] + " ->  " + params[1] + " has 120 seconds to post an IP.");
+      twitchBot.say(channelMessage, userstate["display-name"] + " ->  " + params[1] + " has 120 seconds to post an IP.");
     }
     else if (data.spam.links.permit === true) {
-      twitchBot.say(channel, userstate["display-name"] + " ->  " + params[1] + " has 120 seconds to post a link.");
+      twitchBot.say(channelMessage, userstate["display-name"] + " ->  " + params[1] + " has 120 seconds to post a link.");
     }
-    if (!permitted[channel]) {
-      permitted[channel] = {};
+    if (!permitted[channelAction]) {
+      permitted[channelAction] = {};
     }
-    permitted[channel][params[1].toLowerCase()] = Date.now() / 1000;
+    permitted[channelAction][params[1].toLowerCase()] = Date.now() / 1000;
   }
   else {
-    twitchBot.say(channel, userstate["display-name"] + " -> The permit command is not enabled on this channel.");
+    twitchBot.say(channelMessage, userstate["display-name"] + " -> The permit command is not enabled on this channel.");
   }
 }
 
+function addEditor(channelAction, channelMessage, userstate, data, user) {
+  if (data[0].editors.map(function(x) { return x.username; }).indexOf(user.toLowerCase()) > -1) {
+    twitchBot.say(channelMessage, userstate["display-name"] + " -> " + user + " is already an editor.");
+  }
+  else {
+    helpers.twitch_settings.getChannel(user).then(function(userData) {
+      data[0].editors.push({ user: user, username: user.toLowerCase(), icon: userData.logo });
+      db.twitch_settings.update(data[0].user_id, data[0]);
+      twitchBot.say(channelMessage, userstate["display-name"] + " -> " + user + " has been added as an editor.");
+    });
+  }
+}
+
+function removeEditor(channelAction, channelMessage, userstate, data, user) {
+  if (data[0].editors.map(function(x) { return x.username; }).indexOf(user.toLowerCase()) == -1) {
+    twitchBot.say(channelMessage, userstate["display-name"] + " -> " + user + " is not an editor.");
+  }
+  else {
+    helpers.twitch_settings.getChannel(user).then(function(userData) {
+      data[0].editors.splice(data[0].editors.map(function(x) { return x.username; }).indexOf(user.toLowerCase()), 1);
+      db.twitch_settings.update(data[0].user_id, data[0]);
+      twitchBot.say(channelMessage, userstate["display-name"] + " -> " + user + " has been removed as an editor.");
+    });
+  }
+}
+
+function listEditors(channelAction, channelMessage, userstate, data) {
+  var editorObjects = [];
+  for (var i in data[0].editors) {
+    editorObjects.push(data[0].editors[i].user);
+  }
+  var editors = editorObjects.join(", ");
+  twitchBot.say(channelMessage, userstate["display-name"] + " -> The editors of this channel are: " + editors);
+}
+
+function editorUsage(channelAction, channelMessage, userstate, data) {
+  twitchBot.say(channelMessage, userstate["display-name"] + " -> Usage: " + data[0].command_prefix + "editors add|remove|delete|list");
+}
+
+function addRegular(channelAction, channelMessage, userstate, data, user) {
+  if (data[0].regulars.map(function(x) { return x.username; }).indexOf(user.toLowerCase()) > -1) {
+    twitchBot.say(channelMessage, userstate["display-name"] + " -> " + user + " is already a regular.");
+  }
+  else {
+    helpers.twitch_settings.getChannel(user).then(function(userData) {
+      data[0].regulars.push({ user: user, username: user.toLowerCase(), icon: userData.logo });
+      db.twitch_settings.update(data[0].user_id, data[0]);
+      twitchBot.say(channelMessage, userstate["display-name"] + " -> " + user + " has been added as a regular.");
+    });
+  }
+}
+
+function removeRegular(channelAction, channelMessage, userstate, data, user) {
+  if (data[0].regulars.map(function(x) { return x.username; }).indexOf(user.toLowerCase()) == -1) {
+    twitchBot.say(channelMessage, userstate["display-name"] + " -> " + user + " is not a regular.");
+  }
+  else {
+    helpers.twitch_settings.getChannel(user).then(function(userData) {
+      data[0].regulars.splice(data[0].regulars.map(function(x) { return x.username; }).indexOf(user.toLowerCase()), 1);
+      db.twitch_settings.update(data[0].user_id, data[0]);
+      twitchBot.say(channelMessage, userstate["display-name"] + " -> " + user + " has been removed as a regular.");
+    });
+  }
+}
+
+function listRegulars(channelAction, channelMessage, userstate, data) {
+  var regularObjects = [];
+  for (var i in data[0].regulars) {
+    regularObjects.push(data[0].regulars[i].user);
+  }
+  var regulars = regularObjects.join(", ");
+  twitchBot.say(channelMessage, userstate["display-name"] + " -> The regulars of this channel are: " + regulars);
+}
+
+function regularUsage(channelAction, channelMessage, userstate, data) {
+  twitchBot.say(channelMessage, userstate["display-name"] + " -> Usage: " + data[0].command_prefix + "regulars add|remove|delete|list");
+}
+
+function addRestrictedUser(channelAction, channelMessage, userstate, data, user) {
+  if (data[0].restricted.map(function(x) { return x.username; }).indexOf(user.toLowerCase()) > -1) {
+    twitchBot.say(channelMessage, userstate["display-name"] + " -> " + user + " is already a restricted user.");
+  }
+  else {
+    helpers.twitch_settings.getChannel(user).then(function(userData) {
+      data[0].restricted.push({ user: user, username: user.toLowerCase(), icon: userData.logo });
+      db.twitch_settings.update(data[0].user_id, data[0]);
+      twitchBot.say(channelMessage, userstate["display-name"] + " -> " + user + " has been added as a restricted user.");
+    });
+  }
+}
+
+function removeRestrictedUser(channelAction, channelMessage, userstate, data, user) {
+  if (data[0].restricted.map(function(x) { return x.username; }).indexOf(user.toLowerCase()) == -1) {
+    twitchBot.say(channelMessage, userstate["display-name"] + " -> " + user + " is not a restricted user.");
+  }
+  else {
+    helpers.twitch_settings.getChannel(user).then(function(userData) {
+      data[0].restricted.splice(data[0].restricted.map(function(x) { return x.username; }).indexOf(user.toLowerCase()), 1);
+      db.twitch_settings.update(data[0].user_id, data[0]);
+      twitchBot.say(channelMessage, userstate["display-name"] + " -> " + user + " has been removed as a restricted user.");
+    });
+  }
+}
+
+function listRestrictedUsers(channelAction, channelMessage, userstate, data) {
+  var regularObjects = [];
+  for (var i in data[0].restricted) {
+    regularObjects.push(data[0].restricted[i].user);
+  }
+  var restricted = regularObjects.join(", ");
+  twitchBot.say(channelMessage, userstate["display-name"] + " -> The restricted users of this channel are: " + restricted);
+}
+
+function restrictedUserUsage(channelAction, channelMessage, userstate, data) {
+  twitchBot.say(channelMessage, userstate["display-name"] + " -> Usage: " + data[0].command_prefix + "restricted add|remove|delete|list");
+}
 
 module.exports = {
   joinChannel: joinChannel,

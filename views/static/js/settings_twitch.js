@@ -53,6 +53,108 @@ $(document).delegate("#update-api-status", "click", function() {
   });
 });
 
+$(document).delegate("#add-editor", "click", function() {
+  var channel = $(this).data("channel"),
+      user = $("#add-editor-name").val();
+
+  $("#add-editor-name").val("");
+  $("#no-editors").slideUp();
+
+  $.post('/twitch/editors/add/', {
+    channel: channel,
+    user: user
+  }, function(data) {
+    if (data.status == "success") {
+      $("#editors-list").append('<li class="collection-item avatar" id="editor-' + user + '" style="min-height: 64px;"><img src="' + data.icon + '" alt="" class="circle"><p style="margin-top: 10px;">' + user + '</p></li>');
+      Materialize.toast(user + " has been added as an editor.", 4000);
+    }
+    else if (data.status == "exists") {
+      Materialize.toast(user + " is already an editor.", 4000);
+    }
+  });
+});
+
+$(document).delegate("#remove-editor", "click", function() {
+  var channel = $(this).data("channel"),
+      user = $(this).data("user");
+
+  $("#editor-" + user).slideUp();
+
+  $.post('/twitch/editors/remove/', {
+    channel: channel,
+    user: user
+  });
+  Materialize.toast(user + " has been removed as an editor.", 4000);
+});
+
+$(document).delegate("#add-regular", "click", function() {
+  var channel = $(this).data("channel"),
+      user = $("#add-regular-name").val();
+
+  $("#add-regular-name").val("");
+  $("#no-regulars").slideUp();
+
+  $.post('/twitch/regulars/add/', {
+    channel: channel,
+    user: user
+  }, function(data) {
+    if (data.status == "success") {
+      $("#regulars-list").append('<li class="collection-item avatar" id="regular-' + user + '" style="min-height: 64px;"><img src="' + data.icon + '" alt="" class="circle"><p style="margin-top: 10px;">' + user + '</p></li>');
+      Materialize.toast(user + " has been added as a regular.", 4000);
+    }
+    else if (data.status == "exists") {
+      Materialize.toast(user + " is already a regular.", 4000);
+    }
+  });
+});
+
+$(document).delegate("#remove-regular", "click", function() {
+  var channel = $(this).data("channel"),
+      user = $(this).data("user");
+
+  $("#regular-" + user).slideUp();
+
+  $.post('/twitch/regulars/remove/', {
+    channel: channel,
+    user: user
+  });
+  Materialize.toast(user + " has been removed as a regular.", 4000);
+});
+
+$(document).delegate("#add-restricted-user", "click", function() {
+  var channel = $(this).data("channel"),
+      user = $("#add-restricted-user-name").val();
+
+  $("#add-restricted-user-name").val("");
+  $("#no-restricted-users").slideUp();
+
+  $.post('/twitch/restricted_users/add/', {
+    channel: channel,
+    user: user
+  }, function(data) {
+    if (data.status == "success") {
+      $("#restricted-users-list").append('<li class="collection-item avatar" id="restricted-user-' + user + '" style="min-height: 64px;"><img src="' + data.icon + '" alt="" class="circle"><p style="margin-top: 10px;">' + user + '</p></li>');
+      Materialize.toast(user + " has been added as a restricted user.", 4000);
+    }
+    else if (data.status == "exists") {
+      Materialize.toast(user + " is already a restricted user.", 4000);
+    }
+  });
+});
+
+$(document).delegate("#remove-restricted-user", "click", function() {
+  var channel = $(this).data("channel"),
+      user = $(this).data("user");
+
+  $("#restricted-user-" + user).slideUp();
+
+  $.post('/twitch/restricted_users/remove/', {
+    channel: channel,
+    user: user
+  });
+  Materialize.toast(user + " has been removed as a restricted user.", 4000);
+});
+
 $(document).delegate("#actions-protection-toggle", "change", function() {
   var channel = $(this).data("channel"),
       enabled = $("#actions-protection-toggle").prop("checked");

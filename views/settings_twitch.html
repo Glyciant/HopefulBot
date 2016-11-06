@@ -1,6 +1,6 @@
 {% include "./header.html" %}
 
-<div class="row">
+<div class="row" style="margin-bottom: 0;">
   <div class="col m3 l2 white" style="height: calc(100% - 64px); overflow: auto;">
     <div class="collection with-header">
       <h5 class="center">Bot Settings</h5>
@@ -13,7 +13,7 @@
       <a href="." class="collection-item black-text">Custom Commands<i class="material-icons secondary-content black-text">present_to_all</i></a>
       <a href="#modal-editors" class="collection-item black-text modal-trigger">Editors<i class="material-icons secondary-content black-text">present_to_all</i></a>
       <a href="#modal-regulars" class="collection-item black-text modal-trigger">Regulars<i class="material-icons secondary-content black-text">present_to_all</i></a>
-      <a href="#modal-restricted" class="collection-item black-text modal-trigger">Restricted Users<i class="material-icons secondary-content black-text">present_to_all</i></a>
+      <a href="#modal-restricted-users" class="collection-item black-text modal-trigger">Restricted Users<i class="material-icons secondary-content black-text">present_to_all</i></a>
       <a href="#modal-raffle" class="collection-item black-text modal-trigger">Raffle<i class="material-icons secondary-content black-text">present_to_all</i></a>
       <a href="#modal-poll" class="collection-item black-text modal-trigger">Poll<i class="material-icons secondary-content black-text">present_to_all</i></a>
       <a href="#modal-points" class="collection-item black-text modal-trigger">Points<i class="material-icons secondary-content black-text">present_to_all</i></a>
@@ -32,113 +32,111 @@
     </div>
     {% endif %}
   </div>
-  <div class="col m9 l10" style="overflow: auto;">
-    <div class="col s7">
-      <div class="white black-text center row" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
-        <h4>Dashboard: {{api.display_name}}</h4>
-        {% if isAdmin %}
-        <p>You are an admin on this dashboard.</p>
-        {% elseif isOwner %}
-        <p>You are the owner of this dashboard.</p>
-        {% elseif isEditor %}
-        <p>You are an editor of this dashboard.</p>
-        {% elseif isRegular %}
-        <p>You are a regular of this dashboard.</p>
-        {% else %}
-        <p>You are a viewer of this dashboard.</p>
-        {% endif %}
+  <div class="col m6 l7" style="overflow: auto;">
+    <div class="white black-text center row" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
+      <h4>Dashboard: {{api.display_name}}</h4>
+      {% if isAdmin %}
+      <p>You are an admin on this dashboard.</p>
+      {% elseif isOwner %}
+      <p>You are the owner of this dashboard.</p>
+      {% elseif isEditor %}
+      <p>You are an editor of this dashboard.</p>
+      {% elseif isRegular %}
+      <p>You are a regular of this dashboard.</p>
+      {% else %}
+      <p>You are a viewer of this dashboard.</p>
+      {% endif %}
+    </div>
+    <div class="row white black-text center" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
+      <div class="col s12 l3" >
+        <a href="javascript:;" id="bot-join-channel" data-channel="{{api.name}}" class="black-text">
+          <p style="margin-bottom: 0;"><i class="material-icons black-text" style="font-size: 44px;">play_arrow</i></p><br />
+          <p style="margin-top: 0;">Join Channel</p>
+        </a>
       </div>
-      <div class="row white black-text center" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
-        <div class="col s12 l3" >
-          <a href="javascript:;" id="bot-join-channel" data-channel="{{api.name}}" class="black-text">
-            <p style="margin-bottom: 0;"><i class="material-icons black-text" style="font-size: 44px;">play_arrow</i></p><br />
-            <p style="margin-top: 0;">Join Channel</p>
-          </a>
-        </div>
-        <div class="col s12 l3" >
-          <a href="javascript:;" id="bot-part-channel" data-channel="{{api.name}}" class="black-text">
-            <p style="margin-bottom: 0;"><i class="material-icons black-text" style="font-size: 44px;">stop</i></p><br />
-            <p style="margin-top: 0;">Part Channel</p>
-          </a>
-        </div>
-        <div class="col s12 l3" >
-          <a href="javascript:;" id="bot-rejoin-channel" data-channel="{{api.name}}" class="black-text">
-            <p style="margin-bottom: 0;"><i class="material-icons black-text" style="font-size: 44px;">loop</i></p><br />
-            <p style="margin-top: 0;">Rejoin Channel</p>
-          </a>
-        </div>
-        <div class="col s12 l3" >
-          <a href="javascript:;" id="bot-default-settings" data-channel="{{api.name}}" class="black-text">
-            <p style="margin-bottom: 0;"><i class="material-icons black-text" style="font-size: 44px;">repeat</i></p><br />
-            <p style="margin-top: 0;">Reset Bot</p>
-          </a>
-        </div>
+      <div class="col s12 l3" >
+        <a href="javascript:;" id="bot-part-channel" data-channel="{{api.name}}" class="black-text">
+          <p style="margin-bottom: 0;"><i class="material-icons black-text" style="font-size: 44px;">stop</i></p><br />
+          <p style="margin-top: 0;">Part Channel</p>
+        </a>
       </div>
-      <div class="row white black-text center" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
-        <div class="col s12 l6" >
-          <h5>Run Custom Command</h5>
-          <div class="col s8">
-            <select>
-              <option>Choose Command</option>
-            </select>
-          </div>
-          <div class="col s4">
-            <a href="javascript:;" class="btn purple darken-4 white-text">Run</a>
-          </div>
-        </div>
-        <div class="col s12 l6">
-          <h5>Permit User</h5>
-          <div class="col s8">
-            <input placeholder="User" {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %} type="text" id="permit-user-name">
-          </div>
-          <div class="col s4">
-            <a href="javascript:;" class="btn purple darken-4 white-text {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %}" id="permit-user" data-channel="{{api.name}}" data-user="{{twitch}}">Permit</a>
-          </div>
-        </div>
+      <div class="col s12 l3" >
+        <a href="javascript:;" id="bot-rejoin-channel" data-channel="{{api.name}}" class="black-text">
+          <p style="margin-bottom: 0;"><i class="material-icons black-text" style="font-size: 44px;">loop</i></p><br />
+          <p style="margin-top: 0;">Rejoin Channel</p>
+        </a>
       </div>
-      <div class="row">
-        <div class="white black-text center col s12" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
-          <h5>Edit Twitch Settings</h5>
-          <div class="col s12 l6">
-            <input id="api-status-title" {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %} value="{{api.status}}" placeholder="Title" type="text">
-          </div>
-          <div class="col s8 l4">
-            <input id="api-status-game" {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %} value="{{api.game}}" placeholder="Game" type="text">
-          </div>
-          <div class="col s4 l2">
-            <a href="javascript:;" id="update-api-status" data-channel="{{api.name}}" class="btn purple darken-4 white-text {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %}">Update</a>
-          </div>
-        </div>
-      </div>
-      <div class="row white black-text center" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
-        {% if api.partner %}
-        <div class="col s12 l4" >
-          <h5>Latest Viewer:</h5>
-          <p></p>
-        </div>
-        <div class="col s12 l4">
-          <h5>Latest Follower:</h5>
-          <p></p>
-        </div>
-        <div class="col s12 l4">
-          <h5>Latest Subscriber:</h5>
-          <p></p>
-        </div>
-        {% else %}
-        <div class="col s12 l6" >
-          <h5>Latest Viewer:</h5>
-          <p></p>
-        </div>
-        <div class="col s12 l6">
-          <h5>Latest Follower:</h5>
-          <p></p>
-        </div>
-        {% endif %}
+      <div class="col s12 l3" >
+        <a href="javascript:;" id="bot-default-settings" data-channel="{{api.name}}" class="black-text">
+          <p style="margin-bottom: 0;"><i class="material-icons black-text" style="font-size: 44px;">repeat</i></p><br />
+          <p style="margin-top: 0;">Reset Bot</p>
+        </a>
       </div>
     </div>
-    <div class="col s4" style="margin: 5px; height: calc(100% - 74px);">
-      <iframe frameborder="0" scrolling="no" id="twitch-chat-embed" src="http://www.twitch.tv/{{api.name}}/chat" height="100%" width="100%"></iframe>
+    <div class="row white black-text center" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
+      <div class="col s12 l6" >
+        <h5>Run Custom Command</h5>
+        <div class="col s8">
+          <select>
+            <option>Choose Command</option>
+          </select>
+        </div>
+        <div class="col s4">
+          <a href="javascript:;" class="btn purple darken-4 white-text">Run</a>
+        </div>
+      </div>
+      <div class="col s12 l6">
+        <h5>Permit User</h5>
+        <div class="col s8">
+          <input placeholder="User" {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %} type="text" id="permit-user-name">
+        </div>
+        <div class="col s4">
+          <a href="javascript:;" class="btn purple darken-4 white-text {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %}" id="permit-user" data-channel="{{api.name}}" data-user="{{twitch}}">Permit</a>
+        </div>
+      </div>
     </div>
+    <div class="row">
+      <div class="white black-text center col s12" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
+        <h5>Edit Twitch Settings</h5>
+        <div class="col s12 l6">
+          <input id="api-status-title" {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %} value="{{api.status}}" placeholder="Title" type="text">
+        </div>
+        <div class="col s8 l4">
+          <input id="api-status-game" {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %} value="{{api.game}}" placeholder="Game" type="text">
+        </div>
+        <div class="col s4 l2">
+          <a href="javascript:;" id="update-api-status" data-channel="{{api.name}}" class="btn purple darken-4 white-text {% if !isAdmin && !isOwner && !isEditor %} disabled {% endif %}">Update</a>
+        </div>
+      </div>
+    </div>
+    <div class="row white black-text center" style="border-radius:20px; margin-top:15px; padding: 15px; border: 3px solid #ede7f6;">
+      {% if api.partner %}
+      <div class="col s12 l4" >
+        <h5>Latest Viewer:</h5>
+        <p></p>
+      </div>
+      <div class="col s12 l4">
+        <h5>Latest Follower:</h5>
+        <p></p>
+      </div>
+      <div class="col s12 l4">
+        <h5>Latest Subscriber:</h5>
+        <p></p>
+      </div>
+      {% else %}
+      <div class="col s12 l6" >
+        <h5>Latest Viewer:</h5>
+        <p></p>
+      </div>
+      <div class="col s12 l6">
+        <h5>Latest Follower:</h5>
+        <p></p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col m3 l3" style="margin-top: 5px; height: calc(100% - 74px);">
+    <iframe frameborder="0" scrolling="no" id="twitch-chat-embed" src="http://www.twitch.tv/{{api.name}}/chat" height="100%" width="100%"></iframe>
   </div>
 </div>
 
@@ -1525,6 +1523,96 @@
   </div>
   <div class="modal-footer">
     <a href="#modal-spam-protection" id="symbols-protection-update" data-channel="{{api.name}}" class="modal-action modal-trigger modal-close btn-flat">Save</a>
+  </div>
+</div>
+
+<!-- Editors Modal -->
+<div id="modal-editors" class="modal modal-fixed-footer">
+  <div class="modal-content">
+    <h4>Editors</h4>
+    <ul class="collection" id="editors-list">
+      {% if !data.regulars[0] %}
+        <li class="collection-item center" id="no-editors"><i>None Found</i></li>
+      {% endif %}
+      {% for editor in data.editors %}
+        <li class="collection-item avatar" id="editor-{{editor.user}}" style="min-height: 64px;"><img src="{{editor.icon}}" alt="" class="circle"><p style="margin-top: 10px;">{{editor.user}}</p>{% if isAdmin || isOwner %}<a href="javascript:;" id="remove-editor" data-channel="{{api.name}}" data-user="{{editor.user}}"><i class="material-icons secondary-content black-text">delete</i></a>{% endif %}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="modal-footer row">
+    {% if isAdmin || isOwner %}
+      <div class="col s8">
+        <input id="add-editor-name" placeholder="User" type="text" />
+      </div>
+      <div class="col s2">
+        <a href="javascript:;" id="add-editor" class="btn purple darken-4 white-text" data-channel="{{api.name}}" style="margin-top: 20px;">Add</a>
+      </div>
+      <div class="col s2">
+        <a href="javascript:;" class="modal-action modal-close btn-flat" style="margin-top: 20px;">Close</a>
+      </div>
+    {% else %}
+      <a href="javascript:;" class="modal-action modal-close btn-flat" style="margin-top: 20px;">Close</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Regulars Modal -->
+<div id="modal-regulars" class="modal modal-fixed-footer">
+  <div class="modal-content">
+    <h4>Regulars</h4>
+    <ul class="collection" id="regulars-list">
+      {% if !data.regulars[0] %}
+        <li class="collection-item center" id="no-regulars"><i>None Found</i></li>
+      {% endif %}
+      {% for regular in data.regulars %}
+        <li class="collection-item avatar" id="regular-{{regular.user}}" style="min-height: 64px;"><img src="{{regular.icon}}" alt="" class="circle"><p style="margin-top: 10px;">{{regular.user}}</p>{% if isAdmin || isOwner || isEditor %}<a href="javascript:;" id="remove-regular" data-channel="{{api.name}}" data-user="{{regular.user}}"><i class="material-icons secondary-content black-text">delete</i></a>{% endif %}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="modal-footer row">
+    {% if isAdmin || isOwner || isEditor %}
+      <div class="col s8">
+        <input id="add-regular-name" placeholder="User" type="text" />
+      </div>
+      <div class="col s2">
+        <a href="javascript:;" id="add-regular" class="btn purple darken-4 white-text" data-channel="{{api.name}}" style="margin-top: 20px;">Add</a>
+      </div>
+      <div class="col s2">
+        <a href="javascript:;" class="modal-action modal-close btn-flat" style="margin-top: 20px;">Close</a>
+      </div>
+    {% else %}
+      <a href="javascript:;" class="modal-action modal-close btn-flat" style="margin-top: 20px;">Close</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Restricted Users Modal -->
+<div id="modal-restricted-users" class="modal modal-fixed-footer">
+  <div class="modal-content">
+    <h4>Restricted Users</h4>
+    <ul class="collection" id="restricted-users-list">
+      {% if !data.restricted[0] %}
+        <li class="collection-item center" id="no-restricted-users"><i>None Found</i></li>
+      {% endif %}
+      {% for restricted in data.restricted %}
+        <li class="collection-item avatar" id="restricted-user-{{restricted.user}}" style="min-height: 64px;"><img src="{{restricted.icon}}" alt="" class="circle"><p style="margin-top: 10px;">{{restricted.user}}</p>{% if isAdmin || isOwner || isEditor %}<a href="javascript:;" id="remove-restricted-user" data-channel="{{api.name}}" data-user="{{restricted.user}}"><i class="material-icons secondary-content black-text">delete</i></a>{% endif %}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="modal-footer row">
+    {% if isAdmin || isOwner || isEditor %}
+      <div class="col s8">
+        <input id="add-restricted-user-name" placeholder="User" type="text" />
+      </div>
+      <div class="col s2">
+        <a href="javascript:;" id="add-restricted-user" class="btn purple darken-4 white-text" data-channel="{{api.name}}" style="margin-top: 20px;">Add</a>
+      </div>
+      <div class="col s2">
+        <a href="javascript:;" class="modal-action modal-close btn-flat" style="margin-top: 20px;">Close</a>
+      </div>
+    {% else %}
+      <a href="javascript:;" class="modal-action modal-close btn-flat" style="margin-top: 20px;">Close</a>
+    {% endif %}
   </div>
 </div>
 

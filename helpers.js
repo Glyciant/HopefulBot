@@ -370,13 +370,13 @@ var twitch_settings = {
     else if (data.username == user.username) {
       return 300;
     }
-    else if (data.regulars.indexOf(user.username) > -1) {
+    else if (data.editors.map(function(x) { return x.username; }).indexOf(user.username) > -1) {
       return 400;
     }
     else if (user.mod === true) {
       return 500;
     }
-    else if (data.editors.indexOf(user.username) > -1) {
+    else if (data.regulars.map(function(x) { return x.username; }).indexOf(user.username) > -1) {
       return 600;
     }
     else if (user.subscriber === true) {
@@ -385,7 +385,7 @@ var twitch_settings = {
     else if (user.turbo === true) {
       return 750;
     }
-    else if (data.restricted.indexOf(user.username) > -1) {
+    else if (data.restricted.map(function(x) { return x.username; }).indexOf(user.username) > -1) {
       return 900;
     }
     else {
