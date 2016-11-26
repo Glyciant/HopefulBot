@@ -3,7 +3,7 @@ $(document).delegate("#bot-join-channel", "click", function() {
   $.post('/twitch/channel/join/', {
     channel: channel
   });
-  Materialize.toast("Heepsbot has joined the channel.", 4000);
+  Materialize.toast("HopefulBot has joined the channel.", 4000);
 });
 
 $(document).delegate("#bot-part-channel", "click", function() {
@@ -11,7 +11,7 @@ $(document).delegate("#bot-part-channel", "click", function() {
   $.post('/twitch/channel/part/', {
     channel: channel
   });
-  Materialize.toast("Heepsbot has left the channel.", 4000);
+  Materialize.toast("HopefulBot has left the channel.", 4000);
 });
 
 $(document).delegate("#bot-rejoin-channel", "click", function() {
@@ -19,7 +19,7 @@ $(document).delegate("#bot-rejoin-channel", "click", function() {
   $.post('/twitch/channel/rejoin/', {
     channel: channel
   });
-  Materialize.toast("Heepsbot has rejoined the channel.", 4000);
+  Materialize.toast("HopefulBot has rejoined the channel.", 4000);
 });
 
 $(document).delegate("#bot-default-settings", "click", function() {
@@ -65,7 +65,12 @@ $(document).delegate("#add-editor", "click", function() {
     user: user
   }, function(data) {
     if (data.status == "success") {
-      $("#editors-list").append('<li class="collection-item avatar" id="editor-' + user + '" style="min-height: 64px;"><img src="' + data.icon + '" alt="" class="circle"><p style="margin-top: 10px;">' + user + '</p></li>');
+      if (data.icon) {
+        $("#editors-list").append('<li class="collection-item avatar" id="editor-' + user + '" style="min-height: 64px;"><img src="' + data.icon + '" alt="" class="circle"><p style="margin-top: 10px;">' + user + " (" + data.id + ")" + '</p></li>');
+      }
+      else {
+        $("#editors-list").append('<li class="collection-item avatar" id="editor-' + user + '" style="min-height: 64px;"><img src="/img/twitch.png" alt="" class="circle"><p style="margin-top: 10px;">' + user + " (" + data.id + ")" + '</p></li>');
+      }
       Materialize.toast(user + " has been added as an editor.", 4000);
     }
     else if (data.status == "exists") {
@@ -99,7 +104,12 @@ $(document).delegate("#add-regular", "click", function() {
     user: user
   }, function(data) {
     if (data.status == "success") {
-      $("#regulars-list").append('<li class="collection-item avatar" id="regular-' + user + '" style="min-height: 64px;"><img src="' + data.icon + '" alt="" class="circle"><p style="margin-top: 10px;">' + user + '</p></li>');
+      if (data.icon) {
+        $("#regulars-list").append('<li class="collection-item avatar" id="regular-' + user + '" style="min-height: 64px;"><img src="' + data.icon + '" alt="" class="circle"><p style="margin-top: 10px;">' + user + " (" + data.id + ")" + '</p></li>');
+      }
+      else {
+        $("#regulars-list").append('<li class="collection-item avatar" id="regular-' + user + '" style="min-height: 64px;"><img src="/img/twitch.png" alt="" class="circle"><p style="margin-top: 10px;">' + user + " (" + data.id + ")" + '</p></li>');
+      }
       Materialize.toast(user + " has been added as a regular.", 4000);
     }
     else if (data.status == "exists") {
@@ -133,8 +143,12 @@ $(document).delegate("#add-restricted-user", "click", function() {
     user: user
   }, function(data) {
     if (data.status == "success") {
-      $("#restricted-users-list").append('<li class="collection-item avatar" id="restricted-user-' + user + '" style="min-height: 64px;"><img src="' + data.icon + '" alt="" class="circle"><p style="margin-top: 10px;">' + user + '</p></li>');
-      Materialize.toast(user + " has been added as a restricted user.", 4000);
+      if (data.icon) {
+        $("#restriced-users-list").append('<li class="collection-item avatar" id="restriced-user-' + user + '" style="min-height: 64px;"><img src="' + data.icon + '" alt="" class="circle"><p style="margin-top: 10px;">' + user + " (" + data.id + ")" + '</p></li>');
+      }
+      else {
+        $("#restriced-users-list").append('<li class="collection-item avatar" id="restriced-user-' + user + '" style="min-height: 64px;"><img src="/img/twitch.png" alt="" class="circle"><p style="margin-top: 10px;">' + user + " (" + data.id + ")" + '</p></li>');
+      }      Materialize.toast(user + " has been added as a restricted user.", 4000);
     }
     else if (data.status == "exists") {
       Materialize.toast(user + " is already a restricted user.", 4000);

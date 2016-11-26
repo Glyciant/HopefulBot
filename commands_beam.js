@@ -9,13 +9,13 @@ prepareSocket(316990);
 prepareSocket(326666);
 db.beam_settings.getAll().then(function(result) {
   for (var i in result) {
-    prepareSocket(result[i].chat_id);
+    prepareSocket(result[i].id);
   }
 });
 
 function prepareSocket(channelId) {
   beamBot.use('password', {
-      username: 'Heepsbot',
+      username: 'HopefulBot',
       password: config.beam.bot,
   })
   .attempt()

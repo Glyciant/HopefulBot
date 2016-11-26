@@ -37,3 +37,11 @@
 .twitch-body-theme .dropdown-content li>a, .dropdown-content li>span {
 	color: #6441A5;
 }
+
+.neutral-body-theme .tabs .indicator {
+	background-color: #388E3C;
+}
+
+.neutral-body-theme .tabs .tab a {
+	color: #388E3C;
+}

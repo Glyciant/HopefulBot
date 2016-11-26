@@ -15,8 +15,9 @@
       <br />
       <div class="col s12 l4" >
         <img src="/img/twitch.png" style="height: 100px; width: 100px;" />
-        {% if user.twitch %}
+        {% if user.twitch_id %}
         <p style="margin-top: 0;">{{twitch.display_name}}</p>
+        <p style="margin-top: 0;">{{user.twitch_id}}</p>
         {% else %}
         <p style="margin-top: 0;">Not Connected</p>
         {% endif %}
@@ -24,6 +25,7 @@
       <div class="col s12 l4" >
         <img src="/img/discord.png" style="height: 100px; width: 100px;" />
         {% if user.discord_id %}
+        <p style="margin-top: 0;">{{user.discord_name}}</p>
         <p style="margin-top: 0;">{{user.discord_id}}</p>
         {% else %}
         <p style="margin-top: 0;">Not Connected</p>
@@ -31,8 +33,9 @@
       </div>
       <div class="col s12 l4" >
         <img src="/img/beam.png" style="height: 100px; width: 100px;" />
-        {% if user.beam %}
+        {% if user.beam_id %}
         <p style="margin-top: 0;">{{beam.token}}</p>
+        <p style="margin-top: 0;">{{user.beam_id}}</p>
         {% else %}
         <p style="margin-top: 0;">Not Connected</p>
         {% endif %}

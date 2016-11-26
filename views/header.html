@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Heepsbot: {{title}}</title>
+    <title>HopefulBot: {{title}}</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <link rel="shortcut icon" href="/img/icon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css">
@@ -16,7 +16,7 @@
   {% elseif theme == "Beam" %}
   <body class="indigo lighten-4 beam-body-theme">
   {% else %}
-  <body class="grey lighten-4 neutral-body-theme">
+  <body class="green lighten-4 neutral-body-theme">
   {% endif %}
     <div class="nav">
       {% if loggedin %}
@@ -27,9 +27,9 @@
       {% elseif theme == "Beam" %}
       <ul id="dropdown-logout" class="dropdown-content indigo darken-2">
       {% else %}
-      <ul id="dropdown-logout" class="dropdown-content grey darken-2">
+      <ul id="dropdown-logout" class="dropdown-content green darken-2">
       {% endif %}
-        <li><a class="white-text" href="/link/">Link Accounts</a></li>
+        <li><a class="white-text" href="/link/">Accounts</a></li>
         <li><a class="white-text" href="/auth/logout/">Logout</a></li>
       </ul>
       {% endif%}
@@ -40,13 +40,45 @@
       {% elseif theme == "Beam" %}
       <ul id="dropdown-docs" class="dropdown-content indigo darken-2">
       {% else %}
-      <ul id="dropdown-docs" class="dropdown-content grey darken-2">
+      <ul id="dropdown-docs" class="dropdown-content green darken-2">
       {% endif %}
         <li><a class="white-text" href="/docs/web/">Web Panel</a></li>
-        <li><a class="white-text" href="/docs/commands/">Chat Controls</a></li>
+        <li><a class="white-text" href="/docs/chat/">Chat Controls</a></li>
         <li><a class="white-text" href="/docs/userlevels/">User Levels</a></li>
         <li><a class="white-text" href="/docs/variables/">Variables</a></li>
+        <li><a class="white-text" href="/docs/api/">API</a></li>
       </ul>
+      {% if loggedin %}
+      {% if theme == "Twitch" %}
+      <ul id="dropdown-settings" class="dropdown-content deep-purple darken-2">
+      {% elseif theme == "Discord" %}
+      <ul id="dropdown-settings" class="dropdown-content blue darken-2">
+      {% elseif theme == "Beam" %}
+      <ul id="dropdown-settings" class="dropdown-content indigo darken-2">
+      {% else %}
+      <ul id="dropdown-settings" class="dropdown-content green darken-2">
+      {% endif %}
+        <li><a class="white-text" href="/settings/{{loggedin}}/">Global Settings</a></li>
+        <li><a class="white-text" href="/settings/{{loggedin}}/twitch/">Twitch Settings</a></li>
+        <li><a class="white-text" href="/settings/{{loggedin}}/discord/">Discord Settings</a></li>
+        <li><a class="white-text" href="/settings/{{loggedin}}/beam/">Beam Settings</a></li>
+      </ul>
+      {% endif %}
+      {% if loggedin %}
+      {% if theme == "Twitch" %}
+      <ul id="dropdown-logs" class="dropdown-content deep-purple darken-2">
+      {% elseif theme == "Discord" %}
+      <ul id="dropdown-logs" class="dropdown-content blue darken-2">
+      {% elseif theme == "Beam" %}
+      <ul id="dropdown-logs" class="dropdown-content indigo darken-2">
+      {% else %}
+      <ul id="dropdown-logs" class="dropdown-content green darken-2">
+      {% endif %}
+        <li><a class="white-text" href="/logs/{{loggedin}}/twitch/">Twitch Logs</a></li>
+        <li><a class="white-text" href="/logs/{{loggedin}}/discord/">Discord Logs</a></li>
+        <li><a class="white-text" href="/logs/{{loggedin}}/beam/">Beam Logs</a></li>
+      </ul>
+      {% endif %}
       {% if theme == "Twitch" %}
       <nav class="deep-purple darken-2">
       {% elseif theme == "Discord" %}
@@ -54,19 +86,20 @@
       {% elseif theme == "Beam" %}
       <nav class="indigo darken-2">
       {% else %}
-      <nav class="grey darken-2">
+      <nav class="green darken-2">
       {% endif %}
         <div class="nav-wrapper">
           <ul class="center">
             <li><a href="/">Home</a></li>
-            <li><a class="dropdown-button" href="#!" data-activates="dropdown-docs">Documentation</a></li>
+            <li><a class="dropdown-button" href="#!" data-activates="dropdown-docs">Documentation<i class="material-icons right">arrow_drop_down</i></a></li>
             {%if loggedin%}
-            <li><a href="/settings/{{loggedin}}/">Settings</a></li>
-            <li><a href="/logs/{{loggedin}}/">Logs</a></li>
+            <li><a class="dropdown-button" href="#!" data-activates="dropdown-settings">Settings<i class="material-icons right">arrow_drop_down</i></a></li>
+            <li><a class="dropdown-button" href="#!" data-activates="dropdown-logs">Logs<i class="material-icons right">arrow_drop_down</i></a></li>
             {%endif%}
-            <li><a href="https://github.com/Heep123/Heepsbot-V2">GitHub</a></li>
           </ul>
           <ul class="right">
+            <li><a href="https://github.com/Heep123/HopefulBot"><i class="fa fa-github" aria-hidden="true"></i></a></li>
+            <li><a href="https://twitter.com/HopefulBotTV"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
             {%if !loggedin%}
             <li><a href="/signup/">Log In/Sign Up</a></li>
             {%else%}

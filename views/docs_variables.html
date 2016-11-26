@@ -1,3 +1,1222 @@
 {% include "./header.html" %}
 
+<div class="row" style="margin-top:15px;">
+  <div class="col s12">
+    <ul class="tabs" style="overflow:hidden;">
+      <li class="tab col s4"><a href="#twitch">Twitch</a></li>
+      <li class="tab col s4"><a href="#discord">Discord</a></li>
+      <li class="tab col s4"><a href="#beam">Beam</a></li>
+    </ul>
+  </div>
+</div>
+<div class="row">
+  <div id="twitch" class="col s12">
+    <div class="col s10 offset-s1">
+      <table class="bordered highlight">
+        <thead>
+          <th>Format</th>
+          <th>Description</th>
+          <th>Information</th>
+        </thead>
+        <tbody>
+          <tr>
+            <td>$(user)</td>
+            <td>Returns the user who triggered the bot event.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-user-variable">See More</a></td>
+            <div id="modal-user-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(user)</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Subscriber Alerts</li>
+                  <li>Resub Alerts</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo The user who requested this is: $(user).</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: The user who requested this is: TestUser.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(nick)</td>
+            <td>Returns the user who triggered the bot event, but will use a custom nickname if possible.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-nick-variable">See More</a></td>
+            <div id="modal-nick-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(nick)</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Subscriber Alerts</li>
+                  <li>Resub Alerts</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !nickname add TestUser TestingUser</code><br />
+                <code>&lt;HopefulBot&gt;: Nickname for TestUser has been updated to TestingUser.</code><br />
+                <code>&lt;TestEditor&gt;: !command add !demo The user who requested this is: $(nick).</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: The user who requested this is: TestingUser.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(level)</td>
+            <td>Returns the user level of the user who triggered the bot event.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-level-variable">See More</a></td>
+            <div id="modal-level-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(level)</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo The user level of the person who requested this is: $(level).</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: The user level of the person who requested this is: 800.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(channel)</td>
+            <td>Returns the channel the bot event occured in.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-channel-variable">See More</a></td>
+            <div id="modal-channel-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(channel)</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Subscriber Alerts</li>
+                  <li>Resub Alerts</li>
+                  <li>Host Alert</li>
+                  <li>Timers</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo You are currently in $(channel)'s channel.</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: You are currently in TestBroadcaster's channel.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(params(<i>param</i>))</td>
+            <td>Returns the command argument specified by <i>param</i>.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-params-variable">See More</a></td>
+            <div id="modal-params-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(params(<i>param</i>))</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Custom Commands</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo The second argument of that message was: $(params(2)).</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo Lorem ipsum dolor sit amet</code><br />
+                <code>&lt;HopefulBot&gt;: The second argument of that message was: ipsum.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(randInt(<i>min</i>,<i>max</i>))</td>
+            <td>Returns a random number between <i>min</i> and <i>max</i>.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-rantint-variable">See More</a></td>
+            <div id="modal-rantint-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(randInt(<i>min</i>,<i>max</i>))</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Sub Alerts</li>
+                  <li>Resub Alerts</li>
+                  <li>Host Alerts</li>
+                  <li>Timers</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo Random number: $(randInt(1,10)).</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: Random number: 8.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(result)</td>
+            <td>Returns the result of a spam protection action - either <code>Purge</code> or <code>Timeout</code>.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-result-variable">See More</a></td>
+            <div id="modal-result-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(result)</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestUser&gt;: http://twitch.tv</code><br />
+                <code>&lt;HopefulBot&gt;: TestUser -> Please do not post links without a moderator's permission. [Purge]</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(count)</td>
+            <td>Returns the number of times the command or timer has ran.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-count-variable">See More</a></td>
+            <div id="modal-count-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(count)</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Custom Commands</li>
+                  <li>Timers</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo This command has been used $(count) times.</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: This command has been used 1 times.</code><br />
+                <code>&lt;TestUser2&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: This command has been used 2 times.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: This command has been used 3 times.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(randUser)</td>
+            <td>Returns a random user in the chat where the event is triggered.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-randuser-variable">See More</a></td>
+            <div id="modal-randuser-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(randUser)</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Sub Alerts</li>
+                  <li>Timers</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo Everyone say hi to $(randUser)!</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: Everyone say hi to TestEditor!</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(latestSub)</td>
+            <td>Returns the last person to subscribe the to the channel.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-latestsub-variable">See More</a></td>
+            <div id="modal-latestsub-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(latestSub)</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Sub Alerts</li>
+                  <li>Resub Alerts</li>
+                  <li>Timers</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo The latest subscriber on this channel is: $(latestSub).</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: The latest subscriber on this channel is: TestSub.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(latestFollower)</td>
+            <td>Returns the last person to follow the channel.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-latestfollower-variable">See More</a></td>
+            <div id="modal-latestfollower-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(latestFollower)</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Sub Alerts</li>
+                  <li>Resub Alerts</li>
+                  <li>Timers</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo The latest follower on this channel is: $(latestFollower).</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: The latest follower on this channel is: TestFollower.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(viewers)</td>
+            <td>Returns the number of viewers currently watching the stream.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-viewers-variable">See More</a></td>
+            <div id="modal-viewers-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(viewers)</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Sub Alerts</li>
+                  <li>Resub Alerts</li>
+                  <li>Timers</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo Number of viewers currently watching the stream: $(viewers).</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: Number of viewers currently watching the stream: 2.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(chatters)</td>
+            <td>Returns the number of chatters currently in the channel.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-chatters-variable">See More</a></td>
+            <div id="modal-chatters-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(chatters)</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Sub Alerts</li>
+                  <li>Resub Alerts</li>
+                  <li>Timers</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo Number of chatters currently in the channel: $(chatters).</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: Number of chatters currently in the channel: 2.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(followers)</td>
+            <td>Returns the number of users following the channel.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-followers-variable">See More</a></td>
+            <div id="modal-followers-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(followers)</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Sub Alerts</li>
+                  <li>Resub Alerts</li>
+                  <li>Timers</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo Follower Count: $(followers).</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: Follower Count: 8.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(following)</td>
+            <td>Returns the number of users the channel follows.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-following-variable">See More</a></td>
+            <div id="modal-following-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(following)</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Sub Alerts</li>
+                  <li>Resub Alerts</li>
+                  <li>Timers</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo Following Count: $(following).</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: Following Count: 1.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(title)</td>
+            <td>Returns the current title of the channel.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-title-variable">See More</a></td>
+            <div id="modal-title-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(title)</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Sub Alerts</li>
+                  <li>Resub Alerts</li>
+                  <li>Timers</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo Title: $(title).</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: Title: Welcome to TestBroadcaster's Channel.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(directory)</td>
+            <td>Returns the current directory the channel is set to appear in.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-directory-variable">See More</a></td>
+            <div id="modal-directory-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(directory)</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Sub Alerts</li>
+                  <li>Resub Alerts</li>
+                  <li>Timers</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo Currently Playing: $(directory).</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: Currently Playing: Creative.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(uptime)</td>
+            <td>Returns the current uptime of the stream.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-uptime-variable">See More</a></td>
+            <div id="modal-uptime-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(uptime)</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Sub Alerts</li>
+                  <li>Resub Alerts</li>
+                  <li>Timers</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo Stream Uptime: $(uptime).</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: Stream Uptime: 1 day, 23 hours, 53 minutes, 3 seconds.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(countdown(<i>year</i>,<i>month</i>,<i>date</i>,<i>hour</i>,<i>minute</i>,<i>second</i>))</td>
+            <td>Returns a countdown to a given date and time.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-countdown-variable">See More</a></td>
+            <div id="modal-countdown-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(countdown(<i>year</i>,<i>month</i>,<i>date</i>,<i>hour</i>,<i>minute</i>,<i>second</i>))</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Sub Alerts</li>
+                  <li>Resub Alerts</li>
+                  <li>Host Alerts</li>
+                  <li>Timers</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo Countdown to new milenium: $(countdown(2100,1,1,0,0,0)).</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code title="Created on 26/11/16">&lt;HopefulBot&gt;: Countdown to new milenium: 30350 days, 5 hours, 41 minutes, 24 seconds.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(countup(<i>year</i>,<i>month</i>,<i>date</i>,<i>hour</i>,<i>minute</i>,<i>second</i>))</td>
+            <td>Returns a countup from a given date and time.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-countup-variable">See More</a></td>
+            <div id="modal-countup-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(countup(<i>year</i>,<i>month</i>,<i>date</i>,<i>hour</i>,<i>minute</i>,<i>second</i>))</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Sub Alerts</li>
+                  <li>Resub Alerts</li>
+                  <li>Host Alerts</li>
+                  <li>Timers</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo Countup from January 1st 1970: $(countup(1970,1,1,0,0,0)).</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code title="Created on 26/11/16">&lt;HopefulBot&gt;: Countup from January 1st 1970: 17131 days, 18 hours, 45 minutes, 43 seconds.</code><br />
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <td>$(time(<i>timezone</i>))</td>
+            <td>Returns the current time in a given timezone.</td>
+            <td><a class="btn green darken-2 modal-trigger" href="#modal-time-variable">See More</a></td>
+            <div id="modal-time-variable" class="modal">
+              <div class="modal-content">
+                <h4>$(time(<i>timezone</i>))</h4>
+                <hr />
+                <p>Used in:</p>
+                <ul>
+                  <li>Spam Protection</li>
+                  <li>Custom Commands</li>
+                  <li>Sub Alerts</li>
+                  <li>Resub Alerts</li>
+                  <li>Host Alerts</li>
+                  <li>Timers</li>
+                  <li>Auto-Welcome</li>
+                </ul>
+                <hr />
+                <p>Example:</p>
+                <code>&lt;TestEditor&gt;: !command add !demo Current time in New York: $(time(America/New_York)).</code><br />
+                <code>&lt;HopefulBot&gt;: Command !demo has been added.</code><br />
+                <code>&lt;TestUser&gt;: !demo</code><br />
+                <code>&lt;HopefulBot&gt;: Current time in New York: Saturday 26th November 2016, 1:37:16 pm.</code><br />
+                <hr />
+                <p>Timezones:</p>
+                <ul>
+                  <li>Africa/Abidjan</li>
+                  <li>Africa/Accra</li>
+                  <li>Africa/Addis_Ababa</li>
+                  <li>Africa/Algiers</li>
+                  <li>Africa/Asmara</li>
+                  <li>Africa/Asmera</li>
+                  <li>Africa/Bamako</li>
+                  <li>Africa/Bangui</li>
+                  <li>Africa/Banjul</li>
+                  <li>Africa/Bissau</li>
+                  <li>Africa/Blantyre</li>
+                  <li>Africa/Brazzaville</li>
+                  <li>Africa/Bujumbura</li>
+                  <li>Africa/Cairo</li>
+                  <li>Africa/Casablanca</li>
+                  <li>Africa/Ceuta</li>
+                  <li>Africa/Conakry</li>
+                  <li>Africa/Dakar</li>
+                  <li>Africa/Dar_es_Salaam</li>
+                  <li>Africa/Djibouti</li>
+                  <li>Africa/Douala</li>
+                  <li>Africa/El_Aaiun</li>
+                  <li>Africa/Freetown</li>
+                  <li>Africa/Gaborone</li>
+                  <li>Africa/Harare</li>
+                  <li>Africa/Johannesburg</li>
+                  <li>Africa/Juba</li>
+                  <li>Africa/Kampala</li>
+                  <li>Africa/Khartoum</li>
+                  <li>Africa/Kigali</li>
+                  <li>Africa/Kinshasa</li>
+                  <li>Africa/Lagos</li>
+                  <li>Africa/Libreville</li>
+                  <li>Africa/Lome</li>
+                  <li>Africa/Luanda</li>
+                  <li>Africa/Lubumbashi</li>
+                  <li>Africa/Lusaka</li>
+                  <li>Africa/Malabo</li>
+                  <li>Africa/Maputo</li>
+                  <li>Africa/Maseru</li>
+                  <li>Africa/Mbabane</li>
+                  <li>Africa/Mogadishu</li>
+                  <li>Africa/Monrovia</li>
+                  <li>Africa/Nairobi</li>
+                  <li>Africa/Ndjamena</li>
+                  <li>Africa/Niamey</li>
+                  <li>Africa/Nouakchott</li>
+                  <li>Africa/Ouagadougou</li>
+                  <li>Africa/Porto-Novo</li>
+                  <li>Africa/Sao_Tome</li>
+                  <li>Africa/Timbuktu</li>
+                  <li>Africa/Tripoli</li>
+                  <li>Africa/Tunis</li>
+                  <li>Africa/Windhoek</li>
+                  <li>America/Adak</li>
+                  <li>America/Anchorage</li>
+                  <li>America/Anguilla</li>
+                  <li>America/Antigua</li>
+                  <li>America/Araguaina</li>
+                  <li>America/Argentina/Buenos_Aires</li>
+                  <li>America/Argentina/Catamarca</li>
+                  <li>America/Argentina/ComodRivadavia</li>
+                  <li>America/Argentina/Cordoba</li>
+                  <li>America/Argentina/Jujuy</li>
+                  <li>America/Argentina/La_Rioja</li>
+                  <li>America/Argentina/Mendoza</li>
+                  <li>America/Argentina/Rio_Gallegos</li>
+                  <li>America/Argentina/Salta</li>
+                  <li>America/Argentina/San_Juan</li>
+                  <li>America/Argentina/San_Luis</li>
+                  <li>America/Argentina/Tucuman</li>
+                  <li>America/Argentina/Ushuaia</li>
+                  <li>America/Aruba</li>
+                  <li>America/Asuncion</li>
+                  <li>America/Atikokan</li>
+                  <li>America/Atka</li>
+                  <li>America/Bahia</li>
+                  <li>America/Bahia_Banderas</li>
+                  <li>America/Barbados</li>
+                  <li>America/Belem</li>
+                  <li>America/Belize</li>
+                  <li>America/Blanc-Sablon</li>
+                  <li>America/Boa_Vista</li>
+                  <li>America/Bogota</li>
+                  <li>America/Boise</li>
+                  <li>America/Buenos_Aires</li>
+                  <li>America/Cambridge_Bay</li>
+                  <li>America/Campo_Grande</li>
+                  <li>America/Cancun</li>
+                  <li>America/Caracas</li>
+                  <li>America/Catamarca</li>
+                  <li>America/Cayenne</li>
+                  <li>America/Cayman</li>
+                  <li>America/Chicago</li>
+                  <li>America/Chihuahua</li>
+                  <li>America/Coral_Harbour</li>
+                  <li>America/Cordoba</li>
+                  <li>America/Costa_Rica</li>
+                  <li>America/Creston</li>
+                  <li>America/Cuiaba</li>
+                  <li>America/Curacao</li>
+                  <li>America/Danmarkshavn</li>
+                  <li>America/Dawson</li>
+                  <li>America/Dawson_Creek</li>
+                  <li>America/Denver</li>
+                  <li>America/Detroit</li>
+                  <li>America/Dominica</li>
+                  <li>America/Edmonton</li>
+                  <li>America/Eirunepe</li>
+                  <li>America/El_Salvador</li>
+                  <li>America/Ensenada</li>
+                  <li>America/Fort_Nelson</li>
+                  <li>America/Fort_Wayne</li>
+                  <li>America/Fortaleza</li>
+                  <li>America/Glace_Bay</li>
+                  <li>America/Godthab</li>
+                  <li>America/Goose_Bay</li>
+                  <li>America/Grand_Turk</li>
+                  <li>America/Grenada</li>
+                  <li>America/Guadeloupe</li>
+                  <li>America/Guatemala</li>
+                  <li>America/Guayaquil</li>
+                  <li>America/Guyana</li>
+                  <li>America/Halifax</li>
+                  <li>America/Havana</li>
+                  <li>America/Hermosillo</li>
+                  <li>America/Indiana/Indianapolis</li>
+                  <li>America/Indiana/Knox</li>
+                  <li>America/Indiana/Marengo</li>
+                  <li>America/Indiana/Petersburg</li>
+                  <li>America/Indiana/Tell_City</li>
+                  <li>America/Indiana/Vevay</li>
+                  <li>America/Indiana/Vincennes</li>
+                  <li>America/Indiana/Winamac</li>
+                  <li>America/Indianapolis</li>
+                  <li>America/Inuvik</li>
+                  <li>America/Iqaluit</li>
+                  <li>America/Jamaica</li>
+                  <li>America/Jujuy</li>
+                  <li>America/Juneau</li>
+                  <li>America/Kentucky/Louisville</li>
+                  <li>America/Kentucky/Monticello</li>
+                  <li>America/Knox_IN</li>
+                  <li>America/Kralendijk</li>
+                  <li>America/La_Paz</li>
+                  <li>America/Lima</li>
+                  <li>America/Los_Angeles</li>
+                  <li>America/Louisville</li>
+                  <li>America/Lower_Princes</li>
+                  <li>America/Maceio</li>
+                  <li>America/Managua</li>
+                  <li>America/Manaus</li>
+                  <li>America/Marigot</li>
+                  <li>America/Martinique</li>
+                  <li>America/Matamoros</li>
+                  <li>America/Mazatlan</li>
+                  <li>America/Mendoza</li>
+                  <li>America/Menominee</li>
+                  <li>America/Merida</li>
+                  <li>America/Metlakatla</li>
+                  <li>America/Mexico_City</li>
+                  <li>America/Miquelon</li>
+                  <li>America/Moncton</li>
+                  <li>America/Monterrey</li>
+                  <li>America/Montevideo</li>
+                  <li>America/Montreal</li>
+                  <li>America/Montserrat</li>
+                  <li>America/Nassau</li>
+                  <li>America/New_York</li>
+                  <li>America/Nipigon</li>
+                  <li>America/Nome</li>
+                  <li>America/Noronha</li>
+                  <li>America/North_Dakota/Beulah</li>
+                  <li>America/North_Dakota/Center</li>
+                  <li>America/North_Dakota/New_Salem</li>
+                  <li>America/Ojinaga</li>
+                  <li>America/Panama</li>
+                  <li>America/Pangnirtung</li>
+                  <li>America/Paramaribo</li>
+                  <li>America/Phoenix</li>
+                  <li>America/Port-au-Prince</li>
+                  <li>America/Port_of_Spain</li>
+                  <li>America/Porto_Acre</li>
+                  <li>America/Porto_Velho</li>
+                  <li>America/Puerto_Rico</li>
+                  <li>America/Rainy_River</li>
+                  <li>America/Rankin_Inlet</li>
+                  <li>America/Recife</li>
+                  <li>America/Regina</li>
+                  <li>America/Resolute</li>
+                  <li>America/Rio_Branco</li>
+                  <li>America/Rosario</li>
+                  <li>America/Santa_Isabel</li>
+                  <li>America/Santarem</li>
+                  <li>America/Santiago</li>
+                  <li>America/Santo_Domingo</li>
+                  <li>America/Sao_Paulo</li>
+                  <li>America/Scoresbysund</li>
+                  <li>America/Shiprock</li>
+                  <li>America/Sitka</li>
+                  <li>America/St_Barthelemy</li>
+                  <li>America/St_Johns</li>
+                  <li>America/St_Kitts</li>
+                  <li>America/St_Lucia</li>
+                  <li>America/St_Thomas</li>
+                  <li>America/St_Vincent</li>
+                  <li>America/Swift_Current</li>
+                  <li>America/Tegucigalpa</li>
+                  <li>America/Thule</li>
+                  <li>America/Thunder_Bay</li>
+                  <li>America/Tijuana</li>
+                  <li>America/Toronto</li>
+                  <li>America/Tortola</li>
+                  <li>America/Vancouver</li>
+                  <li>America/Virgin</li>
+                  <li>America/Whitehorse</li>
+                  <li>America/Winnipeg</li>
+                  <li>America/Yakutat</li>
+                  <li>America/Yellowknife</li>
+                  <li>Antarctica/Casey</li>
+                  <li>Antarctica/Davis</li>
+                  <li>Antarctica/DumontDUrville</li>
+                  <li>Antarctica/Macquarie</li>
+                  <li>Antarctica/Mawson</li>
+                  <li>Antarctica/McMurdo</li>
+                  <li>Antarctica/Palmer</li>
+                  <li>Antarctica/Rothera</li>
+                  <li>Antarctica/South_Pole</li>
+                  <li>Antarctica/Syowa</li>
+                  <li>Antarctica/Troll</li>
+                  <li>Antarctica/Vostok</li>
+                  <li>Arctic/Longyearbyen</li>
+                  <li>Asia/Aden</li>
+                  <li>Asia/Almaty</li>
+                  <li>Asia/Amman</li>
+                  <li>Asia/Anadyr</li>
+                  <li>Asia/Aqtau</li>
+                  <li>Asia/Aqtobe</li>
+                  <li>Asia/Ashgabat</li>
+                  <li>Asia/Ashkhabad</li>
+                  <li>Asia/Baghdad</li>
+                  <li>Asia/Bahrain</li>
+                  <li>Asia/Baku</li>
+                  <li>Asia/Bangkok</li>
+                  <li>Asia/Barnaul</li>
+                  <li>Asia/Beirut</li>
+                  <li>Asia/Bishkek</li>
+                  <li>Asia/Brunei</li>
+                  <li>Asia/Calcutta</li>
+                  <li>Asia/Chita</li>
+                  <li>Asia/Choibalsan</li>
+                  <li>Asia/Chongqing</li>
+                  <li>Asia/Chungking</li>
+                  <li>Asia/Colombo</li>
+                  <li>Asia/Dacca</li>
+                  <li>Asia/Damascus</li>
+                  <li>Asia/Dhaka</li>
+                  <li>Asia/Dili</li>
+                  <li>Asia/Dubai</li>
+                  <li>Asia/Dushanbe</li>
+                  <li>Asia/Famagusta</li>
+                  <li>Asia/Gaza</li>
+                  <li>Asia/Harbin</li>
+                  <li>Asia/Hebron</li>
+                  <li>Asia/Ho_Chi_Minh</li>
+                  <li>Asia/Hong_Kong</li>
+                  <li>Asia/Hovd</li>
+                  <li>Asia/Irkutsk</li>
+                  <li>Asia/Istanbul</li>
+                  <li>Asia/Jakarta</li>
+                  <li>Asia/Jayapura</li>
+                  <li>Asia/Jerusalem</li>
+                  <li>Asia/Kabul</li>
+                  <li>Asia/Kamchatka</li>
+                  <li>Asia/Karachi</li>
+                  <li>Asia/Kashgar</li>
+                  <li>Asia/Kathmandu</li>
+                  <li>Asia/Katmandu</li>
+                  <li>Asia/Khandyga</li>
+                  <li>Asia/Kolkata</li>
+                  <li>Asia/Krasnoyarsk</li>
+                  <li>Asia/Kuala_Lumpur</li>
+                  <li>Asia/Kuching</li>
+                  <li>Asia/Kuwait</li>
+                  <li>Asia/Macao</li>
+                  <li>Asia/Macau</li>
+                  <li>Asia/Magadan</li>
+                  <li>Asia/Makassar</li>
+                  <li>Asia/Manila</li>
+                  <li>Asia/Muscat</li>
+                  <li>Asia/Nicosia</li>
+                  <li>Asia/Novokuznetsk</li>
+                  <li>Asia/Novosibirsk</li>
+                  <li>Asia/Omsk</li>
+                  <li>Asia/Oral</li>
+                  <li>Asia/Phnom_Penh</li>
+                  <li>Asia/Pontianak</li>
+                  <li>Asia/Pyongyang</li>
+                  <li>Asia/Qatar</li>
+                  <li>Asia/Qyzylorda</li>
+                  <li>Asia/Rangoon</li>
+                  <li>Asia/Riyadh</li>
+                  <li>Asia/Saigon</li>
+                  <li>Asia/Sakhalin</li>
+                  <li>Asia/Samarkand</li>
+                  <li>Asia/Seoul</li>
+                  <li>Asia/Shanghai</li>
+                  <li>Asia/Singapore</li>
+                  <li>Asia/Srednekolymsk</li>
+                  <li>Asia/Taipei</li>
+                  <li>Asia/Tashkent</li>
+                  <li>Asia/Tbilisi</li>
+                  <li>Asia/Tehran</li>
+                  <li>Asia/Tel_Aviv</li>
+                  <li>Asia/Thimbu</li>
+                  <li>Asia/Thimphu</li>
+                  <li>Asia/Tokyo</li>
+                  <li>Asia/Tomsk</li>
+                  <li>Asia/Ujung_Pandang</li>
+                  <li>Asia/Ulaanbaatar</li>
+                  <li>Asia/Ulan_Bator</li>
+                  <li>Asia/Urumqi</li>
+                  <li>Asia/Ust-Nera</li>
+                  <li>Asia/Vientiane</li>
+                  <li>Asia/Vladivostok</li>
+                  <li>Asia/Yakutsk</li>
+                  <li>Asia/Yangon</li>
+                  <li>Asia/Yekaterinburg</li>
+                  <li>Asia/Yerevan</li>
+                  <li>Atlantic/Azores</li>
+                  <li>Atlantic/Bermuda</li>
+                  <li>Atlantic/Canary</li>
+                  <li>Atlantic/Cape_Verde</li>
+                  <li>Atlantic/Faeroe</li>
+                  <li>Atlantic/Faroe</li>
+                  <li>Atlantic/Jan_Mayen</li>
+                  <li>Atlantic/Madeira</li>
+                  <li>Atlantic/Reykjavik</li>
+                  <li>Atlantic/South_Georgia</li>
+                  <li>Atlantic/St_Helena</li>
+                  <li>Atlantic/Stanley</li>
+                  <li>Australia/ACT</li>
+                  <li>Australia/Adelaide</li>
+                  <li>Australia/Brisbane</li>
+                  <li>Australia/Broken_Hill</li>
+                  <li>Australia/Canberra</li>
+                  <li>Australia/Currie</li>
+                  <li>Australia/Darwin</li>
+                  <li>Australia/Eucla</li>
+                  <li>Australia/Hobart</li>
+                  <li>Australia/LHI</li>
+                  <li>Australia/Lindeman</li>
+                  <li>Australia/Lord_Howe</li>
+                  <li>Australia/Melbourne</li>
+                  <li>Australia/NSW</li>
+                  <li>Australia/North</li>
+                  <li>Australia/Perth</li>
+                  <li>Australia/Queensland</li>
+                  <li>Australia/South</li>
+                  <li>Australia/Sydney</li>
+                  <li>Australia/Tasmania</li>
+                  <li>Australia/Victoria</li>
+                  <li>Australia/West</li>
+                  <li>Australia/Yancowinna</li>
+                  <li>Brazil/Acre</li>
+                  <li>Brazil/DeNoronha</li>
+                  <li>Brazil/East</li>
+                  <li>Brazil/West</li>
+                  <li>CET</li>
+                  <li>CST6CDT</li>
+                  <li>Canada/Atlantic</li>
+                  <li>Canada/Central</li>
+                  <li>Canada/East-Saskatchewan</li>
+                  <li>Canada/Eastern</li>
+                  <li>Canada/Mountain</li>
+                  <li>Canada/Newfoundland</li>
+                  <li>Canada/Pacific</li>
+                  <li>Canada/Saskatchewan</li>
+                  <li>Canada/Yukon</li>
+                  <li>Chile/Continental</li>
+                  <li>Chile/EasterIsland</li>
+                  <li>Cuba</li>
+                  <li>EET</li>
+                  <li>EST</li>
+                  <li>EST5EDT</li>
+                  <li>Egypt</li>
+                  <li>Eire</li>
+                  <li>Etc/GMT</li>
+                  <li>Etc/GMT+0</li>
+                  <li>Etc/GMT+1</li>
+                  <li>Etc/GMT+10</li>
+                  <li>Etc/GMT+11</li>
+                  <li>Etc/GMT+12</li>
+                  <li>Etc/GMT+2</li>
+                  <li>Etc/GMT+3</li>
+                  <li>Etc/GMT+4</li>
+                  <li>Etc/GMT+5</li>
+                  <li>Etc/GMT+6</li>
+                  <li>Etc/GMT+7</li>
+                  <li>Etc/GMT+8</li>
+                  <li>Etc/GMT+9</li>
+                  <li>Etc/GMT-0</li>
+                  <li>Etc/GMT-1</li>
+                  <li>Etc/GMT-10</li>
+                  <li>Etc/GMT-11</li>
+                  <li>Etc/GMT-12</li>
+                  <li>Etc/GMT-13</li>
+                  <li>Etc/GMT-14</li>
+                  <li>Etc/GMT-2</li>
+                  <li>Etc/GMT-3</li>
+                  <li>Etc/GMT-4</li>
+                  <li>Etc/GMT-5</li>
+                  <li>Etc/GMT-6</li>
+                  <li>Etc/GMT-7</li>
+                  <li>Etc/GMT-8</li>
+                  <li>Etc/GMT-9</li>
+                  <li>Etc/GMT0</li>
+                  <li>Etc/Greenwich</li>
+                  <li>Etc/UCT</li>
+                  <li>Etc/UTC</li>
+                  <li>Etc/Universal</li>
+                  <li>Etc/Zulu</li>
+                  <li>Europe/Amsterdam</li>
+                  <li>Europe/Andorra</li>
+                  <li>Europe/Astrakhan</li>
+                  <li>Europe/Athens</li>
+                  <li>Europe/Belfast</li>
+                  <li>Europe/Belgrade</li>
+                  <li>Europe/Berlin</li>
+                  <li>Europe/Bratislava</li>
+                  <li>Europe/Brussels</li>
+                  <li>Europe/Bucharest</li>
+                  <li>Europe/Budapest</li>
+                  <li>Europe/Busingen</li>
+                  <li>Europe/Chisinau</li>
+                  <li>Europe/Copenhagen</li>
+                  <li>Europe/Dublin</li>
+                  <li>Europe/Gibraltar</li>
+                  <li>Europe/Guernsey</li>
+                  <li>Europe/Helsinki</li>
+                  <li>Europe/Isle_of_Man</li>
+                  <li>Europe/Istanbul</li>
+                  <li>Europe/Jersey</li>
+                  <li>Europe/Kaliningrad</li>
+                  <li>Europe/Kiev</li>
+                  <li>Europe/Kirov</li>
+                  <li>Europe/Lisbon</li>
+                  <li>Europe/Ljubljana</li>
+                  <li>Europe/London</li>
+                  <li>Europe/Luxembourg</li>
+                  <li>Europe/Madrid</li>
+                  <li>Europe/Malta</li>
+                  <li>Europe/Mariehamn</li>
+                  <li>Europe/Minsk</li>
+                  <li>Europe/Monaco</li>
+                  <li>Europe/Moscow</li>
+                  <li>Europe/Nicosia</li>
+                  <li>Europe/Oslo</li>
+                  <li>Europe/Paris</li>
+                  <li>Europe/Podgorica</li>
+                  <li>Europe/Prague</li>
+                  <li>Europe/Riga</li>
+                  <li>Europe/Rome</li>
+                  <li>Europe/Samara</li>
+                  <li>Europe/San_Marino</li>
+                  <li>Europe/Sarajevo</li>
+                  <li>Europe/Simferopol</li>
+                  <li>Europe/Skopje</li>
+                  <li>Europe/Sofia</li>
+                  <li>Europe/Stockholm</li>
+                  <li>Europe/Tallinn</li>
+                  <li>Europe/Tirane</li>
+                  <li>Europe/Tiraspol</li>
+                  <li>Europe/Ulyanovsk</li>
+                  <li>Europe/Uzhgorod</li>
+                  <li>Europe/Vaduz</li>
+                  <li>Europe/Vatican</li>
+                  <li>Europe/Vienna</li>
+                  <li>Europe/Vilnius</li>
+                  <li>Europe/Volgograd</li>
+                  <li>Europe/Warsaw</li>
+                  <li>Europe/Zagreb</li>
+                  <li>Europe/Zaporozhye</li>
+                  <li>Europe/Zurich</li>
+                  <li>GB</li>
+                  <li>GB-Eire</li>
+                  <li>GMT</li>
+                  <li>GMT+0</li>
+                  <li>GMT-0</li>
+                  <li>GMT0</li>
+                  <li>Greenwich</li>
+                  <li>HST</li>
+                  <li>Hongkong</li>
+                  <li>Iceland</li>
+                  <li>Indian/Antananarivo</li>
+                  <li>Indian/Chagos</li>
+                  <li>Indian/Christmas</li>
+                  <li>Indian/Cocos</li>
+                  <li>Indian/Comoro</li>
+                  <li>Indian/Kerguelen</li>
+                  <li>Indian/Mahe</li>
+                  <li>Indian/Maldives</li>
+                  <li>Indian/Mauritius</li>
+                  <li>Indian/Mayotte</li>
+                  <li>Indian/Reunion</li>
+                  <li>Iran</li>
+                  <li>Israel</li>
+                  <li>Jamaica</li>
+                  <li>Japan</li>
+                  <li>Kwajalein</li>
+                  <li>Libya</li>
+                  <li>MET</li>
+                  <li>MST</li>
+                  <li>MST7MDT</li>
+                  <li>Mexico/BajaNorte</li>
+                  <li>Mexico/BajaSur</li>
+                  <li>Mexico/General</li>
+                  <li>NZ</li>
+                  <li>NZ-CHAT</li>
+                  <li>Navajo</li>
+                  <li>PRC</li>
+                  <li>PST8PDT</li>
+                  <li>Pacific/Apia</li>
+                  <li>Pacific/Auckland</li>
+                  <li>Pacific/Bougainville</li>
+                  <li>Pacific/Chatham</li>
+                  <li>Pacific/Chuuk</li>
+                  <li>Pacific/Easter</li>
+                  <li>Pacific/Efate</li>
+                  <li>Pacific/Enderbury</li>
+                  <li>Pacific/Fakaofo</li>
+                  <li>Pacific/Fiji</li>
+                  <li>Pacific/Funafuti</li>
+                  <li>Pacific/Galapagos</li>
+                  <li>Pacific/Gambier</li>
+                  <li>Pacific/Guadalcanal</li>
+                  <li>Pacific/Guam</li>
+                  <li>Pacific/Honolulu</li>
+                  <li>Pacific/Johnston</li>
+                  <li>Pacific/Kiritimati</li>
+                  <li>Pacific/Kosrae</li>
+                  <li>Pacific/Kwajalein</li>
+                  <li>Pacific/Majuro</li>
+                  <li>Pacific/Marquesas</li>
+                  <li>Pacific/Midway</li>
+                  <li>Pacific/Nauru</li>
+                  <li>Pacific/Niue</li>
+                  <li>Pacific/Norfolk</li>
+                  <li>Pacific/Noumea</li>
+                  <li>Pacific/Pago_Pago</li>
+                  <li>Pacific/Palau</li>
+                  <li>Pacific/Pitcairn</li>
+                  <li>Pacific/Pohnpei</li>
+                  <li>Pacific/Ponape</li>
+                  <li>Pacific/Port_Moresby</li>
+                  <li>Pacific/Rarotonga</li>
+                  <li>Pacific/Saipan</li>
+                  <li>Pacific/Samoa</li>
+                  <li>Pacific/Tahiti</li>
+                  <li>Pacific/Tarawa</li>
+                  <li>Pacific/Tongatapu</li>
+                  <li>Pacific/Truk</li>
+                  <li>Pacific/Wake</li>
+                  <li>Pacific/Wallis</li>
+                  <li>Pacific/Yap</li>
+                  <li>Poland</li>
+                  <li>Portugal</li>
+                  <li>ROC</li>
+                  <li>ROK</li>
+                  <li>Singapore</li>
+                  <li>Turkey</li>
+                  <li>UCT</li>
+                  <li>US/Alaska</li>
+                  <li>US/Aleutian</li>
+                  <li>US/Arizona</li>
+                  <li>US/Central</li>
+                  <li>US/East-Indiana</li>
+                  <li>US/Eastern</li>
+                  <li>US/Hawaii</li>
+                  <li>US/Indiana-Starke</li>
+                  <li>US/Michigan</li>
+                  <li>US/Mountain</li>
+                  <li>US/Pacific</li>
+                  <li>US/Pacific-New</li>
+                  <li>US/Samoa</li>
+                  <li>UTC</li>
+                  <li>Universal</li>
+                  <li>W-SU</li>
+                  <li>WET</li>
+                  <li>Zulu</li>
+                </ul>
+              </div>
+              <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close btn-flat">Close</a>
+              </div>
+            </div>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div id="discord" class="col s12">Discord</div>
+  <div id="beam" class="col s12">Beam</div>
+</div>
+
 {% include "./footer.html" %}

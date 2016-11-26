@@ -1,5 +1,5 @@
 {
-  "name": "Heepsbot",
+  "name": "HopefulBot",
   "version": "0.1.0",
   "description": "A chat bot for Twitch made by Heep.",
   "main": "app.js",
@@ -11,6 +11,7 @@
     "discord.js": "^9.3.1",
     "express": "^4.13.3",
     "express-session": "^1.11.3",
+    "moment-timezone": "^0.5.9",
     "mongodb": "^2.2.11",
     "needle": "^1.1.2",
     "nodemon": "^1.11.0",

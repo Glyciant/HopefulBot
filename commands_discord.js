@@ -18,6 +18,11 @@ var botServers = function() {
   return discordBot.guilds.array();
 };
 
+var leaveServer = function(server) {
+  server.leave();
+};
+
 module.exports = {
-  botServers: botServers
+  botServers: botServers,
+  leaveServer: leaveServer
 };

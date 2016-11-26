@@ -1,7 +1,7 @@
 {% include "./header.html" %}
 
 <div class="container">
-  <div class="row">
+  <div class="row" style="margin-bottom: 10px;">
     <div class="col s12 m6 l4">
       <ul class="collection with-header">
         <li class="collection-header center"><h4>Twitch</h4></li>
@@ -57,9 +57,9 @@
   </div>
   <div class="row center">
     <div class="col s12 m6 l4">
-      {% if twitch %}
-      <a class="btn-large purple darken-4 white-text" style="width: 100%; cursor: default;">Twitch: {{twitch}}</a>
-      {% if discord || beam %}
+      {% if twitch_display_name %}
+      <a class="btn-large purple darken-4 white-text" style="width: 100%; cursor: default;">Twitch: {{twitch_display_name}}</a>
+      {% if discord_display_name || beam_display_name %}
       <a href="javascript:;" id="unlink-twitch" class="btn purple darken-4 white-text" style="margin-top: 2px;" data-id="{{loggedin}}">Unlink</a>
       {% endif %}
       {% else %}
@@ -67,9 +67,9 @@
       {% endif %}
     </div>
     <div class="col s12 m6 l4">
-      {% if discord %}
-      <a class="btn-large blue darken-4 white-text" style="width: 100%; cursor: default;">Discord: {{discord}}</a>
-      {% if twitch || beam %}
+      {% if discord_display_name %}
+      <a class="btn-large blue darken-4 white-text" style="width: 100%; cursor: default;">Discord: {{discord_display_name}}</a>
+      {% if twitch_display_name || beam_display_name %}
       <a href="javascript:;" id="unlink-discord" class="btn blue darken-4 white-text" style="margin-top: 2px;" data-id="{{loggedin}}">Unlink</a>
       {% endif %}
       {% else %}
@@ -77,9 +77,9 @@
       {% endif %}
     </div>
     <div class="col s12 m6 offset-m3 l4">
-      {% if beam %}
-      <a class="btn-large indigo darken-4 white-text" style="width: 100%; cursor: default;">Beam: {{beam}}</a>
-      {% if twitch || discord %}
+      {% if beam_display_name %}
+      <a class="btn-large indigo darken-4 white-text" style="width: 100%; cursor: default;">Beam: {{beam_display_name}}</a>
+      {% if twitch_display_name || discord_display_name %}
       <a href="javascript:;" id="unlink-beam" class="btn indigo darken-4 white-text" style="margin-top: 2px;" data-id="{{loggedin}}">Unlink</a>
       {% endif %}
       {% else %}
@@ -87,7 +87,7 @@
       {% endif %}
     </div>
   </div>
+  <script src="/js/link.js"></script>
 </div>
-<script src="/js/link.js"></script>
 
 {% include "./footer.html" %}
